@@ -1,12 +1,12 @@
-{
-  "latestVersion": "1.1.0",
-  "releaseDate": "2026-07-20",
-  "changelog": [
-    "Добавлена поддержка Revit 2026",
-    "Исправлены ошибки в автомарках"
-  ],
-  "packages": {
-    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v1.1.0/bimboclub_net48.zip",
-    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v1.1.0/bimboclub_net8.zip"
-  }
+﻿{
+    "latestVersion":  "1.1.2",
+    "releaseDate":  "2026-07-20",
+    "changelog":  [
+                      "Тестовое обновление автовыпуска через консоль",
+                      "Исправлены синтаксические ошибки компилятора в SAVDecompiled"
+                  ],
+    "packages":  {
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.1.2/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.1.2/bimboclub_net8.zip"
+                 }
 }
