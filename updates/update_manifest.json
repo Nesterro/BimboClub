@@ -1,13 +1,12 @@
 ﻿{
-    "latestVersion":  "1.2.0",
+    "latestVersion":  "1.2.1",
     "releaseDate":  "2026-07-30",
     "changelog":  [
-                      "Добавлен автономный модуль Редактор правил с фирменным интерфейсом BimboClub (WPF)",
-                      "Поддержка считывания исходных XML-файлов правил LTools",
-                      "Кросс-платформенная сборка для Revit 2021-2026 (.NET 4.8 / .NET 8.0)"
+                      "Исправлено отображение выпадающих списков ComboBox (белый текст на темном фоне)",
+                      "Улучшен визуальный стиль списков и элементов выбора условных выражений"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.2.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.2.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.2.1/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.2.1/bimboclub_net8.zip"
                  }
 }
