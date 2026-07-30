@@ -375,8 +375,28 @@ namespace BimboClub
 				Logger.LogError("Не удалось создать выпадающий список 'Сети MEP'", ex);
 			}
 
-			PushButtonData pushButtonDataHeatLoss = new PushButtonData("cmdHeatLossPrep", "Расчет теплопотерь", text4, "BimboClub.HeatLoss.HeatLossPrepCommand");
+			PushButtonData pushButtonDataHeatLoss = new PushButtonData("cmdHeatLossPrep", "Расчет\nтеплопотерь", text4, "BimboClub.HeatLoss.HeatLossPrepCommand");
 			pushButtonDataHeatLoss.ToolTip = "Автоматизированная подготовка данных и расчет ограждающих конструкций (кубики-маркеры) для теплопотерь.";
+			BitmapSource iconHeat = this.LoadImage(Path.Combine(text, "icon_param.png"));
+			if (iconHeat != null)
+			{
+				pushButtonDataHeatLoss.LargeImage = iconHeat;
+			}
+			BitmapSource iconHeat16 = this.LoadImage(Path.Combine(text, "icon_param_16.png"));
+			if (iconHeat16 != null)
+			{
+				pushButtonDataHeatLoss.Image = iconHeat16;
+			}
+
+			// 1. Отдельная крупная кнопка "Расчет теплопотерь" на ленте BimboClub
+			try
+			{
+				ribbonPanel.AddItem(pushButtonDataHeatLoss);
+			}
+			catch (Exception ex)
+			{
+				Logger.LogError("Не удалось добавить кнопку 'Расчет теплопотерь' на ленту", ex);
+			}
 
 			// --- Pulldown: Параметры ---
 			try
