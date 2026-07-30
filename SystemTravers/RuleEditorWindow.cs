@@ -59,6 +59,8 @@ namespace BimboClub.RuleEditor
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
 
+            UiThemeHelper.ApplyDarkTheme(this);
+
             LoadAvailableParameters();
 
             // Загрузка или создание набора правил

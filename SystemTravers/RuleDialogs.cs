@@ -29,6 +29,8 @@ namespace BimboClub.RuleEditor
             ResizeMode = ResizeMode.NoResize;
             ShowInTaskbar = false;
 
+            UiThemeHelper.ApplyDarkTheme(this);
+
             Grid grid = new Grid { Margin = new Thickness(15) };
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Search
             grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // List
@@ -157,6 +159,8 @@ namespace BimboClub.RuleEditor
             FontSize = 13;
             ResizeMode = ResizeMode.NoResize;
             ShowInTaskbar = false;
+
+            UiThemeHelper.ApplyDarkTheme(this);
 
             StackPanel mainPanel = new StackPanel { Margin = new Thickness(20) };
 
@@ -319,6 +323,8 @@ namespace BimboClub.RuleEditor
             FontSize = 13;
             ResizeMode = ResizeMode.NoResize;
             ShowInTaskbar = false;
+
+            UiThemeHelper.ApplyDarkTheme(this);
 
             StackPanel mainPanel = new StackPanel { Margin = new Thickness(20) };
 
