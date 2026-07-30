@@ -65,6 +65,57 @@ namespace BimboClub
 
             // Global ComboBox Style
             window.Resources[typeof(ComboBox)] = CreateDarkComboBoxStyle(darkBg, popupBg, borderBrush, accentRed);
+
+            // Global TabItem Style (Scarlet Red contrast theme)
+            window.Resources[typeof(TabItem)] = CreateScarletTabItemStyle();
+        }
+
+        public static Style CreateScarletTabItemStyle()
+        {
+            Style style = new Style(typeof(TabItem));
+            SolidColorBrush unselectedBg = new SolidColorBrush(Color.FromRgb(40, 40, 48));
+            SolidColorBrush selectedBg = new SolidColorBrush(Color.FromRgb(179, 14, 45));   // Scarlet Red #B30E2D
+            SolidColorBrush hoverBg = new SolidColorBrush(Color.FromRgb(199, 16, 50));      // Bright Scarlet Red #C71032
+
+            style.Setters.Add(new Setter(TabItem.BackgroundProperty, unselectedBg));
+            style.Setters.Add(new Setter(TabItem.ForegroundProperty, Brushes.White));
+            style.Setters.Add(new Setter(TabItem.PaddingProperty, new Thickness(16, 8, 16, 8)));
+            style.Setters.Add(new Setter(TabItem.MarginProperty, new Thickness(0, 0, 4, 0)));
+            style.Setters.Add(new Setter(TabItem.FontWeightProperty, FontWeights.Medium));
+
+            ControlTemplate template = new ControlTemplate(typeof(TabItem));
+            FrameworkElementFactory border = new FrameworkElementFactory(typeof(Border));
+            border.Name = "Bd";
+            border.SetValue(Border.BackgroundProperty, new Binding("Background") { RelativeSource = RelativeSource.TemplatedParent });
+            border.SetValue(Border.BorderBrushProperty, new Binding("BorderBrush") { RelativeSource = RelativeSource.TemplatedParent });
+            border.SetValue(Border.BorderThicknessProperty, new Thickness(0));
+            border.SetValue(Border.CornerRadiusProperty, new CornerRadius(4, 4, 0, 0));
+            border.SetValue(Border.PaddingProperty, new Binding("Padding") { RelativeSource = RelativeSource.TemplatedParent });
+
+            FrameworkElementFactory contentPresenter = new FrameworkElementFactory(typeof(ContentPresenter));
+            contentPresenter.SetValue(ContentPresenter.ContentSourceProperty, "Header");
+            contentPresenter.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
+            contentPresenter.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
+            border.AppendChild(contentPresenter);
+            template.VisualTree = border;
+
+            // Trigger for IsSelected = true
+            Trigger selectedTrigger = new Trigger { Property = TabItem.IsSelectedProperty, Value = true };
+            selectedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, selectedBg, "Bd"));
+            selectedTrigger.Setters.Add(new Setter(TabItem.ForegroundProperty, Brushes.White));
+            selectedTrigger.Setters.Add(new Setter(TabItem.FontWeightProperty, FontWeights.Bold));
+            template.Triggers.Add(selectedTrigger);
+
+            // Trigger for IsMouseOver = true (when not selected)
+            MultiTrigger hoverTrigger = new MultiTrigger();
+            hoverTrigger.Conditions.Add(new Condition(TabItem.IsMouseOverProperty, true));
+            hoverTrigger.Conditions.Add(new Condition(TabItem.IsSelectedProperty, false));
+            hoverTrigger.Setters.Add(new Setter(Border.BackgroundProperty, hoverBg, "Bd"));
+            hoverTrigger.Setters.Add(new Setter(TabItem.ForegroundProperty, Brushes.White));
+            template.Triggers.Add(hoverTrigger);
+
+            style.Setters.Add(new Setter(TabItem.TemplateProperty, template));
+            return style;
         }
 
         public static Style CreateDarkComboBoxStyle(SolidColorBrush bg, SolidColorBrush popupBg, SolidColorBrush borderBrush, SolidColorBrush accentRed)
