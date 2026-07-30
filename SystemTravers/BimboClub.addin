@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>BimboClub Tools</Name>
+    <Assembly>BimboClub.dll</Assembly>
+    <AddInId>B13B0C1B-C10B-4DDE-A3C9-968B750A8610</AddInId>
+    <FullClassName>BimboClub.App</FullClassName>
+    <VendorId>BMBC</VendorId>
+    <VendorDescription>BimboClub</VendorDescription>
+  </AddIn>
+</RevitAddIns>

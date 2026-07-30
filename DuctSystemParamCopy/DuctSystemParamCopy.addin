@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>DuctSystemParamCopy</Name>
+    <Assembly>DuctSystemParamCopy\DuctSystemParamCopy.dll</Assembly>
+    <AddInId>D3F7C9A1-4B2E-4F88-9C7D-1A2B3C4D5E6F</AddInId>
+    <FullClassName>DuctSystemParamCopy.App</FullClassName>
+    <VendorId>CUSTOM</VendorId>
+    <VendorDescription>Custom MEP Tools</VendorDescription>
+  </AddIn>
+</RevitAddIns>
