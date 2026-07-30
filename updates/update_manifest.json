@@ -1,16 +1,13 @@
 ﻿{
-    "latestVersion":  "1.3.0",
+    "latestVersion":  "1.3.2",
     "releaseDate":  "2026-07-30",
     "changelog":  [
-                      "Добавлен новый модуль Подготовка данных для расчета теплопотерь",
-                      "Автоматическое создание Пространств (Spaces) по Помещениям (Rooms)",
-                      "Анализ ограждающих конструкций (BoundarySegment) и расчет площадей",
-                      "Точный расчет компасного азимута ориентации стен, дверей и окон",
-                      "Автоматическое размещение кубиков-маркеров HeatLoss_Cube с записью параметров",
-                      "Генерация спецификации Теплопотери - Ограждающие конструкции"
+                      "Исправлена ошибка Revit API: The symbol is not active",
+                      "Добавлена автоактивация всех типоразмеров семейства HeatLoss_Cube перед созданием элементов",
+                      "Обновлено локальное развертывание плагина"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.3.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.3.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.3.2/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.3.2/bimboclub_net8.zip"
                  }
 }
