@@ -17,6 +17,13 @@ namespace BimboClub.PipeClamps
         public string DisplayName => $"Ø{Math.Round(DiameterMm, 0)} мм ({PipeCount} шт.)";
     }
 
+    public class PipeClampsPlacementOptions
+    {
+        public bool CopyRiserParameter { get; set; } = true;
+        public string SourceParamName { get; set; } = "ADSK_Номер стояка";
+        public string TargetParamName { get; set; } = "ADSK_Номер стояка";
+    }
+
     public class PipeClampsResult
     {
         public int ClampsPlaced { get; set; }
@@ -77,7 +84,7 @@ namespace BimboClub.PipeClamps
                 .ToList();
         }
 
-        public static PipeClampsResult RunPlacement(Document doc, List<PipeDiameterInfo> diameterSettings)
+        public static PipeClampsResult RunPlacement(Document doc, List<PipeDiameterInfo> diameterSettings, PipeClampsPlacementOptions options = null)
         {
             var result = new PipeClampsResult();
 
@@ -121,6 +128,13 @@ namespace BimboClub.PipeClamps
                     doc.Regenerate();
                 }
 
+                // Извлечение значения параметра стояка (например ADSK_Номер стояка)
+                string riserVal = null;
+                if (options != null && options.CopyRiserParameter && !string.IsNullOrEmpty(options.SourceParamName))
+                {
+                    riserVal = GetParameterStringValue(pipe, options.SourceParamName);
+                }
+
                 if (pipe.Location is LocationCurve locCurve && locCurve.Curve is Line line)
                 {
                     XYZ p0 = line.GetEndPoint(0);
@@ -161,6 +175,13 @@ namespace BimboClub.PipeClamps
                         {
                             countOnPipe++;
                             result.ClampsPlaced++;
+
+                            // Копирование значения параметра стояка в хомут
+                            if (!string.IsNullOrEmpty(riserVal) && options != null)
+                            {
+                                string targetParamName = !string.IsNullOrEmpty(options.TargetParamName) ? options.TargetParamName : options.SourceParamName;
+                                SetParameterValue(clampInst, targetParamName, riserVal);
+                            }
                         }
                     }
 
@@ -195,6 +216,49 @@ namespace BimboClub.PipeClamps
                 return pDiam.AsDouble() * 304.8;
             }
             return pipe.Diameter * 304.8;
+        }
+
+        private static string GetParameterStringValue(Element elem, string paramName)
+        {
+            if (elem == null || string.IsNullOrEmpty(paramName)) return null;
+
+            Parameter p = elem.LookupParameter(paramName);
+            if (p == null || !p.HasValue) return null;
+
+            switch (p.StorageType)
+            {
+                case StorageType.String:
+                    return p.AsString();
+                case StorageType.Integer:
+                    return p.AsInteger().ToString();
+                case StorageType.Double:
+                    return p.AsValueString() ?? p.AsDouble().ToString("F2");
+                case StorageType.ElementId:
+                    return p.AsElementId()?.ToString();
+                default:
+                    return null;
+            }
+        }
+
+        private static void SetParameterValue(Element elem, string paramName, string valStr)
+        {
+            if (elem == null || string.IsNullOrEmpty(paramName) || valStr == null) return;
+
+            Parameter p = elem.LookupParameter(paramName);
+            if (p == null || p.IsReadOnly) return;
+
+            if (p.StorageType == StorageType.String)
+            {
+                p.Set(valStr);
+            }
+            else if (p.StorageType == StorageType.Integer && int.TryParse(valStr, out int intVal))
+            {
+                p.Set(intVal);
+            }
+            else if (p.StorageType == StorageType.Double && double.TryParse(valStr, out double dblVal))
+            {
+                p.Set(dblVal);
+            }
         }
     }
 }

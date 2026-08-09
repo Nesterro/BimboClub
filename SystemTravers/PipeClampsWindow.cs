@@ -33,14 +33,19 @@ namespace BimboClub.PipeClamps
     {
         public bool UserApproved { get; private set; } = false;
         public List<PipeDiameterInfo> ResultSettings { get; private set; }
+        public PipeClampsPlacementOptions ResultOptions { get; private set; }
 
         private List<PipeClampRowViewModel> _rowViewModels;
+
+        private CheckBox _chkCopyParam;
+        private TextBox _txtSourceParam;
+        private TextBox _txtTargetParam;
 
         public PipeClampsWindow(Document doc)
         {
             Title = "Расстановка хомутов — BimboClub";
-            Width = 640;
-            Height = 500;
+            Width = 660;
+            Height = 580;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.CanResizeWithGrip;
 
@@ -93,6 +98,7 @@ namespace BimboClub.PipeClamps
             Grid mainGrid = new Grid();
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60) });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(110) });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(65) });
 
             // Шапка BimboClub
@@ -140,7 +146,7 @@ namespace BimboClub.PipeClamps
                     CanUserAddRows = false,
                     CanUserDeleteRows = false,
                     ItemsSource = _rowViewModels,
-                    Margin = new Thickness(15),
+                    Margin = new Thickness(15, 10, 15, 5),
                     Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36)),
                     RowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(37, 37, 45)),
                     AlternatingRowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(43, 43, 52)),
@@ -192,6 +198,77 @@ namespace BimboClub.PipeClamps
                 mainGrid.Children.Add(grid);
             }
 
+            // Блок опций переноса параметров
+            Border paramBorder = new Border
+            {
+                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(37, 37, 45)),
+                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 72)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(4),
+                Margin = new Thickness(15, 5, 15, 5),
+                Padding = new Thickness(10)
+            };
+
+            StackPanel paramPanel = new StackPanel();
+
+            _chkCopyParam = new CheckBox
+            {
+                Content = "Переносить параметр стояка в хомут",
+                IsChecked = true,
+                Foreground = System.Windows.Media.Brushes.White,
+                FontWeight = FontWeights.SemiBold,
+                FontSize = 13,
+                Margin = new Thickness(0, 0, 0, 8)
+            };
+            paramPanel.Children.Add(_chkCopyParam);
+
+            Grid fieldsGrid = new Grid();
+            fieldsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            fieldsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(15) });
+            fieldsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            StackPanel p1 = new StackPanel();
+            p1.Children.Add(new TextBlock
+            {
+                Text = "Параметр из трубы (источник):",
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(190, 190, 200)),
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 0, 3)
+            });
+            _txtSourceParam = new TextBox
+            {
+                Text = "ADSK_Номер стояка",
+                Height = 26,
+                Padding = new Thickness(4, 2, 4, 2)
+            };
+            p1.Children.Add(_txtSourceParam);
+            Grid.SetColumn(p1, 0);
+            fieldsGrid.Children.Add(p1);
+
+            StackPanel p2 = new StackPanel();
+            p2.Children.Add(new TextBlock
+            {
+                Text = "Параметр в хомуте (приемник):",
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(190, 190, 200)),
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 0, 3)
+            });
+            _txtTargetParam = new TextBox
+            {
+                Text = "ADSK_Номер стояка",
+                Height = 26,
+                Padding = new Thickness(4, 2, 4, 2)
+            };
+            p2.Children.Add(_txtTargetParam);
+            Grid.SetColumn(p2, 2);
+            fieldsGrid.Children.Add(p2);
+
+            paramPanel.Children.Add(fieldsGrid);
+            paramBorder.Child = paramPanel;
+
+            Grid.SetRow(paramBorder, 2);
+            mainGrid.Children.Add(paramBorder);
+
             // Подвал с кнопкой
             Border footerBorder = new Border
             {
@@ -216,7 +293,7 @@ namespace BimboClub.PipeClamps
             btnStart.Click += BtnStart_Click;
             footerBorder.Child = btnStart;
 
-            Grid.SetRow(footerBorder, 2);
+            Grid.SetRow(footerBorder, 3);
             mainGrid.Children.Add(footerBorder);
 
             Content = mainGrid;
@@ -250,6 +327,13 @@ namespace BimboClub.PipeClamps
                 System.Windows.MessageBox.Show("Пожалуйста, выберите хотя бы один типоразмер хомута для расстановки.", "BimboClub — Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            ResultOptions = new PipeClampsPlacementOptions
+            {
+                CopyRiserParameter = _chkCopyParam.IsChecked == true,
+                SourceParamName = _txtSourceParam.Text?.Trim(),
+                TargetParamName = _txtTargetParam.Text?.Trim()
+            };
 
             UserApproved = true;
             DialogResult = true;

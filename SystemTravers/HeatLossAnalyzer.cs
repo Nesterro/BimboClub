@@ -187,7 +187,7 @@ namespace BimboClub.HeatLoss
                             double insAzimuth = CalculateAzimuth(insFacing);
 
                             XYZ cubePos = GetCubePlacementPoint(roomCenter, cubeIndexInRoom++);
-                            FamilySymbol insSymbol = GetSymbolForCategory(doc, insCatName) ?? defaultSymbol;
+                            FamilySymbol insSymbol = EnsureSymbolActive(doc, GetSymbolForCategory(doc, insCatName) ?? defaultSymbol);
 
                             FamilyInstance insCube = doc.Create.NewFamilyInstance(cubePos, insSymbol, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                             FillCubeParameters(insCube, GetIdValue(insert.Id), insCatName, insAreaSqFt * 0.09290304, insAzimuth, room.Name, room.Number, isExternal);
@@ -200,7 +200,7 @@ namespace BimboClub.HeatLoss
 
                         // Размещение кубика для самой конструкции (Стена / Конструкция)
                         XYZ wallCubePos = GetCubePlacementPoint(roomCenter, cubeIndexInRoom++);
-                        FamilySymbol wallSymbol = GetSymbolForCategory(doc, categoryName) ?? defaultSymbol;
+                        FamilySymbol wallSymbol = EnsureSymbolActive(doc, GetSymbolForCategory(doc, categoryName) ?? defaultSymbol);
 
                         FamilyInstance wallCube = doc.Create.NewFamilyInstance(wallCubePos, wallSymbol, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                         FillCubeParameters(wallCube, GetIdValue(hostElem.Id), categoryName, netAreaSqMeters, azimuth, room.Name, room.Number, isExternal);
@@ -222,7 +222,7 @@ namespace BimboClub.HeatLoss
             if (areaSqMeters <= 0) return;
 
             XYZ pos = GetCubePlacementPoint(roomCenter, cubeIndex++);
-            FamilySymbol symbol = GetSymbolForCategory(doc, catName) ?? defaultSymbol;
+            FamilySymbol symbol = EnsureSymbolActive(doc, GetSymbolForCategory(doc, catName) ?? defaultSymbol);
 
             FamilyInstance cube = doc.Create.NewFamilyInstance(pos, symbol, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
             FillCubeParameters(cube, GetIdValue(room.LevelId), catName, areaSqMeters, 0.0, room.Name, room.Number, catName == "Крыша");
@@ -321,6 +321,16 @@ namespace BimboClub.HeatLoss
             }
         }
 
+        private static FamilySymbol EnsureSymbolActive(Document doc, FamilySymbol symbol)
+        {
+            if (symbol != null && !symbol.IsActive)
+            {
+                symbol.Activate();
+                doc.Regenerate();
+            }
+            return symbol;
+        }
+
         private static FamilySymbol FindOrCreateCubeSymbol(Document doc, HeatLossResult result)
         {
             var symbols = new FilteredElementCollector(doc)
@@ -330,7 +340,8 @@ namespace BimboClub.HeatLoss
                 .Where(fs => fs.FamilyName.Equals(CUBE_FAMILY_NAME, StringComparison.OrdinalIgnoreCase))
                 .ToList();
 
-            return symbols.FirstOrDefault();
+            FamilySymbol sym = symbols.FirstOrDefault();
+            return EnsureSymbolActive(doc, sym);
         }
 
         private static FamilySymbol GetSymbolForCategory(Document doc, string catName)
@@ -341,11 +352,13 @@ namespace BimboClub.HeatLoss
             else if (catName.Contains("Перекрытие") || catName.Contains("Пол")) symbolName = "Cube_Floor";
             else if (catName.Contains("Крыша")) symbolName = "Cube_Roof";
 
-            return new FilteredElementCollector(doc)
+            FamilySymbol sym = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
                 .FirstOrDefault(fs => fs.Name.Equals(symbolName, StringComparison.OrdinalIgnoreCase));
+
+            return EnsureSymbolActive(doc, sym);
         }
 
         private static void DeleteExistingCubes(Document doc, HeatLossResult result)

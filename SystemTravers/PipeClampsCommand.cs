@@ -41,7 +41,7 @@ namespace BimboClub.PipeClamps
                 {
                     tx.Start();
 
-                    result = PipeClampsEngine.RunPlacement(doc, settings);
+                    result = PipeClampsEngine.RunPlacement(doc, settings, window.ResultOptions);
 
                     tx.Commit();
                 }

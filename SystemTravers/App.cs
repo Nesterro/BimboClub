@@ -358,21 +358,12 @@ namespace BimboClub
 			// --- Pulldown: Сети MEP ---
 			try
 			{
-				PushButtonData pushButtonDataPipeClamps = new PushButtonData("cmdPipeClamps", "Расстановка хомутов", text4, "BimboClub.PipeClamps.PipeClampsCommand");
-				pushButtonDataPipeClamps.ToolTip = "Автоматическая расстановка хомутов по вертикальным трубопроводам с выбором типа и шага по диаметрам.";
-				BitmapSource iconClamp16 = this.LoadImage(Path.Combine(text, "icon_router_16.png"));
-				if (iconClamp16 != null)
-				{
-					pushButtonDataPipeClamps.Image = iconClamp16;
-				}
-
 				PulldownButtonData pdData = new PulldownButtonData("pbMepNetworks", "Сети MEP");
 				PulldownButton pd = ribbonPanel.AddItem(pdData) as PulldownButton;
 				if (pd != null)
 				{
 					pd.LargeImage = bitmapSource21; // icon_router.png
 					pd.Image = bitmapSource22; // icon_router_16.png
-					pd.AddPushButton(pushButtonDataPipeClamps); // Расстановка хомутов по стоякам
 					pd.AddPushButton(pushButtonData11); // Умная трассировка
 					pd.AddPushButton(pushButtonData19); // Нумерация стояков
 					pd.AddPushButton(pushButtonData20); // Подключение труб
@@ -382,6 +373,29 @@ namespace BimboClub
 			catch (Exception ex)
 			{
 				Logger.LogError("Не удалось создать выпадающий список 'Сети MEP'", ex);
+			}
+
+			// 1. Отдельная крупная кнопка "Расстановка хомутов" на ленте BimboClub
+			try
+			{
+				PushButtonData pushButtonDataPipeClamps = new PushButtonData("cmdPipeClamps", "Расстановка\nхомутов", text4, "BimboClub.PipeClamps.PipeClampsCommand");
+				pushButtonDataPipeClamps.ToolTip = "Автоматическая расстановка хомутов по вертикальным трубопроводам с выбором типа, шага и переносом параметров стояка.";
+				BitmapSource iconClamp = this.LoadImage(Path.Combine(text, "icon_router.png"));
+				if (iconClamp != null)
+				{
+					pushButtonDataPipeClamps.LargeImage = iconClamp;
+				}
+				BitmapSource iconClamp16 = this.LoadImage(Path.Combine(text, "icon_router_16.png"));
+				if (iconClamp16 != null)
+				{
+					pushButtonDataPipeClamps.Image = iconClamp16;
+				}
+
+				ribbonPanel.AddItem(pushButtonDataPipeClamps);
+			}
+			catch (Exception ex)
+			{
+				Logger.LogError("Не удалось добавить кнопку 'Расстановка хомутов' на ленту", ex);
 			}
 
 			PushButtonData pushButtonDataHeatLoss = new PushButtonData("cmdHeatLossPrep", "Расчет\nтеплопотерь", text4, "BimboClub.HeatLoss.HeatLossPrepCommand");
@@ -397,7 +411,7 @@ namespace BimboClub
 				pushButtonDataHeatLoss.Image = iconHeat16;
 			}
 
-			// 1. Отдельная крупная кнопка "Расчет теплопотерь" на ленте BimboClub
+			// 2. Отдельная крупная кнопка "Расчет теплопотерь" на ленте BimboClub
 			try
 			{
 				ribbonPanel.AddItem(pushButtonDataHeatLoss);
