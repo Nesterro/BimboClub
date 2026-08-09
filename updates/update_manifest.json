@@ -1,12 +1,12 @@
 ﻿{
-    "latestVersion":  "1.7.0",
+    "latestVersion":  "1.8.0",
     "releaseDate":  "2026-08-09",
     "changelog":  [
-                      "Исправлен контраст заголовков таблицы DataGrid (теперь яркие золотые надписи на темном фоне)",
-                      "Добавлено автосохранение всех настроек окна (диаметры, хомуты, шаги, углы, параметры) при повторном открытии"
+                      "Исправлен поворот семейства: оси вращения теперь строятся строго через точную точку вставки (LocationPoint) и локальные векторы семейства",
+                      "Устранено улетание и смещение хомутов в сторону от оси стояка при поворотах"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.7.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.7.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.8.0/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.8.0/bimboclub_net8.zip"
                  }
 }
