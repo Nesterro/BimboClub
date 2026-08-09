@@ -182,17 +182,25 @@ namespace BimboClub.PipeClamps
                     for (double z = offsetFeet; z <= totalHeightFeet - 0.2; z += stepFeet)
                     {
                         XYZ placementPoint = new XYZ(p0.X, p0.Y, p0.Z + z);
-
                         Level level = doc.GetElement(pipe.LevelId) as Level;
-                        FamilyInstance clampInst;
 
-                        if (level != null)
-                        {
-                            clampInst = doc.Create.NewFamilyInstance(placementPoint, sym, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
-                        }
-                        else
+                        FamilyInstance clampInst = null;
+
+                        // Сначала пробуем свободной точкой (без жесткой привязки плоскости уровня),
+                        // чтобы Revit разрешал свободный 3D поворот вокруг любых осей без смещения по плоскости
+                        try
                         {
                             clampInst = doc.Create.NewFamilyInstance(placementPoint, sym, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                        }
+                        catch { }
+
+                        if (clampInst == null && level != null)
+                        {
+                            try
+                            {
+                                clampInst = doc.Create.NewFamilyInstance(placementPoint, sym, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                            }
+                            catch { }
                         }
 
                         if (clampInst != null)
@@ -200,7 +208,7 @@ namespace BimboClub.PipeClamps
                             countOnPipe++;
                             result.ClampsPlaced++;
 
-                            // 1. Копирование параметров из трубы в хомут ДО поворота
+                            // 1. Копирование параметров из трубы стояка в хомут
                             if (options != null)
                             {
                                 if (!string.IsNullOrEmpty(valParam1) && options.CopyParam1)
@@ -216,48 +224,73 @@ namespace BimboClub.PipeClamps
                                 }
                             }
 
-                            // 2. Вращение вокруг ТОЧНОЙ локальной оси и точки вставки самого семейства
+                            // 2. Выполнение 3D вращений вокруг осей элемента
                             if (options != null)
                             {
-                                XYZ instOrigin = (clampInst.Location is LocationPoint lp) ? lp.Point : placementPoint;
+                                XYZ currentOrigin = (clampInst.Location is LocationPoint lp0) ? lp0.Point : placementPoint;
                                 Transform tr = clampInst.GetTransform();
 
-                                // Вращение по оси Z (вокруг оси трубы / стояка)
+                                // Вращение по оси Z (вокруг стояка)
                                 if (Math.Abs(options.RotateZDeg) > 0.001)
                                 {
                                     try
                                     {
-                                        Line axisZ = Line.CreateBound(instOrigin, instOrigin + tr.BasisZ);
+                                        Line axisZ = Line.CreateBound(currentOrigin, currentOrigin + tr.BasisZ);
                                         ElementTransformUtils.RotateElement(doc, clampInst.Id, axisZ, options.RotateZDeg * Math.PI / 180.0);
                                         tr = clampInst.GetTransform();
-                                        if (clampInst.Location is LocationPoint lpZ) instOrigin = lpZ.Point;
+                                        if (clampInst.Location is LocationPoint lpZ) currentOrigin = lpZ.Point;
                                     }
                                     catch { }
                                 }
 
-                                // Вращение по локальной оси X семейства (наклон во фронтальной плоскости)
+                                // Вращение по локальной оси X элемента
                                 if (Math.Abs(options.RotateXDeg) > 0.001)
                                 {
                                     try
                                     {
-                                        Line axisX = Line.CreateBound(instOrigin, instOrigin + tr.BasisX);
+                                        Line axisX = Line.CreateBound(currentOrigin, currentOrigin + tr.BasisX);
                                         ElementTransformUtils.RotateElement(doc, clampInst.Id, axisX, options.RotateXDeg * Math.PI / 180.0);
                                         tr = clampInst.GetTransform();
-                                        if (clampInst.Location is LocationPoint lpX) instOrigin = lpX.Point;
+                                        if (clampInst.Location is LocationPoint lpX) currentOrigin = lpX.Point;
                                     }
                                     catch { }
                                 }
 
-                                // Вращение по локальной оси Y семейства (наклон в профильной плоскости)
+                                // Вращение по локальной оси Y элемента
                                 if (Math.Abs(options.RotateYDeg) > 0.001)
                                 {
                                     try
                                     {
-                                        Line axisY = Line.CreateBound(instOrigin, instOrigin + tr.BasisY);
+                                        Line axisY = Line.CreateBound(currentOrigin, currentOrigin + tr.BasisY);
                                         ElementTransformUtils.RotateElement(doc, clampInst.Id, axisY, options.RotateYDeg * Math.PI / 180.0);
                                     }
                                     catch { }
                                 }
+                            }
+
+                            // 3. ПРИНУДИТЕЛЬНАЯ ФИКСАЦИЯ И ВОЗВРАТ НА ОСЬ ТРУБЫ (ПОЗОВОЛЯЕТ ИЗБЕЖАТЬ УЛЕТАНИЯ И СМЕЩЕНИЯ В СТОРОНУ)
+                            if (clampInst.Location is LocationPoint lpFinal)
+                            {
+                                XYZ finalPos = lpFinal.Point;
+                                XYZ moveDelta = placementPoint - finalPos;
+                                if (moveDelta.GetLength() > 0.0001)
+                                {
+                                    ElementTransformUtils.MoveElement(doc, clampInst.Id, moveDelta);
+                                }
+                            }
+
+                            // 4. Привязка уровня для спецификации (если применимо)
+                            if (level != null)
+                            {
+                                try
+                                {
+                                    Parameter pLevel = clampInst.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM);
+                                    if (pLevel != null && !pLevel.IsReadOnly)
+                                    {
+                                        pLevel.Set(level.Id);
+                                    }
+                                }
+                                catch { }
                             }
                         }
                     }
