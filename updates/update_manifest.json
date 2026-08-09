@@ -1,13 +1,12 @@
 ﻿{
-    "latestVersion":  "1.6.0",
+    "latestVersion":  "1.7.0",
     "releaseDate":  "2026-08-09",
     "changelog":  [
-                      "Добавлена возможность расстановки хомутов только на текущем активном виде",
-                      "Добавлен второй переносимый параметр стояка ADSK_Секция (с настройкой названий)",
-                      "Исправлена контрастность UI: яркие четкие заголовки и светлый текст на темном фоне"
+                      "Исправлен контраст заголовков таблицы DataGrid (теперь яркие золотые надписи на темном фоне)",
+                      "Добавлено автосохранение всех настроек окна (диаметры, хомуты, шаги, углы, параметры) при повторном открытии"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.6.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.6.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.7.0/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.7.0/bimboclub_net8.zip"
                  }
 }
