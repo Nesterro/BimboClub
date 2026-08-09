@@ -40,12 +40,13 @@ namespace BimboClub.PipeClamps
         private CheckBox _chkCopyParam;
         private TextBox _txtSourceParam;
         private TextBox _txtTargetParam;
+        private CheckBox _chkRotate90;
 
         public PipeClampsWindow(Document doc)
         {
             Title = "Расстановка хомутов — BimboClub";
             Width = 660;
-            Height = 580;
+            Height = 610;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.CanResizeWithGrip;
 
@@ -98,7 +99,7 @@ namespace BimboClub.PipeClamps
             Grid mainGrid = new Grid();
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60) });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(110) });
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(140) });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(65) });
 
             // Шапка BimboClub
@@ -198,7 +199,7 @@ namespace BimboClub.PipeClamps
                 mainGrid.Children.Add(grid);
             }
 
-            // Блок опций переноса параметров
+            // Блок опций переноса параметров и ориентации
             Border paramBorder = new Border
             {
                 Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(37, 37, 45)),
@@ -264,6 +265,18 @@ namespace BimboClub.PipeClamps
             fieldsGrid.Children.Add(p2);
 
             paramPanel.Children.Add(fieldsGrid);
+
+            _chkRotate90 = new CheckBox
+            {
+                Content = "Повернуть хомуты на 90° относительно оси стояка",
+                IsChecked = false,
+                Foreground = System.Windows.Media.Brushes.White,
+                FontWeight = FontWeights.SemiBold,
+                FontSize = 12,
+                Margin = new Thickness(0, 8, 0, 0)
+            };
+            paramPanel.Children.Add(_chkRotate90);
+
             paramBorder.Child = paramPanel;
 
             Grid.SetRow(paramBorder, 2);
@@ -332,7 +345,8 @@ namespace BimboClub.PipeClamps
             {
                 CopyRiserParameter = _chkCopyParam.IsChecked == true,
                 SourceParamName = _txtSourceParam.Text?.Trim(),
-                TargetParamName = _txtTargetParam.Text?.Trim()
+                TargetParamName = _txtTargetParam.Text?.Trim(),
+                Rotate90Degrees = _chkRotate90.IsChecked == true
             };
 
             UserApproved = true;

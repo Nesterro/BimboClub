@@ -22,6 +22,7 @@ namespace BimboClub.PipeClamps
         public bool CopyRiserParameter { get; set; } = true;
         public string SourceParamName { get; set; } = "ADSK_Номер стояка";
         public string TargetParamName { get; set; } = "ADSK_Номер стояка";
+        public bool Rotate90Degrees { get; set; } = false;
     }
 
     public class PipeClampsResult
@@ -175,6 +176,20 @@ namespace BimboClub.PipeClamps
                         {
                             countOnPipe++;
                             result.ClampsPlaced++;
+
+                            // Вращение хомута на 90 градусов при необходимости
+                            if (options != null && options.Rotate90Degrees)
+                            {
+                                try
+                                {
+                                    Line axis = Line.CreateBound(placementPoint, placementPoint + XYZ.BasisZ);
+                                    ElementTransformUtils.RotateElement(doc, clampInst.Id, axis, Math.PI / 2.0);
+                                }
+                                catch
+                                {
+                                    // Игнорируем, если элемент заблокирован для поворота
+                                }
+                            }
 
                             // Копирование значения параметра стояка в хомут
                             if (!string.IsNullOrEmpty(riserVal) && options != null)
