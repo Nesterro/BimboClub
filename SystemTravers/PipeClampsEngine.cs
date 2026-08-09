@@ -200,41 +200,7 @@ namespace BimboClub.PipeClamps
                             countOnPipe++;
                             result.ClampsPlaced++;
 
-                            // Повороты элемента в 3D пространстве по осям X, Y, Z
-                            if (options != null)
-                            {
-                                if (Math.Abs(options.RotateXDeg) > 0.001)
-                                {
-                                    try
-                                    {
-                                        Line axisX = Line.CreateBound(placementPoint, placementPoint + XYZ.BasisX);
-                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisX, options.RotateXDeg * Math.PI / 180.0);
-                                    }
-                                    catch { }
-                                }
-
-                                if (Math.Abs(options.RotateYDeg) > 0.001)
-                                {
-                                    try
-                                    {
-                                        Line axisY = Line.CreateBound(placementPoint, placementPoint + XYZ.BasisY);
-                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisY, options.RotateYDeg * Math.PI / 180.0);
-                                    }
-                                    catch { }
-                                }
-
-                                if (Math.Abs(options.RotateZDeg) > 0.001)
-                                {
-                                    try
-                                    {
-                                        Line axisZ = Line.CreateBound(placementPoint, placementPoint + XYZ.BasisZ);
-                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisZ, options.RotateZDeg * Math.PI / 180.0);
-                                    }
-                                    catch { }
-                                }
-                            }
-
-                            // Копирование параметров из трубы в хомут
+                            // 1. Копирование параметров из трубы в хомут ДО поворота
                             if (options != null)
                             {
                                 if (!string.IsNullOrEmpty(valParam1) && options.CopyParam1)
@@ -247,6 +213,50 @@ namespace BimboClub.PipeClamps
                                 {
                                     string target2 = !string.IsNullOrEmpty(options.TargetParam2) ? options.TargetParam2 : options.SourceParam2;
                                     SetParameterValue(clampInst, target2, valParam2);
+                                }
+                            }
+
+                            // 2. Вращение вокруг ТОЧНОЙ локальной оси и точки вставки самого семейства
+                            if (options != null)
+                            {
+                                XYZ instOrigin = (clampInst.Location is LocationPoint lp) ? lp.Point : placementPoint;
+                                Transform tr = clampInst.GetTransform();
+
+                                // Вращение по оси Z (вокруг оси трубы / стояка)
+                                if (Math.Abs(options.RotateZDeg) > 0.001)
+                                {
+                                    try
+                                    {
+                                        Line axisZ = Line.CreateBound(instOrigin, instOrigin + tr.BasisZ);
+                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisZ, options.RotateZDeg * Math.PI / 180.0);
+                                        tr = clampInst.GetTransform();
+                                        if (clampInst.Location is LocationPoint lpZ) instOrigin = lpZ.Point;
+                                    }
+                                    catch { }
+                                }
+
+                                // Вращение по локальной оси X семейства (наклон во фронтальной плоскости)
+                                if (Math.Abs(options.RotateXDeg) > 0.001)
+                                {
+                                    try
+                                    {
+                                        Line axisX = Line.CreateBound(instOrigin, instOrigin + tr.BasisX);
+                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisX, options.RotateXDeg * Math.PI / 180.0);
+                                        tr = clampInst.GetTransform();
+                                        if (clampInst.Location is LocationPoint lpX) instOrigin = lpX.Point;
+                                    }
+                                    catch { }
+                                }
+
+                                // Вращение по локальной оси Y семейства (наклон в профильной плоскости)
+                                if (Math.Abs(options.RotateYDeg) > 0.001)
+                                {
+                                    try
+                                    {
+                                        Line axisY = Line.CreateBound(instOrigin, instOrigin + tr.BasisY);
+                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisY, options.RotateYDeg * Math.PI / 180.0);
+                                    }
+                                    catch { }
                                 }
                             }
                         }
