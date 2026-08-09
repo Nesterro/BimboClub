@@ -45,8 +45,8 @@ namespace BimboClub.PipeClamps
         public PipeClampsWindow(Document doc)
         {
             Title = "Расстановка хомутов — BimboClub";
-            Width = 660;
-            Height = 610;
+            Width = 680;
+            Height = 620;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.CanResizeWithGrip;
 
@@ -99,7 +99,7 @@ namespace BimboClub.PipeClamps
             Grid mainGrid = new Grid();
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60) });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(140) });
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(65) });
 
             // Шапка BimboClub
@@ -207,10 +207,15 @@ namespace BimboClub.PipeClamps
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(4),
                 Margin = new Thickness(15, 5, 15, 5),
-                Padding = new Thickness(10)
+                Padding = new Thickness(12)
             };
 
             StackPanel paramPanel = new StackPanel();
+
+            // Верхний ряд галочек
+            Grid optionsHeaderGrid = new Grid();
+            optionsHeaderGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            optionsHeaderGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
             _chkCopyParam = new CheckBox
             {
@@ -218,11 +223,27 @@ namespace BimboClub.PipeClamps
                 IsChecked = true,
                 Foreground = System.Windows.Media.Brushes.White,
                 FontWeight = FontWeights.SemiBold,
-                FontSize = 13,
+                FontSize = 12,
                 Margin = new Thickness(0, 0, 0, 8)
             };
-            paramPanel.Children.Add(_chkCopyParam);
+            Grid.SetColumn(_chkCopyParam, 0);
+            optionsHeaderGrid.Children.Add(_chkCopyParam);
 
+            _chkRotate90 = new CheckBox
+            {
+                Content = "Повернуть хомуты на 90°",
+                IsChecked = false,
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 180, 50)),
+                FontWeight = FontWeights.Bold,
+                FontSize = 12,
+                Margin = new Thickness(0, 0, 0, 8)
+            };
+            Grid.SetColumn(_chkRotate90, 1);
+            optionsHeaderGrid.Children.Add(_chkRotate90);
+
+            paramPanel.Children.Add(optionsHeaderGrid);
+
+            // Ряд полей имен параметров
             Grid fieldsGrid = new Grid();
             fieldsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             fieldsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(15) });
@@ -265,17 +286,6 @@ namespace BimboClub.PipeClamps
             fieldsGrid.Children.Add(p2);
 
             paramPanel.Children.Add(fieldsGrid);
-
-            _chkRotate90 = new CheckBox
-            {
-                Content = "Повернуть хомуты на 90° относительно оси стояка",
-                IsChecked = false,
-                Foreground = System.Windows.Media.Brushes.White,
-                FontWeight = FontWeights.SemiBold,
-                FontSize = 12,
-                Margin = new Thickness(0, 8, 0, 0)
-            };
-            paramPanel.Children.Add(_chkRotate90);
 
             paramBorder.Child = paramPanel;
 
