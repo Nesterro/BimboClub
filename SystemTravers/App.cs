@@ -358,12 +358,21 @@ namespace BimboClub
 			// --- Pulldown: Сети MEP ---
 			try
 			{
+				PushButtonData pushButtonDataPipeClamps = new PushButtonData("cmdPipeClamps", "Расстановка хомутов", text4, "BimboClub.PipeClamps.PipeClampsCommand");
+				pushButtonDataPipeClamps.ToolTip = "Автоматическая расстановка хомутов по вертикальным трубопроводам с выбором типа и шага по диаметрам.";
+				BitmapSource iconClamp16 = this.LoadImage(Path.Combine(text, "icon_router_16.png"));
+				if (iconClamp16 != null)
+				{
+					pushButtonDataPipeClamps.Image = iconClamp16;
+				}
+
 				PulldownButtonData pdData = new PulldownButtonData("pbMepNetworks", "Сети MEP");
 				PulldownButton pd = ribbonPanel.AddItem(pdData) as PulldownButton;
 				if (pd != null)
 				{
 					pd.LargeImage = bitmapSource21; // icon_router.png
 					pd.Image = bitmapSource22; // icon_router_16.png
+					pd.AddPushButton(pushButtonDataPipeClamps); // Расстановка хомутов по стоякам
 					pd.AddPushButton(pushButtonData11); // Умная трассировка
 					pd.AddPushButton(pushButtonData19); // Нумерация стояков
 					pd.AddPushButton(pushButtonData20); // Подключение труб
