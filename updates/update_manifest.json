@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "1.4.2",
+    "latestVersion":  "1.4.3",
     "releaseDate":  "2026-08-09",
     "changelog":  [
-                      "Добавлена галочка Повернуть хомуты на 90° относительно оси стояка при расстановке"
+                      "Оптимизирована компоновка окна расстановки хомутов: оранжевая галочка Повернуть хомуты на 90° вынесена на самый видный верхний блок"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.4.2/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.4.2/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v1.4.3/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v1.4.3/bimboclub_net8.zip"
                  }
 }
