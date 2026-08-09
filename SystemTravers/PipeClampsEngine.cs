@@ -19,10 +19,16 @@ namespace BimboClub.PipeClamps
 
     public class PipeClampsPlacementOptions
     {
-        public bool CopyRiserParameter { get; set; } = true;
-        public string SourceParamName { get; set; } = "ADSK_Номер стояка";
-        public string TargetParamName { get; set; } = "ADSK_Номер стояка";
-        
+        public bool ActiveViewOnly { get; set; } = false;
+
+        public bool CopyParam1 { get; set; } = true;
+        public string SourceParam1 { get; set; } = "ADSK_Номер стояка";
+        public string TargetParam1 { get; set; } = "ADSK_Номер стояка";
+
+        public bool CopyParam2 { get; set; } = true;
+        public string SourceParam2 { get; set; } = "ADSK_Секция";
+        public string TargetParam2 { get; set; } = "ADSK_Секция";
+
         public double RotateXDeg { get; set; } = 0;
         public double RotateYDeg { get; set; } = 0;
         public double RotateZDeg { get; set; } = 0;
@@ -37,11 +43,15 @@ namespace BimboClub.PipeClamps
 
     public static class PipeClampsEngine
     {
-        public static List<PipeDiameterInfo> GetVerticalPipeDiameters(Document doc)
+        public static List<PipeDiameterInfo> GetVerticalPipeDiameters(Document doc, bool activeViewOnly = false)
         {
             var dict = new Dictionary<int, List<Pipe>>();
 
-            var pipes = new FilteredElementCollector(doc)
+            FilteredElementCollector collector = (activeViewOnly && doc?.ActiveView != null)
+                ? new FilteredElementCollector(doc, doc.ActiveView.Id)
+                : new FilteredElementCollector(doc);
+
+            var pipes = collector
                 .OfCategory(BuiltInCategory.OST_PipeCurves)
                 .WhereElementIsNotElementType()
                 .Cast<Pipe>()
@@ -108,7 +118,11 @@ namespace BimboClub.PipeClamps
                 return result;
             }
 
-            var pipes = new FilteredElementCollector(doc)
+            FilteredElementCollector collector = (options != null && options.ActiveViewOnly && doc.ActiveView != null)
+                ? new FilteredElementCollector(doc, doc.ActiveView.Id)
+                : new FilteredElementCollector(doc);
+
+            var pipes = collector
                 .OfCategory(BuiltInCategory.OST_PipeCurves)
                 .WhereElementIsNotElementType()
                 .Cast<Pipe>()
@@ -132,11 +146,17 @@ namespace BimboClub.PipeClamps
                     doc.Regenerate();
                 }
 
-                // Извлечение значения параметра стояка (например ADSK_Номер стояка)
-                string riserVal = null;
-                if (options != null && options.CopyRiserParameter && !string.IsNullOrEmpty(options.SourceParamName))
+                // Извлечение значений параметров стояка
+                string valParam1 = null;
+                if (options != null && options.CopyParam1 && !string.IsNullOrEmpty(options.SourceParam1))
                 {
-                    riserVal = GetParameterStringValue(pipe, options.SourceParamName);
+                    valParam1 = GetParameterStringValue(pipe, options.SourceParam1);
+                }
+
+                string valParam2 = null;
+                if (options != null && options.CopyParam2 && !string.IsNullOrEmpty(options.SourceParam2))
+                {
+                    valParam2 = GetParameterStringValue(pipe, options.SourceParam2);
                 }
 
                 if (pipe.Location is LocationCurve locCurve && locCurve.Curve is Line line)
@@ -214,11 +234,20 @@ namespace BimboClub.PipeClamps
                                 }
                             }
 
-                            // Копирование значения параметра стояка в хомут
-                            if (!string.IsNullOrEmpty(riserVal) && options != null)
+                            // Копирование параметров из трубы в хомут
+                            if (options != null)
                             {
-                                string targetParamName = !string.IsNullOrEmpty(options.TargetParamName) ? options.TargetParamName : options.SourceParamName;
-                                SetParameterValue(clampInst, targetParamName, riserVal);
+                                if (!string.IsNullOrEmpty(valParam1) && options.CopyParam1)
+                                {
+                                    string target1 = !string.IsNullOrEmpty(options.TargetParam1) ? options.TargetParam1 : options.SourceParam1;
+                                    SetParameterValue(clampInst, target1, valParam1);
+                                }
+
+                                if (!string.IsNullOrEmpty(valParam2) && options.CopyParam2)
+                                {
+                                    string target2 = !string.IsNullOrEmpty(options.TargetParam2) ? options.TargetParam2 : options.SourceParam2;
+                                    SetParameterValue(clampInst, target2, valParam2);
+                                }
                             }
                         }
                     }

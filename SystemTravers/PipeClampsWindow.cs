@@ -35,11 +35,18 @@ namespace BimboClub.PipeClamps
         public List<PipeDiameterInfo> ResultSettings { get; private set; }
         public PipeClampsPlacementOptions ResultOptions { get; private set; }
 
+        private Document _doc;
         private List<PipeClampRowViewModel> _rowViewModels;
 
-        private CheckBox _chkCopyParam;
-        private TextBox _txtSourceParam;
-        private TextBox _txtTargetParam;
+        private CheckBox _chkActiveViewOnly;
+
+        private CheckBox _chkCopyParam1;
+        private TextBox _txtSourceParam1;
+        private TextBox _txtTargetParam1;
+
+        private CheckBox _chkCopyParam2;
+        private TextBox _txtSourceParam2;
+        private TextBox _txtTargetParam2;
 
         private TextBox _txtRotateX;
         private TextBox _txtRotateY;
@@ -47,24 +54,25 @@ namespace BimboClub.PipeClamps
 
         public PipeClampsWindow(Document doc)
         {
+            _doc = doc;
             Title = "Расстановка хомутов — BimboClub";
-            Width = 680;
-            Height = 650;
+            Width = 720;
+            Height = 720;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.CanResizeWithGrip;
 
-            InitData(doc);
+            InitData(doc, false);
             BuildUI();
 
             UiThemeHelper.ApplyDarkTheme(this);
         }
 
-        private void InitData(Document doc)
+        private void InitData(Document doc, bool activeViewOnly)
         {
             _rowViewModels = new List<PipeClampRowViewModel>();
             if (doc == null) return;
 
-            var diameters = PipeClampsEngine.GetVerticalPipeDiameters(doc);
+            var diameters = PipeClampsEngine.GetVerticalPipeDiameters(doc, activeViewOnly);
             var symbols = PipeClampsEngine.GetClampSymbols(doc);
 
             var symbolItems = new List<FamilySymbolItem>
@@ -83,7 +91,6 @@ namespace BimboClub.PipeClamps
 
             foreach (var info in diameters)
             {
-                // Сопоставление по диаметру в наименовании типа хомута
                 var autoMatched = symbolItems.FirstOrDefault(s => s.Symbol != null && s.DisplayName.Contains(((int)info.DiameterMm).ToString()));
 
                 _rowViewModels.Add(new PipeClampRowViewModel
@@ -101,11 +108,12 @@ namespace BimboClub.PipeClamps
         {
             Grid mainGrid = new Grid();
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(60) });
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(40) });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(65) });
 
-            // Шапка BimboClub
+            // 1. Шапка BimboClub (яокрая контрастная)
             Border headerBorder = new Border
             {
                 Background = new LinearGradientBrush(
@@ -128,85 +136,96 @@ namespace BimboClub.PipeClamps
             Grid.SetRow(headerBorder, 0);
             mainGrid.Children.Add(headerBorder);
 
-            // Таблица диаметров
-            if (_rowViewModels.Count == 0)
+            // 2. Выбор области расстановки (Весь проект vs Текущий вид)
+            Border scopeBorder = new Border
             {
-                TextBlock emptyText = new TextBlock
-                {
-                    Text = "В проекте не найдено вертикальных трубопроводов.",
-                    Foreground = System.Windows.Media.Brushes.LightGray,
-                    FontSize = 14,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetRow(emptyText, 1);
-                mainGrid.Children.Add(emptyText);
-            }
-            else
+                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(28, 28, 35)),
+                Padding = new Thickness(15, 8, 15, 8)
+            };
+
+            _chkActiveViewOnly = new CheckBox
             {
-                DataGrid grid = new DataGrid
-                {
-                    AutoGenerateColumns = false,
-                    CanUserAddRows = false,
-                    CanUserDeleteRows = false,
-                    ItemsSource = _rowViewModels,
-                    Margin = new Thickness(15, 10, 15, 5),
-                    Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36)),
-                    RowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(37, 37, 45)),
-                    AlternatingRowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(43, 43, 52)),
-                    Foreground = System.Windows.Media.Brushes.White,
-                    GridLinesVisibility = DataGridGridLinesVisibility.Horizontal,
-                    HorizontalGridLinesBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(55, 55, 65))
-                };
+                Content = "Расставлять хомуты только на текущем виде",
+                IsChecked = false,
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0)),
+                FontWeight = FontWeights.Bold,
+                FontSize = 13,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            _chkActiveViewOnly.Checked += ChkActiveViewOnly_Changed;
+            _chkActiveViewOnly.Unchecked += ChkActiveViewOnly_Changed;
 
-                // Колонка 1: Диаметр
-                DataGridTextColumn colDiam = new DataGridTextColumn
-                {
-                    Header = "Диаметр трубы",
-                    Binding = new WpfBinding("DiameterInfo.DisplayName"),
-                    IsReadOnly = true,
-                    Width = new DataGridLength(140)
-                };
-                grid.Columns.Add(colDiam);
+            scopeBorder.Child = _chkActiveViewOnly;
+            Grid.SetRow(scopeBorder, 1);
+            mainGrid.Children.Add(scopeBorder);
 
-                // Колонка 2: Типоразмер хомута (ComboBox)
-                DataGridComboBoxColumn colSymbol = new DataGridComboBoxColumn
-                {
-                    Header = "Типоразмер хомута (Оборудование)",
-                    SelectedValueBinding = new WpfBinding("SelectedSymbolItem"),
-                    DisplayMemberPath = "DisplayName",
-                    Width = new DataGridLength(1, DataGridLengthUnitType.Star)
-                };
+            // 3. Таблица диаметров с высокими контрастными цветами
+            DataGrid grid = new DataGrid
+            {
+                AutoGenerateColumns = false,
+                CanUserAddRows = false,
+                CanUserDeleteRows = false,
+                ItemsSource = _rowViewModels,
+                Margin = new Thickness(15, 5, 15, 5),
+                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 30)),
+                RowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(34, 34, 42)),
+                AlternatingRowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(42, 42, 52)),
+                Foreground = System.Windows.Media.Brushes.White,
+                FontSize = 12,
+                GridLinesVisibility = DataGridGridLinesVisibility.Horizontal,
+                HorizontalGridLinesBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 75))
+            };
+
+            // Колонка 1: Диаметр
+            DataGridTextColumn colDiam = new DataGridTextColumn
+            {
+                Header = "Диаметр трубы",
+                Binding = new WpfBinding("DiameterInfo.DisplayName"),
+                IsReadOnly = true,
+                Width = new DataGridLength(150)
+            };
+            grid.Columns.Add(colDiam);
+
+            // Колонка 2: Типоразмер хомута
+            DataGridComboBoxColumn colSymbol = new DataGridComboBoxColumn
+            {
+                Header = "Типоразмер хомута (Оборудование)",
+                SelectedValueBinding = new WpfBinding("SelectedSymbolItem"),
+                DisplayMemberPath = "DisplayName",
+                Width = new DataGridLength(1, DataGridLengthUnitType.Star)
+            };
+            if (_rowViewModels.Count > 0)
+            {
                 colSymbol.ItemsSource = _rowViewModels[0].AvailableSymbols;
-                grid.Columns.Add(colSymbol);
-
-                // Колонка 3: Шаг (мм)
-                DataGridTextColumn colStep = new DataGridTextColumn
-                {
-                    Header = "Шаг (мм)",
-                    Binding = new WpfBinding("StepText"),
-                    Width = new DataGridLength(80)
-                };
-                grid.Columns.Add(colStep);
-
-                // Колонка 4: Отступ (мм)
-                DataGridTextColumn colOffset = new DataGridTextColumn
-                {
-                    Header = "Отступ (мм)",
-                    Binding = new WpfBinding("OffsetText"),
-                    Width = new DataGridLength(85)
-                };
-                grid.Columns.Add(colOffset);
-
-                Grid.SetRow(grid, 1);
-                mainGrid.Children.Add(grid);
             }
+            grid.Columns.Add(colSymbol);
 
-            // Блок опций переноса параметров и ориентации
+            // Колонка 3: Шаг (мм)
+            DataGridTextColumn colStep = new DataGridTextColumn
+            {
+                Header = "Шаг (мм)",
+                Binding = new WpfBinding("StepText"),
+                Width = new DataGridLength(85)
+            };
+            grid.Columns.Add(colStep);
+
+            // Колонка 4: Отступ (мм)
+            DataGridTextColumn colOffset = new DataGridTextColumn
+            {
+                Header = "Отступ (мм)",
+                Binding = new WpfBinding("OffsetText"),
+                Width = new DataGridLength(90)
+            };
+            grid.Columns.Add(colOffset);
+
+            Grid.SetRow(grid, 2);
+            mainGrid.Children.Add(grid);
+
+            // 4. Блок настроек параметров и 3D поворота
             Border paramBorder = new Border
             {
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(37, 37, 45)),
-                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 72)),
+                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(34, 34, 42)),
+                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(70, 70, 85)),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(4),
                 Margin = new Thickness(15, 5, 15, 5),
@@ -215,74 +234,78 @@ namespace BimboClub.PipeClamps
 
             StackPanel paramPanel = new StackPanel();
 
-            // Чекбокс переноса параметра
-            _chkCopyParam = new CheckBox
+            // Секция параметров перезаписи
+            TextBlock secParamTitle = new TextBlock
             {
-                Content = "Переносить параметр стояка в хомут",
+                Text = "Перенос параметров из трубы стояка в хомут:",
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0)),
+                FontWeight = FontWeights.Bold,
+                FontSize = 12,
+                Margin = new Thickness(0, 0, 0, 8)
+            };
+            paramPanel.Children.Add(secParamTitle);
+
+            // Параметр 1 (ADSK_Номер стояка)
+            _chkCopyParam1 = new CheckBox
+            {
+                Content = "Параметр 1 (например, ADSK_Номер стояка):",
                 IsChecked = true,
                 Foreground = System.Windows.Media.Brushes.White,
                 FontWeight = FontWeights.SemiBold,
                 FontSize = 12,
-                Margin = new Thickness(0, 0, 0, 8)
+                Margin = new Thickness(0, 0, 0, 4)
             };
-            paramPanel.Children.Add(_chkCopyParam);
+            paramPanel.Children.Add(_chkCopyParam1);
 
-            // Ряд полей имен параметров
-            Grid fieldsGrid = new Grid();
-            fieldsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            fieldsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(15) });
-            fieldsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            Grid fGrid1 = new Grid();
+            fGrid1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            fGrid1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(15) });
+            fGrid1.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            StackPanel p1 = new StackPanel();
-            p1.Children.Add(new TextBlock
+            _txtSourceParam1 = CreateHighContrastTextBox("ADSK_Номер стояка");
+            _txtTargetParam1 = CreateHighContrastTextBox("ADSK_Номер стояка");
+            Grid.SetColumn(_txtSourceParam1, 0);
+            Grid.SetColumn(_txtTargetParam1, 2);
+            fGrid1.Children.Add(_txtSourceParam1);
+            fGrid1.Children.Add(_txtTargetParam1);
+            paramPanel.Children.Add(fGrid1);
+
+            // Параметр 2 (ADSK_Секция)
+            _chkCopyParam2 = new CheckBox
             {
-                Text = "Параметр из трубы (источник):",
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(190, 190, 200)),
-                FontSize = 11,
-                Margin = new Thickness(0, 0, 0, 3)
-            });
-            _txtSourceParam = new TextBox
-            {
-                Text = "ADSK_Номер стояка",
-                Height = 26,
-                Padding = new Thickness(4, 2, 4, 2)
+                Content = "Параметр 2 (например, ADSK_Секция):",
+                IsChecked = true,
+                Foreground = System.Windows.Media.Brushes.White,
+                FontWeight = FontWeights.SemiBold,
+                FontSize = 12,
+                Margin = new Thickness(0, 8, 0, 4)
             };
-            p1.Children.Add(_txtSourceParam);
-            Grid.SetColumn(p1, 0);
-            fieldsGrid.Children.Add(p1);
+            paramPanel.Children.Add(_chkCopyParam2);
 
-            StackPanel p2 = new StackPanel();
-            p2.Children.Add(new TextBlock
-            {
-                Text = "Параметр в хомуте (приемник):",
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(190, 190, 200)),
-                FontSize = 11,
-                Margin = new Thickness(0, 0, 0, 3)
-            });
-            _txtTargetParam = new TextBox
-            {
-                Text = "ADSK_Номер стояка",
-                Height = 26,
-                Padding = new Thickness(4, 2, 4, 2)
-            };
-            p2.Children.Add(_txtTargetParam);
-            Grid.SetColumn(p2, 2);
-            fieldsGrid.Children.Add(p2);
+            Grid fGrid2 = new Grid();
+            fGrid2.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            fGrid2.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(15) });
+            fGrid2.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            paramPanel.Children.Add(fieldsGrid);
+            _txtSourceParam2 = CreateHighContrastTextBox("ADSK_Секция");
+            _txtTargetParam2 = CreateHighContrastTextBox("ADSK_Секция");
+            Grid.SetColumn(_txtSourceParam2, 0);
+            Grid.SetColumn(_txtTargetParam2, 2);
+            fGrid2.Children.Add(_txtSourceParam2);
+            fGrid2.Children.Add(_txtTargetParam2);
+            paramPanel.Children.Add(fGrid2);
 
-            // Заголовок раздела поворотов в 3D
+            // Секция 3D Поворота
             TextBlock rotTitle = new TextBlock
             {
                 Text = "Ориентация / Поворот хомута в 3D плоскостях (в градусах):",
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 180, 50)),
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0)),
                 FontWeight = FontWeights.Bold,
                 FontSize = 12,
-                Margin = new Thickness(0, 10, 0, 6)
+                Margin = new Thickness(0, 12, 0, 6)
             };
             paramPanel.Children.Add(rotTitle);
 
-            // Ряд настроек поворота по осям X, Y, Z
             Grid rotGrid = new Grid();
             rotGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             rotGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
@@ -292,42 +315,24 @@ namespace BimboClub.PipeClamps
 
             // Ось X
             StackPanel rx = new StackPanel();
-            rx.Children.Add(new TextBlock
-            {
-                Text = "Ось X (наклон 1):",
-                Foreground = System.Windows.Media.Brushes.LightGray,
-                FontSize = 11,
-                Margin = new Thickness(0, 0, 0, 2)
-            });
-            _txtRotateX = new TextBox { Text = "0", Height = 24, Padding = new Thickness(4, 1, 4, 1) };
+            rx.Children.Add(new TextBlock { Text = "Ось X (наклон 1):", Foreground = System.Windows.Media.Brushes.White, FontSize = 11, Margin = new Thickness(0, 0, 0, 2) });
+            _txtRotateX = CreateHighContrastTextBox("0");
             rx.Children.Add(_txtRotateX);
             Grid.SetColumn(rx, 0);
             rotGrid.Children.Add(rx);
 
             // Ось Y
             StackPanel ry = new StackPanel();
-            ry.Children.Add(new TextBlock
-            {
-                Text = "Ось Y (наклон 2):",
-                Foreground = System.Windows.Media.Brushes.LightGray,
-                FontSize = 11,
-                Margin = new Thickness(0, 0, 0, 2)
-            });
-            _txtRotateY = new TextBox { Text = "0", Height = 24, Padding = new Thickness(4, 1, 4, 1) };
+            ry.Children.Add(new TextBlock { Text = "Ось Y (наклон 2):", Foreground = System.Windows.Media.Brushes.White, FontSize = 11, Margin = new Thickness(0, 0, 0, 2) });
+            _txtRotateY = CreateHighContrastTextBox("0");
             ry.Children.Add(_txtRotateY);
             Grid.SetColumn(ry, 2);
             rotGrid.Children.Add(ry);
 
             // Ось Z
             StackPanel rz = new StackPanel();
-            rz.Children.Add(new TextBlock
-            {
-                Text = "Ось Z (вокруг стояка):",
-                Foreground = System.Windows.Media.Brushes.LightGray,
-                FontSize = 11,
-                Margin = new Thickness(0, 0, 0, 2)
-            });
-            _txtRotateZ = new TextBox { Text = "0", Height = 24, Padding = new Thickness(4, 1, 4, 1) };
+            rz.Children.Add(new TextBlock { Text = "Ось Z (вокруг стояка):", Foreground = System.Windows.Media.Brushes.White, FontSize = 11, Margin = new Thickness(0, 0, 0, 2) });
+            _txtRotateZ = CreateHighContrastTextBox("0");
             rz.Children.Add(_txtRotateZ);
             Grid.SetColumn(rz, 4);
             rotGrid.Children.Add(rz);
@@ -335,14 +340,13 @@ namespace BimboClub.PipeClamps
             paramPanel.Children.Add(rotGrid);
 
             paramBorder.Child = paramPanel;
-
-            Grid.SetRow(paramBorder, 2);
+            Grid.SetRow(paramBorder, 3);
             mainGrid.Children.Add(paramBorder);
 
-            // Подвал с кнопкой
+            // 5. Подвал с кнопкой действия
             Border footerBorder = new Border
             {
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36)),
+                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 30)),
                 BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(50, 50, 60)),
                 BorderThickness = new Thickness(0, 1, 0, 0)
             };
@@ -350,23 +354,44 @@ namespace BimboClub.PipeClamps
             Button btnStart = new Button
             {
                 Content = "Расставить хомуты",
-                Width = 200,
-                Height = 36,
+                Width = 220,
+                Height = 38,
                 Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45)),
                 Foreground = System.Windows.Media.Brushes.White,
                 FontWeight = FontWeights.Bold,
-                FontSize = 13,
+                FontSize = 14,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                IsEnabled = _rowViewModels.Count > 0
+                VerticalAlignment = VerticalAlignment.Center
             };
             btnStart.Click += BtnStart_Click;
             footerBorder.Child = btnStart;
 
-            Grid.SetRow(footerBorder, 3);
+            Grid.SetRow(footerBorder, 4);
             mainGrid.Children.Add(footerBorder);
 
             Content = mainGrid;
+        }
+
+        private TextBox CreateHighContrastTextBox(string defaultText)
+        {
+            return new TextBox
+            {
+                Text = defaultText,
+                Height = 26,
+                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(18, 18, 24)),
+                Foreground = System.Windows.Media.Brushes.White,
+                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(100, 100, 120)),
+                BorderThickness = new Thickness(1),
+                Padding = new Thickness(5, 2, 5, 2),
+                FontWeight = FontWeights.Medium,
+                FontSize = 12
+            };
+        }
+
+        private void ChkActiveViewOnly_Changed(object sender, RoutedEventArgs e)
+        {
+            bool activeViewOnly = _chkActiveViewOnly.IsChecked == true;
+            InitData(_doc, activeViewOnly);
         }
 
         private void BtnStart_Click(object sender, RoutedEventArgs e)
@@ -404,9 +429,16 @@ namespace BimboClub.PipeClamps
 
             ResultOptions = new PipeClampsPlacementOptions
             {
-                CopyRiserParameter = _chkCopyParam.IsChecked == true,
-                SourceParamName = _txtSourceParam.Text?.Trim(),
-                TargetParamName = _txtTargetParam.Text?.Trim(),
+                ActiveViewOnly = _chkActiveViewOnly.IsChecked == true,
+
+                CopyParam1 = _chkCopyParam1.IsChecked == true,
+                SourceParam1 = _txtSourceParam1.Text?.Trim(),
+                TargetParam1 = _txtTargetParam1.Text?.Trim(),
+
+                CopyParam2 = _chkCopyParam2.IsChecked == true,
+                SourceParam2 = _txtSourceParam2.Text?.Trim(),
+                TargetParam2 = _txtTargetParam2.Text?.Trim(),
+
                 RotateXDeg = rx,
                 RotateYDeg = ry,
                 RotateZDeg = rz
