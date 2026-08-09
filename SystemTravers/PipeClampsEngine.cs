@@ -22,7 +22,10 @@ namespace BimboClub.PipeClamps
         public bool CopyRiserParameter { get; set; } = true;
         public string SourceParamName { get; set; } = "ADSK_Номер стояка";
         public string TargetParamName { get; set; } = "ADSK_Номер стояка";
-        public bool Rotate90Degrees { get; set; } = false;
+        
+        public double RotateXDeg { get; set; } = 0;
+        public double RotateYDeg { get; set; } = 0;
+        public double RotateZDeg { get; set; } = 0;
     }
 
     public class PipeClampsResult
@@ -177,17 +180,37 @@ namespace BimboClub.PipeClamps
                             countOnPipe++;
                             result.ClampsPlaced++;
 
-                            // Вращение хомута на 90 градусов при необходимости
-                            if (options != null && options.Rotate90Degrees)
+                            // Повороты элемента в 3D пространстве по осям X, Y, Z
+                            if (options != null)
                             {
-                                try
+                                if (Math.Abs(options.RotateXDeg) > 0.001)
                                 {
-                                    Line axis = Line.CreateBound(placementPoint, placementPoint + XYZ.BasisZ);
-                                    ElementTransformUtils.RotateElement(doc, clampInst.Id, axis, Math.PI / 2.0);
+                                    try
+                                    {
+                                        Line axisX = Line.CreateBound(placementPoint, placementPoint + XYZ.BasisX);
+                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisX, options.RotateXDeg * Math.PI / 180.0);
+                                    }
+                                    catch { }
                                 }
-                                catch
+
+                                if (Math.Abs(options.RotateYDeg) > 0.001)
                                 {
-                                    // Игнорируем, если элемент заблокирован для поворота
+                                    try
+                                    {
+                                        Line axisY = Line.CreateBound(placementPoint, placementPoint + XYZ.BasisY);
+                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisY, options.RotateYDeg * Math.PI / 180.0);
+                                    }
+                                    catch { }
+                                }
+
+                                if (Math.Abs(options.RotateZDeg) > 0.001)
+                                {
+                                    try
+                                    {
+                                        Line axisZ = Line.CreateBound(placementPoint, placementPoint + XYZ.BasisZ);
+                                        ElementTransformUtils.RotateElement(doc, clampInst.Id, axisZ, options.RotateZDeg * Math.PI / 180.0);
+                                    }
+                                    catch { }
                                 }
                             }
 

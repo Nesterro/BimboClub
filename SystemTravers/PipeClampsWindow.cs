@@ -40,13 +40,16 @@ namespace BimboClub.PipeClamps
         private CheckBox _chkCopyParam;
         private TextBox _txtSourceParam;
         private TextBox _txtTargetParam;
-        private CheckBox _chkRotate90;
+
+        private TextBox _txtRotateX;
+        private TextBox _txtRotateY;
+        private TextBox _txtRotateZ;
 
         public PipeClampsWindow(Document doc)
         {
             Title = "Расстановка хомутов — BimboClub";
             Width = 680;
-            Height = 620;
+            Height = 650;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.CanResizeWithGrip;
 
@@ -212,11 +215,7 @@ namespace BimboClub.PipeClamps
 
             StackPanel paramPanel = new StackPanel();
 
-            // Верхний ряд галочек
-            Grid optionsHeaderGrid = new Grid();
-            optionsHeaderGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            optionsHeaderGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
+            // Чекбокс переноса параметра
             _chkCopyParam = new CheckBox
             {
                 Content = "Переносить параметр стояка в хомут",
@@ -226,22 +225,7 @@ namespace BimboClub.PipeClamps
                 FontSize = 12,
                 Margin = new Thickness(0, 0, 0, 8)
             };
-            Grid.SetColumn(_chkCopyParam, 0);
-            optionsHeaderGrid.Children.Add(_chkCopyParam);
-
-            _chkRotate90 = new CheckBox
-            {
-                Content = "Повернуть хомуты на 90°",
-                IsChecked = false,
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 180, 50)),
-                FontWeight = FontWeights.Bold,
-                FontSize = 12,
-                Margin = new Thickness(0, 0, 0, 8)
-            };
-            Grid.SetColumn(_chkRotate90, 1);
-            optionsHeaderGrid.Children.Add(_chkRotate90);
-
-            paramPanel.Children.Add(optionsHeaderGrid);
+            paramPanel.Children.Add(_chkCopyParam);
 
             // Ряд полей имен параметров
             Grid fieldsGrid = new Grid();
@@ -286,6 +270,69 @@ namespace BimboClub.PipeClamps
             fieldsGrid.Children.Add(p2);
 
             paramPanel.Children.Add(fieldsGrid);
+
+            // Заголовок раздела поворотов в 3D
+            TextBlock rotTitle = new TextBlock
+            {
+                Text = "Ориентация / Поворот хомута в 3D плоскостях (в градусах):",
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 180, 50)),
+                FontWeight = FontWeights.Bold,
+                FontSize = 12,
+                Margin = new Thickness(0, 10, 0, 6)
+            };
+            paramPanel.Children.Add(rotTitle);
+
+            // Ряд настроек поворота по осям X, Y, Z
+            Grid rotGrid = new Grid();
+            rotGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            rotGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
+            rotGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            rotGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(10) });
+            rotGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            // Ось X
+            StackPanel rx = new StackPanel();
+            rx.Children.Add(new TextBlock
+            {
+                Text = "Ось X (наклон 1):",
+                Foreground = System.Windows.Media.Brushes.LightGray,
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 0, 2)
+            });
+            _txtRotateX = new TextBox { Text = "0", Height = 24, Padding = new Thickness(4, 1, 4, 1) };
+            rx.Children.Add(_txtRotateX);
+            Grid.SetColumn(rx, 0);
+            rotGrid.Children.Add(rx);
+
+            // Ось Y
+            StackPanel ry = new StackPanel();
+            ry.Children.Add(new TextBlock
+            {
+                Text = "Ось Y (наклон 2):",
+                Foreground = System.Windows.Media.Brushes.LightGray,
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 0, 2)
+            });
+            _txtRotateY = new TextBox { Text = "0", Height = 24, Padding = new Thickness(4, 1, 4, 1) };
+            ry.Children.Add(_txtRotateY);
+            Grid.SetColumn(ry, 2);
+            rotGrid.Children.Add(ry);
+
+            // Ось Z
+            StackPanel rz = new StackPanel();
+            rz.Children.Add(new TextBlock
+            {
+                Text = "Ось Z (вокруг стояка):",
+                Foreground = System.Windows.Media.Brushes.LightGray,
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 0, 2)
+            });
+            _txtRotateZ = new TextBox { Text = "0", Height = 24, Padding = new Thickness(4, 1, 4, 1) };
+            rz.Children.Add(_txtRotateZ);
+            Grid.SetColumn(rz, 4);
+            rotGrid.Children.Add(rz);
+
+            paramPanel.Children.Add(rotGrid);
 
             paramBorder.Child = paramPanel;
 
@@ -351,12 +398,18 @@ namespace BimboClub.PipeClamps
                 return;
             }
 
+            double.TryParse(_txtRotateX.Text, out double rx);
+            double.TryParse(_txtRotateY.Text, out double ry);
+            double.TryParse(_txtRotateZ.Text, out double rz);
+
             ResultOptions = new PipeClampsPlacementOptions
             {
                 CopyRiserParameter = _chkCopyParam.IsChecked == true,
                 SourceParamName = _txtSourceParam.Text?.Trim(),
                 TargetParamName = _txtTargetParam.Text?.Trim(),
-                Rotate90Degrees = _chkRotate90.IsChecked == true
+                RotateXDeg = rx,
+                RotateYDeg = ry,
+                RotateZDeg = rz
             };
 
             UserApproved = true;
