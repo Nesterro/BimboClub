@@ -18,6 +18,7 @@ namespace BimboClubManager.Services
         public UpdateService()
         {
             _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("BimboClubManager/2.0 (Windows; Revit Plugin Update Manager)");
         }
 
         public class UpdateManifest
