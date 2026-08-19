@@ -48,32 +48,26 @@ Compress-Archive -Path "$tempNet8\*" -DestinationPath "UpdateServerMock\packages
 Remove-Item $tempNet48 -Recurse -Force
 Remove-Item $tempNet8 -Recurse -Force
 
-# 3. Publish and package BimboClubManager
+# 3. Publish standalone single-file compressed BimboClubManager.exe
 if (-not $NoManager) {
-    Write-Host "--- 3. Publishing and packaging BimboClubManager.zip ---" -ForegroundColor Cyan
-    dotnet publish BimboClubManager\BimboClubManager.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -p:PublishReadyToRun=true -p:DebugType=None -p:DebugSymbols=false -p:Version=$Version
+    Write-Host "--- 3. Publishing standalone single-file compressed BimboClubManager.exe ---" -ForegroundColor Cyan
+    dotnet publish BimboClubManager\BimboClubManager.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -p:Version=$Version
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Manager publish failed!"
         exit 1
     }
 
-    # Copy local release files
-    $releaseFolder = "BimboClubManager_Release"
-    if (Test-Path $releaseFolder) { Remove-Item $releaseFolder -Recurse -Force }
-    $null = New-Item -ItemType Directory -Path $releaseFolder -Force
-    Copy-Item "BimboClubManager\bin\Release\net8.0-windows\win-x64\publish\*" -Destination $releaseFolder -Recurse -Force
+    # Copy single EXE file to release output
+    $singleExe = "BimboClubManager\bin\Release\net8.0-windows\win-x64\publish\BimboClubManager.exe"
+    Copy-Item $singleExe -Destination "BimboClubManager.exe" -Force
 
     # Copy to Yandex.Disk
-    $yandexFolder = "D:\Yandex.Disk\Revit\Plugins\BimboClubManager"
+    $yandexFolder = "D:\Yandex.Disk\Revit\Plugins"
     Stop-Process -Name "BimboClubManager" -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 1
-    Copy-Item "BimboClubManager\bin\Release\net8.0-windows\win-x64\publish\*" -Destination $yandexFolder -Recurse -Force
-
-    # Create ZIP archive for manager
-    Compress-Archive -Path "BimboClubManager_Release\*" -DestinationPath "BimboClubManager.zip" -Force
-    Copy-Item "BimboClubManager.zip" -Destination "D:\Yandex.Disk\Revit\Plugins\BimboClubManager.zip" -Force
+    Copy-Item $singleExe -Destination "$yandexFolder\BimboClubManager.exe" -Force
 } else {
-    Write-Host "--- 3. Skipping BimboClubManager compile and package (-NoManager set) ---" -ForegroundColor Yellow
+    Write-Host "--- 3. Skipping BimboClubManager compile (-NoManager set) ---" -ForegroundColor Yellow
 }
 
 # 4. Update manifest and push to Git
@@ -92,20 +86,22 @@ $manifest = [ordered]@{
 $json = ConvertTo-Json $manifest -Depth 4
 [System.IO.File]::WriteAllText((Resolve-Path $manifestPath), $json, [System.Text.Encoding]::UTF8)
 
-# Git push
-git add updates/update_manifest.json
+# Git push (BimboClubManager.exe is gitignored and will NOT be committed to git repo)
+git add .
 git commit -m "Release version v$Version"
 git push origin main
 
-# 5. Create Release on GitHub via GitHub CLI
+# 5. Delete existing release tag if exists and recreate release on GitHub via GitHub CLI
 Write-Host "--- 5. Creating Release and uploading assets to GitHub ---" -ForegroundColor Cyan
 $ghPath = "C:\Program Files\GitHub CLI\gh.exe"
-$notes = "BimboClub Tools update version $Version released on $date`n`nChanges:`n" + (($Changelog | ForEach-Object { "- $_" }) -join "`n")
+$notes = "BimboClub Tools version $Version released on $date`n`nChanges:`n" + (($Changelog | ForEach-Object { "- $_" }) -join "`n")
+
+& $ghPath release delete "v$Version" -y --cleanup-tag 2>$null
 
 if ($NoManager) {
     & $ghPath release create "v$Version" "UpdateServerMock\packages\bimboclub_net48.zip" "UpdateServerMock\packages\bimboclub_net8.zip" --title "BimboClub Tools v$Version" --notes $notes
 } else {
-    & $ghPath release create "v$Version" "BimboClubManager.zip" "UpdateServerMock\packages\bimboclub_net48.zip" "UpdateServerMock\packages\bimboclub_net8.zip" --title "BimboClub Tools v$Version" --notes $notes
+    & $ghPath release create "v$Version" "BimboClubManager.exe" "UpdateServerMock\packages\bimboclub_net48.zip" "UpdateServerMock\packages\bimboclub_net8.zip" --title "BimboClub Tools v$Version" --notes $notes
 }
 
 Write-Host ""

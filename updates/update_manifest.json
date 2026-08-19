@@ -1,14 +1,13 @@
 ﻿{
-    "latestVersion":  "2.1.0",
+    "latestVersion":  "2.1.1",
     "releaseDate":  "2026-08-19",
     "changelog":  [
-                      "Full port of all 11 tools from BCCBIM repository",
-                      "AdWindows WPF gold badge dot on Revit ribbon tab header",
-                      "Antigravity dark UI overhaul across all WPF windows",
-                      "Support for Revit 2021-2026 (.NET 4.8 and .NET 8.0)"
+                      "Fixed BimboClubManager startup crash by embedding icon resource",
+                      "Published BimboClubManager as a single standalone EXE file on GitHub",
+                      "Updated BimboClubManager exe icon to high-res 3D gold BIM logo"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.1/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.1/bimboclub_net8.zip"
                  }
 }

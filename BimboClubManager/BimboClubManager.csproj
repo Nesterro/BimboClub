@@ -7,7 +7,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>icon_manager.ico</ApplicationIcon>
-    <StartupObject />
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="icon_manager.png" />
+    <None Include="icon_manager.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>
