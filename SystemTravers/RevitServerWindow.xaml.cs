@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -41,7 +41,7 @@ namespace BimboClub
             ModelsListBox.ItemsSource = CurrentFolderModels;
 
             // Load saved destination path from temporary user settings if any, or default to Documents
-            string defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BIMBCC_Downloads");
+            string defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BimboClub_Downloads");
             DestinationFolderTextBox.Text = defaultPath;
         }
 

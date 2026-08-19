@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -95,7 +95,7 @@ namespace BimboClub
 
                     int placedCount = 0;
 
-                    using (Transaction trans = new Transaction(doc, "BIMBCC Расстановка крепежа"))
+                    using (Transaction trans = new Transaction(doc, "BimboClub Расстановка крепежа"))
                     {
                         trans.Start();
 
@@ -156,7 +156,7 @@ namespace BimboClub
                         trans.Commit();
                     }
 
-                    TaskDialog.Show("BIMBCC | Расстановка крепежа", $"Расстановка успешно завершена!\nРазмещено креплений: {placedCount}");
+                    TaskDialog.Show("BimboClub | Расстановка крепежа", $"Расстановка успешно завершена!\nРазмещено креплений: {placedCount}");
                     return Result.Succeeded;
                 }
 

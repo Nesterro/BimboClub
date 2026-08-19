@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Interop;
@@ -52,7 +52,7 @@ namespace BimboClub
                     int total = points.Count;
                     int successCount = 0;
 
-                    using (Transaction trans = new Transaction(doc, "BIMBCC Расстановка по XYZ"))
+                    using (Transaction trans = new Transaction(doc, "BimboClub Расстановка по XYZ"))
                     {
                         trans.Start();
 
@@ -99,7 +99,7 @@ namespace BimboClub
 
                     MessageBox.Show(
                         $"Успешно расставлено {successCount} из {total} элементов по координатам!",
-                        "BIMBCC | Расстановка по XYZ",
+                        "BimboClub | Расстановка по XYZ",
                         MessageBoxButton.OK,
                         MessageBoxImage.Information
                     );

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
@@ -147,7 +147,7 @@ namespace BimboClub
                 return result;
             }
 
-            using (Transaction tx = new Transaction(_doc, "BIMBCC — Копирование фильтров видов"))
+            using (Transaction tx = new Transaction(_doc, "BimboClub — Копирование фильтров видов"))
             {
                 tx.Start();
 

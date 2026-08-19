@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Interop;
 using Autodesk.Revit.Attributes;
@@ -36,7 +36,7 @@ namespace BimboClub
             catch (Exception ex)
             {
                 message = ex.Message;
-                MessageBox.Show($"Произошла ошибка при запуске модуля Копирования фильтров:\n{ex.Message}", "Ошибка BIMBCC", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Произошла ошибка при запуске модуля Копирования фильтров:\n{ex.Message}", "Ошибка BimboClub", MessageBoxButton.OK, MessageBoxImage.Error);
                 return Result.Failed;
             }
         }

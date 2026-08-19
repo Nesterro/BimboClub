@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -126,7 +126,7 @@ namespace BimboClub
                         pdfOptions.HideCropBoundaries = true;
 
                         // Execute native export
-                        using (Transaction trans = new Transaction(doc, "BIMBCC Native PDF Export"))
+                        using (Transaction trans = new Transaction(doc, "BimboClub Native PDF Export"))
                         {
                             trans.Start();
 
@@ -182,7 +182,7 @@ namespace BimboClub
                             }
 
                             // Setup print settings inside transaction
-                            using (Transaction trans = new Transaction(doc, "BIMBCC Print Configuration"))
+                            using (Transaction trans = new Transaction(doc, "BimboClub Print Configuration"))
                             {
                                 trans.Start();
 
@@ -203,7 +203,7 @@ namespace BimboClub
                                 }
                                 catch
                                 {
-                                    try { viewSheetSetting.SaveAs("BIMBCC_Temp_Set"); } catch { }
+                                    try { viewSheetSetting.SaveAs("BimboClub_Temp_Set"); } catch { }
                                 }
 
                                 PrintParameters printParams = printManager.PrintSetup.CurrentPrintSetting.PrintParameters;
@@ -256,7 +256,7 @@ namespace BimboClub
                                     try { File.Delete(filePath); } catch { }
                                 }
 
-                                using (Transaction trans = new Transaction(doc, "BIMBCC Print Single Sheet"))
+                                using (Transaction trans = new Transaction(doc, "BimboClub Print Single Sheet"))
                                 {
                                     trans.Start();
 
@@ -273,7 +273,7 @@ namespace BimboClub
                                     }
                                     catch
                                     {
-                                        try { viewSheetSetting.SaveAs("BIMBCC_Temp_Set"); } catch { }
+                                        try { viewSheetSetting.SaveAs("BimboClub_Temp_Set"); } catch { }
                                     }
 
                                     PrintParameters printParams = printManager.PrintSetup.CurrentPrintSetting.PrintParameters;
@@ -312,7 +312,7 @@ namespace BimboClub
                     // Prompt to open directory
                     var openFolderResult = MessageBox.Show(
                         "Экспорт успешно завершен!\n\nОткрыть папку с напечатанными PDF файлами?",
-                        "BIMBCC | Экспорт PDF",
+                        "BimboClub | Экспорт PDF",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question
                     );

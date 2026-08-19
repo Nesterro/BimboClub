@@ -114,14 +114,14 @@ namespace BimboClub
             // 1. Убедиться, что в семействе кубика есть все общие параметры и формулы
             EnsureCubeFamilyParametersAndFormulas(symbol);
 
-            using (Transaction tx = new Transaction(_doc, "BIMBCC Теплопотери — очистка конфликтующих параметров проекта"))
+            using (Transaction tx = new Transaction(_doc, "BimboClub Теплопотери — очистка конфликтующих параметров проекта"))
             {
                 tx.Start();
                 CleanupConflictingProjectBindings();
                 tx.Commit();
             }
 
-            using (Transaction tx = new Transaction(_doc, "BIMBCC Теплопотери — расстановка кубиков"))
+            using (Transaction tx = new Transaction(_doc, "BimboClub Теплопотери — расстановка кубиков"))
             {
                 tx.Start();
 
@@ -476,12 +476,12 @@ namespace BimboClub
         // ───────────────────────────────────────────────────────────────────
         public string CreateOrUpdateSchedule(out string errorMessage)
         {
-            const string schedName = "BIMBCC Теплопотери";
+            const string schedName = "BimboClub Теплопотери";
             errorMessage = null;
 
             try
             {
-                using (Transaction tx = new Transaction(_doc, "BIMBCC Теплопотери — спецификация"))
+                using (Transaction tx = new Transaction(_doc, "BimboClub Теплопотери — спецификация"))
                 {
                     tx.Start();
 
@@ -674,7 +674,7 @@ namespace BimboClub
 
             int updatedCount = 0;
 
-            using (Transaction tx = new Transaction(_doc, "BIMBCC | Создание типов кубика и запись коэффициентов k на ТИП"))
+            using (Transaction tx = new Transaction(_doc, "BimboClub | Создание типов кубика и запись коэффициентов k на ТИП"))
             {
                 tx.Start();
 
@@ -830,7 +830,7 @@ namespace BimboClub
                     sb.AppendLine("*META\tVERSION\tMINVERSION");
                     sb.AppendLine("META\t2\t1");
                     sb.AppendLine("*GROUP\tID\tNAME");
-                    sb.AppendLine("GROUP\t1\tBIMBCC_HeatLoss");
+                    sb.AppendLine("GROUP\t1\tBimboClub_HeatLoss");
                     sb.AppendLine("*PARAM\tGUID\tNAME\tDATATYPE\tDATACATEGORY\tGROUP\tVISIBLE\tDESCRIPTION\tUSERMODIFIABLE\tHIDEWHENNOVALUE");
 
                     foreach (string name in AllTextParams)
@@ -850,11 +850,11 @@ namespace BimboClub
                     DefinitionFile defFile = _doc.Application.OpenSharedParameterFile();
                     if (defFile == null) return;
 
-                    DefinitionGroup grp = defFile.Groups.get_Item("BIMBCC_HeatLoss") ?? defFile.Groups.Create("BIMBCC_HeatLoss");
+                    DefinitionGroup grp = defFile.Groups.get_Item("BimboClub_HeatLoss") ?? defFile.Groups.Create("BimboClub_HeatLoss");
 
                     bool modified = false;
 
-                    using (Transaction tx = new Transaction(famDoc, "BIMBCC — Добавление параметров и формул в семейство кубика"))
+                    using (Transaction tx = new Transaction(famDoc, "BimboClub — Добавление параметров и формул в семейство кубика"))
                     {
                         tx.Start();
                         FamilyManager famMgr = famDoc.FamilyManager;

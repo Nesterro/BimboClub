@@ -70,7 +70,7 @@ namespace BimboClub
                 catch { }
             }
 
-            using (Transaction trans = new Transaction(doc, "BIMBCC Пакетное добавление параметров"))
+            using (Transaction trans = new Transaction(doc, "BimboClub Пакетное добавление параметров"))
             {
                 trans.Start();
 
@@ -339,7 +339,7 @@ namespace BimboClub
 
             int total = paramsToDelete.Count;
 
-            using (Transaction trans = new Transaction(doc, "BIMBCC Пакетное удаление параметров"))
+            using (Transaction trans = new Transaction(doc, "BimboClub Пакетное удаление параметров"))
             {
                 trans.Start();
 

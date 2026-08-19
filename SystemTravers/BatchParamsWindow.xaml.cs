@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -315,7 +315,7 @@ namespace BimboClub
             Microsoft.Win32.SaveFileDialog sfd = new Microsoft.Win32.SaveFileDialog
             {
                 Filter = "Пресет параметров (*.json)|*.json",
-                Title = "Сохранить пресет параметров ModPlus/BIMBCC",
+                Title = "Сохранить пресет параметров ModPlus/BimboClub",
                 FileName = "Пресет_Параметров.json"
             };
 
@@ -329,7 +329,7 @@ namespace BimboClub
                         Items = _stagedParams.ToList()
                     };
                     BatchParamsPreset.SavePreset(sfd.FileName, preset);
-                    MessageBox.Show(this, $"Пресет с {_stagedParams.Count} параметрами успешно сохранен!", "BIMBCC Пресет", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(this, $"Пресет с {_stagedParams.Count} параметрами успешно сохранен!", "BimboClub Пресет", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 catch (Exception ex)
                 {
@@ -343,7 +343,7 @@ namespace BimboClub
             Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog
             {
                 Filter = "Пресет параметров (*.json)|*.json",
-                Title = "Загрузить пресет параметров ModPlus/BIMBCC"
+                Title = "Загрузить пресет параметров ModPlus/BimboClub"
             };
 
             if (ofd.ShowDialog() == true)
@@ -360,7 +360,7 @@ namespace BimboClub
                             _stagedParams.Add(item);
                         }
                         UpdateStagedParamsCount();
-                        MessageBox.Show(this, $"Загружено {preset.Items.Count} параметров из пресета {preset.Name}!", "BIMBCC Пресет", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show(this, $"Загружено {preset.Items.Count} параметров из пресета {preset.Name}!", "BimboClub Пресет", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
                 catch (Exception ex)
@@ -766,7 +766,7 @@ namespace BimboClub
                     (!_doc.IsFamilyDocument ? $"• Назначено категорий проекта: {selectedCategories.Count}\n" : "") +
                     $"• Добавлено новых параметров: {added}\n" +
                     $"• Обновлено существующих: {updated}",
-                    "BIMBCC | Результат пакетной записи",
+                    "BimboClub | Результат пакетной записи",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information
                 );
@@ -858,7 +858,7 @@ namespace BimboClub
                     msg += $"\n• Не удалось удалить: {failedParams.Count} ({string.Join(", ", failedParams.Take(5))})";
                 }
 
-                MessageBox.Show(this, msg, "BIMBCC | Удаление параметров", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(this, msg, "BimboClub | Удаление параметров", MessageBoxButton.OK, MessageBoxImage.Information);
                 ProgressStatusTextBlock.Text = "Удаление параметров завершено.";
                 BatchProgressBar.Value = 100;
             }

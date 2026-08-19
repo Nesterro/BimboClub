@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -164,7 +164,7 @@ namespace BimboClub
                     catch { }
                 }
 
-                TaskDialog td = new TaskDialog("BIMBCC | Теплопотери");
+                TaskDialog td = new TaskDialog("BimboClub | Теплопотери");
                 td.MainInstruction = "Расстановка и расчёт теплопотерь завершены!";
                 td.MainContent =
                     $"• Размещено кубиков: {placedCount}\n" +
@@ -231,7 +231,7 @@ namespace BimboClub
                 {
                     Title = "Сохранить расчёт теплопотерь в Excel",
                     Filter = "Книга Excel (*.xlsx)|*.xlsx",
-                    FileName = $"BIMBCC_Теплопотери_{DateTime.Now:yyyy-MM-dd_HHmm}.xlsx",
+                    FileName = $"BimboClub_Теплопотери_{DateTime.Now:yyyy-MM-dd_HHmm}.xlsx",
                     DefaultExt = ".xlsx"
                 };
 

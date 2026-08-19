@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -93,7 +93,7 @@ namespace BimboClub
 
                     var openResult = MessageBox.Show(
                         $"Успешно экспортировано {exportedCount} из {total} спецификаций!\n\nОткрыть папку с файлами?",
-                        "BIMBCC | Экспорт спецификаций",
+                        "BimboClub | Экспорт спецификаций",
                         MessageBoxButton.YesNo,
                         MessageBoxImage.Question
                     );

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -112,7 +112,7 @@ namespace BimboClub
                     List<ElementId> hostIds = hostElements.Select(h => h.Id).ToList();
                     int placedCount = 0;
 
-                    using (Transaction trans = new Transaction(doc, "BIMBCC Размещение отверстий"))
+                    using (Transaction trans = new Transaction(doc, "BimboClub Размещение отверстий"))
                     {
                         trans.Start();
 
@@ -216,7 +216,7 @@ namespace BimboClub
                         trans.Commit();
                     }
 
-                    TaskDialog.Show("BIMBCC | Задание на отверстия", $"Расстановка заданий на отверстия успешно завершена!\nРазмещено отверстий: {placedCount}");
+                    TaskDialog.Show("BimboClub | Задание на отверстия", $"Расстановка заданий на отверстия успешно завершена!\nРазмещено отверстий: {placedCount}");
                     return Result.Succeeded;
                 }
 

@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.1.1",
+    "latestVersion":  "2.1.2",
     "releaseDate":  "2026-08-19",
     "changelog":  [
-                      "Fixed BimboClubManager startup crash by embedding icon resource",
-                      "Published BimboClubManager as a single standalone EXE file on GitHub",
-                      "Updated BimboClubManager exe icon to high-res 3D gold BIM logo"
+                      "Cleaned up all BIMBCC and BCCBIM references across all tools",
+                      "Fixed UI contrast: white and gold high-contrast typography across all WPF controls and cards",
+                      "Fixed ParamRules (Rule Editor) to run natively without LTools.dll dependency"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.1/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.1/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.2/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.2/bimboclub_net8.zip"
                  }
 }

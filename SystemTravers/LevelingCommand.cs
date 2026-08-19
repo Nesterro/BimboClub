@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -84,7 +84,7 @@ namespace BimboClub
                     int total = targetElements.Count;
                     int updatedCount = 0;
 
-                    using (Transaction trans = new Transaction(doc, "BIMBCC Привязка к уровням"))
+                    using (Transaction trans = new Transaction(doc, "BimboClub Привязка к уровням"))
                     {
                         trans.Start();
 
@@ -112,7 +112,7 @@ namespace BimboClub
 
                     MessageBox.Show(
                         $"Успешно привязано {updatedCount} из {total} элементов к уровням!",
-                        "BIMBCC | Привязка к уровням",
+                        "BimboClub | Привязка к уровням",
                         MessageBoxButton.OK,
                         MessageBoxImage.Information
                     );
