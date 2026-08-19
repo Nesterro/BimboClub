@@ -1,13 +1,14 @@
 ﻿{
-    "latestVersion":  "2.0.0",
+    "latestVersion":  "2.0.1",
     "releaseDate":  "2026-08-19",
     "changelog":  [
-                      "Опубликован обновленный BimboClubManager v2.0.0 с прямой поддержкой загрузки манифеста и пакетов обновления с GitHub",
-                      "Добавлен модуль расстановки хомутов по вертикальным трубопроводам с 3D-вращением и сохранением настроек",
-                      "Исправлено позиционирование хомутов ровно по оси стояка при любых углах поворота"
+                      "Добавлена иконка icon_manager.ico для BimboClubManager.exe",
+                      "Вкладка ленты переименована в ⚫ BimboClub для быстрого визуального поиска",
+                      "Добавлена кнопка Инфо v2.0.1 прямо на ленту с информацией о плагине",
+                      "Удалены устаревшие инструменты Теплопотери, Редактор правил, Заполнение параметров, Добавить параметры"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.0.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.0.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.0.1/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.0.1/bimboclub_net8.zip"
                  }
 }
