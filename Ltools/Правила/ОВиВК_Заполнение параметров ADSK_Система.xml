@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rules>
+	<comment></comment>
+	<rule index="1" enable="true">
+		<comment>ADSK_Система_Имя</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Система_Имя</name>
+				<guid>24c33696-0fa2-4a85-affd-e47d1cf20fb3</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Система_Имя'&#xD;&#xA;: [Имя системы(Sys)]">
+				<fragment type="SystemParameter">
+					<fewSystemsMode>JoinWithSeparator</fewSystemsMode>
+					<paramId>
+						<name>Имя системы</name>
+						<bip>-1140324</bip>
+					</paramId>
+					<isInstanceParam>true</isInstanceParam>
+					<separator>,</separator>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByParameterExistence">
+				<paramId>
+					<name>ADSK_Система_Имя</name>
+					<guid>24c33696-0fa2-4a85-affd-e47d1cf20fb3</guid>
+				</paramId>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="2" enable="true">
+		<comment>ADSK_Система_Сокращение</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Система_Сокращение</name>
+				<guid>a36a81ac-7c43-43a4-8b0d-2e863c569a01</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Система_Сокращение'&#xD;&#xA;: [Сокращение(SysT)]">
+				<fragment type="SystemParameter">
+					<fewSystemsMode>JoinWithSeparator</fewSystemsMode>
+					<paramId>
+						<name>Сокращение</name>
+						<bip>-1140332</bip>
+					</paramId>
+					<isInstanceParam>false</isInstanceParam>
+					<separator>,</separator>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByParameterExistence">
+				<paramId>
+					<name>ADSK_Система_Сокращение</name>
+					<guid>a36a81ac-7c43-43a4-8b0d-2e863c569a01</guid>
+				</paramId>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="3" enable="true">
+		<comment>ADSK_Система_Классификация</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Система_Классификация</name>
+				<guid>a85c3915-2e8e-4ca3-ad9a-a0a883959656</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Система_Классификация'&#xD;&#xA;: [Классификация систем(SysT)]">
+				<fragment type="SystemParameter">
+					<fewSystemsMode>JoinWithSeparator</fewSystemsMode>
+					<paramId>
+						<name>Классификация систем</name>
+						<bip>-1140325</bip>
+					</paramId>
+					<isInstanceParam>false</isInstanceParam>
+					<separator>,</separator>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByParameterExistence">
+				<paramId>
+					<name>ADSK_Система_Классификация</name>
+					<guid>a85c3915-2e8e-4ca3-ad9a-a0a883959656</guid>
+				</paramId>
+			</filter>
+		</filters>
+	</rule>
+</rules>

@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rules>
+	<comment></comment>
+	<rule index="1" enable="true">
+		<comment>01. Оборудование</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 01. Оборудование">
+				<fragment type="Const">
+					<const desc="01. Оборудование" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_1._x0020_Оборудование</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_MechanicalEquipment</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="2" enable="true">
+		<comment>02. Арматура</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 02. Арматура">
+				<fragment type="Const">
+					<const desc="02. Арматура" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_2._x0020_Арматура</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctAccessory</category>
+					<category>OST_PipeAccessory</category>
+					<category>OST_Sprinklers</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="3" enable="true">
+		<comment>03. Воздухораспределители
+</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 03. Воздухораспределители&#xD;&#xA;">
+				<fragment type="Const">
+					<const desc="03. Воздухораспределители&#xD;&#xA;" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_3._x0020_Воздухораспределители_x000D__x000A_</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctTerminal</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="4" enable="false">
+		<comment>04. Закладные детали</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 04. Закладные детали&#xD;&#xA;&#xD;&#xA;">
+				<fragment type="Const">
+					<const desc="04. Закладные детали&#xD;&#xA;&#xD;&#xA;" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_4._x0020_Закладные_x0020_детали_x000D__x000A__x000D__x000A_</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_GenericModel</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="5" enable="true">
+		<comment>05. Воздуховоды
+</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 05. Воздуховоды&#xD;&#xA;&#xD;&#xA;">
+				<fragment type="Const">
+					<const desc="05. Воздуховоды&#xD;&#xA;&#xD;&#xA;" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_5._x0020_Воздуховоды_x000D__x000A__x000D__x000A_</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+					<category>OST_FlexDuctCurves</category>
+					<category>OST_PlaceHolderDucts</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="6" enable="true">
+		<comment>05. Трубы
+</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 05. Трубы&#xD;&#xA;&#xD;&#xA;">
+				<fragment type="Const">
+					<const desc="05. Трубы&#xD;&#xA;&#xD;&#xA;" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_5._x0020_Трубы_x000D__x000A__x000D__x000A_</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_FlexPipeCurves</category>
+					<category>OST_PlaceHolderPipes</category>
+					<category>OST_PipeCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="7" enable="true">
+		<comment>06. Фитинги
+</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 06. Фитинги&#xD;&#xA;&#xD;&#xA;">
+				<fragment type="Const">
+					<const desc="06. Фитинги&#xD;&#xA;&#xD;&#xA;" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_6._x0020_Фитинги_x000D__x000A__x000D__x000A_</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctFitting</category>
+					<category>OST_PipeFitting</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="8" enable="true">
+		<comment>07. Теплоизоляционные конструкции
+</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 07. Теплоизоляционные конструкции&#xD;&#xA;&#xD;&#xA;">
+				<fragment type="Const">
+					<const desc="07. Теплоизоляционные конструкции&#xD;&#xA;&#xD;&#xA;" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_7._x0020_Теплоизоляционные_x0020_конструкции_x000D__x000A__x000D__x000A_</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctLinings</category>
+					<category>OST_DuctInsulations</category>
+					<category>OST_PipeInsulations</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="9" enable="false">
+		<comment>08. Материалы</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 08. Материалы&#xD;&#xA;">
+				<fragment type="Const">
+					<const desc="08. Материалы&#xD;&#xA;" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_8._x0020_Материалы_x000D__x000A_</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_GenericModel</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+	<rule index="10" enable="true">
+		<comment>09. Сантехника</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ЛИИС_Сортировка</name>
+				<guid>f64d4921-1f21-4dc5-9f27-3349a413d747</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ЛИИС_Сортировка'&#xD;&#xA;: 09. Сантехника">
+				<fragment type="Const">
+					<const desc="09. Сантехника" namespace="System" typeName="String" assemblyName="mscorlib">_x0030_9._x0020_Сантехника</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_PlumbingFixtures</category>
+					<category>OST_PlumbingEquipment</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" />
+		</filters>
+	</rule>
+</rules>

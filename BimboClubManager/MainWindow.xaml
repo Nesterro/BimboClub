@@ -6,7 +6,8 @@
         xmlns:vm="clr-namespace:BimboClubManager.ViewModels"
         xmlns:models="clr-namespace:BimboClubManager.Models"
         mc:Ignorable="d"
-        Title="Панель BimboClub" 
+        Title="BimboClub Tools — Менеджер обновлений" 
+        Icon="icon_manager.png"
         Height="650" Width="1000"
         Style="{StaticResource ModernWindowStyle}"
         WindowStartupLocation="CenterScreen"
@@ -39,11 +40,8 @@
 
                     <!-- Application Title & Icon -->
                     <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" Margin="16,0,0,0">
-                        <!-- Custom Logo Drawing -->
-                        <Canvas Width="20" Height="20" Margin="0,0,10,0">
-                            <Ellipse Width="20" Height="20" Fill="{StaticResource AccentGradientBrush}" />
-                            <Path Data="M 6,10 L 10,14 L 14,6" Stroke="White" StrokeThickness="2" Canvas.Left="0" Canvas.Top="0" />
-                        </Canvas>
+                        <!-- Custom Icon -->
+                        <Image Source="icon_manager.png" Width="22" Height="22" Margin="0,0,10,0" VerticalAlignment="Center" />
                         <TextBlock Text="BimboClub Tools" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         <Border Margin="8,0,0,0" Padding="6,2" CornerRadius="4" Background="#1D153E" VerticalAlignment="Center">
                             <TextBlock Text="Менеджер обновлений" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
