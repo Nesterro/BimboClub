@@ -1,13 +1,12 @@
 ﻿{
-    "latestVersion":  "2.1.2",
+    "latestVersion":  "2.1.3",
     "releaseDate":  "2026-08-19",
     "changelog":  [
-                      "Cleaned up all BIMBCC and BCCBIM references across all tools",
-                      "Fixed UI contrast: white and gold high-contrast typography across all WPF controls and cards",
-                      "Fixed ParamRules (Rule Editor) to run natively without LTools.dll dependency"
+                      "Fixed missing BimboClub_def.xml error in Rule Editor by automatically initializing valid default settings XML file",
+                      "Fixed dark foreground contrast on RadioButtons and Labels in HeatLoss window"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.2/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.2/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.3/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.3/bimboclub_net8.zip"
                  }
 }

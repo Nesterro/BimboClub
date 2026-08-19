@@ -13245,9 +13245,20 @@ namespace SAV
 				}
 				else
 				{
-					errReport = "Не найден файл настроек по умолчанию '" + filepath + "'.";
-					Log.Write(errReport);
-					result = null;
+					try
+					{
+						string dirName = System.IO.Path.GetDirectoryName(filepath);
+						if (!string.IsNullOrEmpty(dirName) && !System.IO.Directory.Exists(dirName))
+						{
+							System.IO.Directory.CreateDirectory(dirName);
+						}
+						System.IO.File.WriteAllText(filepath, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<root>\r\n</root>", System.Text.Encoding.UTF8);
+						result = XElement.Load(filepath);
+					}
+					catch
+					{
+						result = new XElement("root");
+					}
 				}
 			}
 			return result;
