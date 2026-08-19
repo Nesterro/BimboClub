@@ -1,0 +1,2189 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Mechanical;
+
+
+namespace BimboClub
+{
+    public enum ExteriorDetectionMode
+    {
+        Auto = 0,
+        ByParameter = 1
+    }
+
+    public enum ParameterConditionType
+    {
+        CheckboxChecked = 0,   // Чекбокс включен (1 / Да / True)
+        CheckboxUnchecked = 1, // Чекбокс выключен (0 / Нет / False)
+        TextEquals = 2,        // Текст равен значению
+        TextContains = 3,      // Текст содержит
+        IsNotEmpty = 4         // Параметр заполнен (не пустой)
+    }
+
+    public enum ExteriorClassificationResult
+    {
+        MatchesExterior = 0,   // Если условие выполнено -> Наружная (isInterior = false)
+        MatchesInterior = 1    // Если условие выполнено -> Внутренняя (isInterior = true)
+    }
+
+    public class ExteriorDetectionOptions
+    {
+        public ExteriorDetectionMode Mode { get; set; } = ExteriorDetectionMode.ByParameter;
+        public string ParameterName { get; set; } = "MN_Наружный";
+        public ParameterConditionType Condition { get; set; } = ParameterConditionType.CheckboxChecked;
+        public string TargetValue { get; set; } = "1";
+        public ExteriorClassificationResult Classification { get; set; } = ExteriorClassificationResult.MatchesExterior;
+        public bool FallbackToAuto { get; set; } = true;
+    }
+
+    /// <summary>
+    /// Основной движок модуля «Теплопотери».
+    /// Для каждого MEP-пространства (Space) находит все ограждающие конструкции,
+    /// размещает экземпляр семейства-кубика и заполняет 18 параметров.
+    /// </summary>
+    public class HeatLossEngine
+    {
+        // ── Имена параметров ────────────────────────────────────────────────
+        public const string P_ROOM_NUMBER       = "BCC_HL_Номер помещения";
+        public const string P_ROOM_NAME         = "BCC_HL_Имя помещения";
+        public const string P_TEMP_OUT          = "BCC_HL_Температура наружного воздуха";
+        public const string P_TEMP_IN           = "BCC_HL_Температура внутреннего воздуха";
+        public const string P_CORNER_TYPE       = "BCC_HL_Тип углового помещения";
+        public const string P_CONSTR_LABEL      = "BCC_HL_Обозначение конструкции";
+        public const string P_ORIENTATION       = "BCC_HL_Ориентация конструкции";
+        public const string P_LENGTH            = "BCC_HL_Длина конструкции";
+        public const string P_HEIGHT            = "BCC_HL_Высота конструкции";
+        public const string P_AREA              = "BCC_HL_Площадь конструкции";
+        public const string P_COEFF_N           = "BCC_HL_Коэффициент n";
+        public const string P_COEFF_K           = "BCC_HL_Коэффициент теплопередачи k";
+        public const string P_ADD_B1            = "BCC_HL_Надбавка b1";
+        public const string P_ADD_B2            = "BCC_HL_Надбавка b2";
+        public const string P_ADD_B3            = "BCC_HL_Надбавка b3";
+        public const string P_ADD_B4            = "BCC_HL_Надбавка b4";
+        public const string P_COEFF_ADD         = "BCC_HL_Коэффициент надбавки";
+        public const string P_HEAT_LOSS         = "BCC_HL_Теплопотери";
+
+        private static readonly string[] AllTextParams = new[]
+        {
+            P_ROOM_NUMBER, P_ROOM_NAME, P_CORNER_TYPE,
+            P_CONSTR_LABEL, P_ORIENTATION
+        };
+        private static readonly string[] AllNumberParams = new[]
+        {
+            P_TEMP_OUT, P_TEMP_IN, P_AREA,
+            P_COEFF_N, P_COEFF_K, P_ADD_B1, P_ADD_B2, P_ADD_B3,
+            P_ADD_B4, P_COEFF_ADD, P_HEAT_LOSS
+        };
+
+        private readonly Document _doc;
+
+        public HeatLossEngine(Document doc)
+        {
+            _doc = doc;
+        }
+
+        private Dictionary<ElementId, string> _typeCodeMap;
+        private Dictionary<string, int> _prefixCounterMap;
+
+        // ───────────────────────────────────────────────────────────────────
+        // Главный метод
+        // ───────────────────────────────────────────────────────────────────
+        public int Run(
+            List<Space> spaces,
+            FamilySymbol symbol,
+            double tempOutside,
+            double tempInside,
+            bool processExteriorWalls,
+            bool processInteriorWalls,
+            bool processFloors,
+            bool processDoors,
+            bool processWindows,
+            ExteriorDetectionOptions exteriorOptions = null)
+        {
+            if (exteriorOptions == null)
+            {
+                exteriorOptions = new ExteriorDetectionOptions();
+            }
+            int placedCount = 0;
+            _typeCodeMap = new Dictionary<ElementId, string>();
+            _prefixCounterMap = new Dictionary<string, int>();
+
+            // 1. Убедиться, что в семействе кубика есть все общие параметры и формулы
+            EnsureCubeFamilyParametersAndFormulas(symbol);
+
+            using (Transaction tx = new Transaction(_doc, "BIMBCC Теплопотери — очистка конфликтующих параметров проекта"))
+            {
+                tx.Start();
+                CleanupConflictingProjectBindings();
+                tx.Commit();
+            }
+
+            using (Transaction tx = new Transaction(_doc, "BIMBCC Теплопотери — расстановка кубиков"))
+            {
+                tx.Start();
+
+                // Удалить старые кубики теплопотерь перед новой расстановкой
+                try
+                {
+                    FilteredElementCollector oldCubeCollector = new FilteredElementCollector(_doc);
+                    List<ElementId> oldCubeIds = oldCubeCollector
+                        .OfClass(typeof(FamilyInstance))
+                        .OfCategory(BuiltInCategory.OST_GenericModel)
+                        .WhereElementIsNotElementType()
+                        .Where(e => {
+                            Parameter pMark = e.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
+                            return (pMark != null && pMark.AsString() != null && pMark.AsString().StartsWith("BCC_HL")) ||
+                                   e.LookupParameter("BCC_HL_Теплопотери") != null;
+                        })
+                        .Select(e => e.Id)
+                        .ToList();
+
+                    if (oldCubeIds.Count > 0)
+                    {
+                        _doc.Delete(oldCubeIds);
+                    }
+                }
+                catch { }
+
+                // Активировать символ
+                if (!symbol.IsActive)
+                {
+                    symbol.Activate();
+                    _doc.Regenerate();
+                }
+
+                SpatialElementBoundaryOptions boundaryOpts = new SpatialElementBoundaryOptions
+                {
+                    SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Finish
+                };
+
+                // Построить карту количества пространств, примыкающих к каждому ограждению
+                Dictionary<string, int> wallSpaceCountMap = BuildWallSpaceCountMap(spaces, boundaryOpts);
+
+                int tempFromSpaceCount = 0;
+                int tempDefaultCount = 0;
+
+                foreach (Space space in spaces)
+                {
+                    string roomNumber, roomName;
+                    GetSpaceRoomNumberAndName(space, out roomNumber, out roomName);
+                    double roomHeight = GetSpaceHeightFt(space); // футы
+                    double effectiveTempIn = GetSpaceInternalTemperature(space, tempInside, ref tempFromSpaceCount, ref tempDefaultCount);
+
+                    IList<IList<BoundarySegment>> boundaries =
+                        space.GetBoundarySegments(boundaryOpts);
+
+                    // Предварительный сканирование ориентаций наружных стен для определения углового помещения
+                    HashSet<string> exteriorOrientations = new HashSet<string>();
+                    foreach (IList<BoundarySegment> loop in boundaries)
+                    {
+                        foreach (BoundarySegment seg in loop)
+                        {
+                            ElementId boundElemId = seg.ElementId;
+                            if (boundElemId == ElementId.InvalidElementId) continue;
+
+                            Element boundElem = null;
+                            Element hostElem = _doc.GetElement(boundElemId);
+                            if (hostElem is RevitLinkInstance rvtLink)
+                            {
+                                Document linkedDoc = rvtLink.GetLinkDocument();
+                                if (linkedDoc != null && seg.LinkElementId != null && seg.LinkElementId != ElementId.InvalidElementId)
+                                {
+                                    boundElem = linkedDoc.GetElement(seg.LinkElementId);
+                                }
+                            }
+                            else
+                            {
+                                boundElem = hostElem;
+                            }
+
+                            BuiltInCategory cat = boundElem != null ? GetBuiltInCategory(boundElem) : BuiltInCategory.OST_Walls;
+                            if (cat == BuiltInCategory.OST_Walls)
+                            {
+                                string key = (seg.LinkElementId != null && seg.LinkElementId != ElementId.InvalidElementId)
+                                    ? seg.ElementId.IntegerValue.ToString() + "_" + seg.LinkElementId.IntegerValue.ToString()
+                                    : seg.ElementId.IntegerValue.ToString();
+
+                                bool isInterior = IsInteriorElement(boundElem, cat, key, wallSpaceCountMap, exteriorOptions);
+                                if (!isInterior)
+                                {
+                                    string o = GetOrientation(boundElem, cat, seg);
+                                    if (!string.IsNullOrEmpty(o) && o != "Горизонтальная")
+                                    {
+                                        exteriorOrientations.Add(o);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    bool isCornerSpace = (exteriorOrientations.Count >= 2);
+                    string cornerTypeStr = isCornerSpace ? "Угловое" : "Обычное";
+
+                    // Собрать уникальные элементы-ограждения
+                    HashSet<string> processedKeys = new HashSet<string>();
+
+                    foreach (IList<BoundarySegment> loop in boundaries)
+                    {
+                        int loopCount = loop.Count;
+                        for (int i = 0; i < loopCount; i++)
+                        {
+                            BoundarySegment seg = loop[i];
+                            BoundarySegment prevSeg = loop[(i - 1 + loopCount) % loopCount];
+                            BoundarySegment nextSeg = loop[(i + 1) % loopCount];
+
+                            ElementId boundElemId = seg.ElementId;
+                            RevitLinkInstance linkInst = (_doc.GetElement(boundElemId) is RevitLinkInstance rvtLink) ? rvtLink : null;
+                            Element boundElem = GetElementFromSegment(seg);
+
+                            // Если элемент равен null, вычисляем категорию как Wall по умолчанию
+                            BuiltInCategory cat = boundElem != null ? GetBuiltInCategory(boundElem) : BuiltInCategory.OST_Walls;
+
+                            bool isWall    = (cat == BuiltInCategory.OST_Walls);
+                            bool isFloor   = (cat == BuiltInCategory.OST_Floors  ||
+                                              cat == BuiltInCategory.OST_Ceilings ||
+                                              cat == BuiltInCategory.OST_StructuralFoundation ||
+                                              cat == BuiltInCategory.OST_Roofs);
+                            bool isDoor    = (cat == BuiltInCategory.OST_Doors);
+                            bool isWindow  = (cat == BuiltInCategory.OST_Windows);
+
+                            string wallKey = (boundElem != null && isWall)
+#pragma warning disable CS0618
+                                ? ((seg.LinkElementId != null && seg.LinkElementId != ElementId.InvalidElementId)
+                                    ? seg.ElementId.IntegerValue.ToString() + "_" + seg.LinkElementId.IntegerValue.ToString()
+                                    : seg.ElementId.IntegerValue.ToString())
+#pragma warning restore CS0618
+                                : null;
+                            bool isInteriorWall = IsInteriorElement(boundElem, cat, wallKey, wallSpaceCountMap, exteriorOptions);
+
+                            // 1. Проверяем, надо ли ставить кубик для САМОЙ конструкции
+                            bool shouldPlaceSelfCube = false;
+
+                            if (isWall)
+                            {
+                                if (!isInteriorWall && processExteriorWalls) shouldPlaceSelfCube = true;
+                                if (isInteriorWall  && processInteriorWalls) shouldPlaceSelfCube = true;
+                            }
+                            else if (isFloor)
+                            {
+                                if (processFloors) shouldPlaceSelfCube = true;
+                            }
+                            else if (isDoor)
+                            {
+                                if (processDoors)
+                                {
+                                    if (!isInteriorWall && processExteriorWalls) shouldPlaceSelfCube = true;
+                                    if (isInteriorWall  && processInteriorWalls) shouldPlaceSelfCube = true;
+                                }
+                            }
+                            else if (isWindow)
+                            {
+                                if (processWindows) shouldPlaceSelfCube = true;
+                            }
+
+                            if (shouldPlaceSelfCube)
+                            {
+                                // Ключ уникальности (с учётом помещения и индекса сегмента)
+#pragma warning disable CS0618
+                                string uniqueKey = space.Id.IntegerValue.ToString() + "_" +
+                                                   (linkInst != null ? linkInst.Id.IntegerValue.ToString() + "_" : "") +
+                                                   (boundElem != null ? boundElem.Id.IntegerValue.ToString() + "_" + i.ToString() : seg.GetCurve().Evaluate(0.5, true).ToString());
+#pragma warning restore CS0618
+                                if (processedKeys.Add(uniqueKey))
+                                {
+                                    // Вычислить точку размещения в координатах основной модели
+                                    XYZ placementPoint = GetPlacementPoint(boundElem, linkInst, space, seg, roomHeight);
+                                    if (placementPoint != null)
+                                    {
+                                        // Разместить экземпляр
+                                        FamilyInstance inst = _doc.Create.NewFamilyInstance(
+                                            placementPoint,
+                                            symbol,
+                                            Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+
+                                        if (inst != null)
+                                        {
+                                            // Вычислить геометрические характеристики с припуском до осей смежных стен
+                                            double lengthMm  = 0;
+                                            double heightMm  = 0;
+                                            double areaSqM   = 0;
+                                            string label     = GetConstructionLabel(boundElem, cat, exteriorOptions);
+                                            string orient    = GetOrientation(boundElem, cat, seg);
+
+                                            if (boundElem != null)
+                                            {
+                                                GetConstructionDimensions(boundElem, cat, seg, prevSeg, nextSeg, loop, i, roomHeight,
+                                                    out lengthMm, out heightMm, out areaSqM);
+                                            }
+                                            else
+                                            {
+                                                Element prevElem = GetElementFromSegment(prevSeg);
+                                                Element nextElem = GetElementFromSegment(nextSeg);
+                                                double tPrevFt = GetWallThicknessFt(prevElem);
+                                                double tNextFt = GetWallThicknessFt(nextElem);
+
+                                                double calcLengthFt = GetSpaceCroppedWallLengthFt(seg, loop, i, tPrevFt, tNextFt);
+                                                lengthMm = calcLengthFt * 304.8;
+                                                heightMm = roomHeight * 304.8;
+                                                areaSqM  = (lengthMm / 1000.0) * (heightMm / 1000.0);
+                                            }
+
+                                            // Расчёт надбавок
+                                            bool isExteriorElem = (isWall || isDoor || isWindow);
+                                            double b1 = GetB1OrientationAddon(orient);
+                                            double b2 = (isCornerSpace && isExteriorElem) ? 0.05 : 0.00;
+                                            double b3 = 0.00;
+                                            double b4 = 0.00;
+                                            double coeffAdd = 1.0 + b1 + b2 + b3 + b4;
+
+                                            // Заполнить параметры
+                                            double grossWallAreaSqM = (lengthMm / 1000.0) * (heightMm / 1000.0);
+                                            double totalOpeningsAreaSqM = 0;
+                                            if (boundElem != null && isWall)
+                                            {
+                                                totalOpeningsAreaSqM = ProcessWallOpenings(boundElem, linkInst, space, roomNumber, roomName,
+                                                    cornerTypeStr, isCornerSpace, tempOutside, effectiveTempIn, symbol, seg, roomHeight,
+                                                    processDoors, processWindows, isInteriorWall, processInteriorWalls, processedKeys, ref placedCount,
+                                                    processExteriorWalls, exteriorOptions);
+                                            }
+
+                                            double netWallAreaSqM = isWall
+                                                ? Math.Max(0.01, Math.Round(grossWallAreaSqM - totalOpeningsAreaSqM, 2))
+                                                : Math.Round(areaSqM, 2);
+
+                                            SetText(inst, P_ROOM_NUMBER,  roomNumber);
+                                            SetText(inst, P_ROOM_NAME,    roomName);
+                                            SetText(inst, P_CONSTR_LABEL, label);
+                                            SetText(inst, P_ORIENTATION,  orient);
+                                            SetText(inst, P_CORNER_TYPE,  cornerTypeStr);
+
+                                            SetNumber(inst, P_TEMP_OUT,  tempOutside);
+                                            SetNumber(inst, P_TEMP_IN,   effectiveTempIn);
+                                            SetNumber(inst, P_AREA,      netWallAreaSqM);
+                                            SetNumber(inst, P_COEFF_N,   1); // Коэффициент n по умолчанию 1
+                                            SetNumber(inst, P_COEFF_K,   0);
+                                            SetNumber(inst, P_ADD_B1,    b1); // Надбавка b1 по ориентации
+                                            SetNumber(inst, P_ADD_B2,    b2); // Надбавка b2 (угловое помещение)
+                                            SetNumber(inst, P_ADD_B3,    b3);
+                                            SetNumber(inst, P_ADD_B4,    b4);
+
+                                            try
+                                            {
+                                                Parameter pMark = inst.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
+                                                if (pMark != null && !pMark.IsReadOnly) pMark.Set("BCC_HL_CUBE");
+                                            }
+                                            catch { }
+
+                                            placedCount++;
+                                        }
+                                    }
+                                }
+                            }
+
+                            // 2. ВСЕГДА проверяем проёмы (окна и двери) в стене, независимо от того, ставился ли кубик для стены
+                            if (boundElem != null && isWall && (processDoors || processWindows))
+                            {
+                                ProcessWallOpenings(boundElem, linkInst, space, roomNumber, roomName, cornerTypeStr, isCornerSpace,
+                                                    tempOutside, tempInside, symbol, seg, roomHeight,
+                                                    processDoors, processWindows, isInteriorWall, processInteriorWalls, processedKeys, ref placedCount,
+                                                    processExteriorWalls, exteriorOptions);
+                            }
+                        }
+                    }
+                }
+
+                tx.Commit();
+            }
+
+            return placedCount;
+        }
+
+        private static double GetB1OrientationAddon(string orient)
+        {
+            if (string.IsNullOrEmpty(orient)) return 0.0;
+
+            switch (orient.Trim().ToUpperInvariant())
+            {
+                case "С":
+                case "СВ":
+                case "В":
+                case "СЗ":
+                    return 0.10; // +10%
+
+                case "З":
+                case "ЮВ":
+                    return 0.05; // +5%
+
+                case "Ю":
+                case "ЮЗ":
+                case "ГОРИЗОНТАЛЬНАЯ":
+                default:
+                    return 0.00;
+            }
+        }
+
+        private void GetSpaceRoomNumberAndName(Space space, out string roomNumber, out string roomName)
+        {
+            roomNumber = "";
+            roomName = "";
+
+            // 1. Попытка через BuiltInParameter связанных помещений
+            try
+            {
+                Parameter pNum = space.get_Parameter(BuiltInParameter.SPACE_ASSOC_ROOM_NUMBER);
+                if (pNum != null && pNum.HasValue) roomNumber = pNum.AsString();
+            }
+            catch { }
+
+            try
+            {
+                Parameter pName = space.get_Parameter(BuiltInParameter.SPACE_ASSOC_ROOM_NAME);
+                if (pName != null && pName.HasValue) roomName = pName.AsString();
+            }
+            catch { }
+
+            // 2. Попытка через LookupParameter (стандартные параметры сопоставления)
+            if (string.IsNullOrWhiteSpace(roomNumber))
+            {
+                Parameter p = space.LookupParameter("Номер помещения") ?? space.LookupParameter("Номер связанного помещения");
+                if (p != null && p.HasValue) roomNumber = p.AsString();
+            }
+            if (string.IsNullOrWhiteSpace(roomName))
+            {
+                Parameter p = space.LookupParameter("Имя помещения") ?? space.LookupParameter("Имя связанного помещения");
+                if (p != null && p.HasValue) roomName = p.AsString();
+            }
+
+            // 3. Фолбэк на собственные номер/имя пространства
+            if (string.IsNullOrWhiteSpace(roomNumber))
+            {
+                roomNumber = space.Number;
+            }
+            if (string.IsNullOrWhiteSpace(roomName))
+            {
+                roomName = space.Name;
+            }
+
+            if (roomNumber == null) roomNumber = "";
+            if (roomName == null) roomName = "";
+        }
+
+        // ───────────────────────────────────────────────────────────────────
+        // Создание / обновление спецификации
+        // ───────────────────────────────────────────────────────────────────
+        public string CreateOrUpdateSchedule(out string errorMessage)
+        {
+            const string schedName = "BIMBCC Теплопотери";
+            errorMessage = null;
+
+            try
+            {
+                using (Transaction tx = new Transaction(_doc, "BIMBCC Теплопотери — спецификация"))
+                {
+                    tx.Start();
+
+                    // Удалить старую, если есть
+                    ViewSchedule existing = new FilteredElementCollector(_doc)
+                        .OfClass(typeof(ViewSchedule))
+                        .Cast<ViewSchedule>()
+                        .FirstOrDefault(vs => vs.Name == schedName);
+                    if (existing != null)
+                        _doc.Delete(existing.Id);
+
+                    // Создать новую
+                    ViewSchedule sched = ViewSchedule.CreateSchedule(
+                        _doc,
+                        new ElementId(BuiltInCategory.OST_GenericModel));
+                    sched.Name = schedName;
+
+                    ScheduleDefinition def = sched.Definition;
+                    def.IsItemized = false; // Снять галочку "Для каждого экземпляра"
+
+                    // Добавить поля в порядке столбцов
+                    string[] fieldOrder = new[]
+                    {
+                        P_ROOM_NUMBER, P_ROOM_NAME, P_TEMP_OUT, P_TEMP_IN,
+                        P_CORNER_TYPE, P_CONSTR_LABEL, P_ORIENTATION,
+                        P_AREA, P_COEFF_N, P_COEFF_K,
+                        P_ADD_B1, P_ADD_B2, P_ADD_B3, P_ADD_B4,
+                        P_COEFF_ADD, P_HEAT_LOSS
+                    };
+
+                    // Собрать доступные поля
+                    IList<SchedulableField> schedulable = def.GetSchedulableFields();
+
+                    foreach (string paramName in fieldOrder)
+                    {
+                        SchedulableField sf = schedulable.FirstOrDefault(f => f.GetName(_doc) == paramName);
+                        if (sf != null)
+                        {
+                            ScheduleField addedField = def.AddField(sf);
+                            addedField.HorizontalAlignment = ScheduleHorizontalAlignment.Center; // Выравнивание столбцов по центру
+
+                            if (paramName == P_AREA || paramName == P_HEAT_LOSS)
+                            {
+                                addedField.DisplayType = ScheduleFieldDisplayType.Totals; // Вычисление итогов по площади и теплопотерям!
+                            }
+                        }
+                    }
+
+                    // Сортировка: Номер (с заголовком и нижним колонтитулом "Только итого") → Имя помещения → Обозначение конструкции → Площадь конструкции
+                    def.ClearSortGroupFields();
+
+                    ScheduleField fieldRoomNum = null;
+                    ScheduleField fieldRoomName = null;
+                    ScheduleField fieldConstrLabel = null;
+                    ScheduleField fieldOrientation = null;
+
+                    foreach (ScheduleField f in def.GetFieldOrder().Select(id => def.GetField(id)))
+                    {
+                        string fn = f.GetSchedulableField().GetName(_doc);
+                        if (fn == P_ROOM_NUMBER) fieldRoomNum = f;
+                        else if (fn == P_ROOM_NAME) fieldRoomName = f;
+                        else if (fn == P_CONSTR_LABEL) fieldConstrLabel = f;
+                        else if (fn == P_ORIENTATION) fieldOrientation = f;
+                    }
+
+                    // 1. По номеру помещения с заголовком и нижним колонтитулом ("Только итого")
+                    if (fieldRoomNum != null)
+                    {
+                        ScheduleSortGroupField sort1 = new ScheduleSortGroupField(fieldRoomNum.FieldId);
+                        sort1.ShowHeader = true;       // Заголовок
+                        sort1.ShowFooter = true;       // Нижний колонтитул
+                        sort1.ShowFooterTitle = false; // Без названия заглавия в колонтитуле
+                        sort1.ShowFooterCount = false; // Без количества элементов ("Только итого")
+                        def.AddSortGroupField(sort1);
+                    }
+
+                    // 2. По имени помещения
+                    if (fieldRoomName != null)
+                    {
+                        ScheduleSortGroupField sort2 = new ScheduleSortGroupField(fieldRoomName.FieldId);
+                        def.AddSortGroupField(sort2);
+                    }
+
+                    // 3. По обозначению конструкции
+                    if (fieldConstrLabel != null)
+                    {
+                        ScheduleSortGroupField sort3 = new ScheduleSortGroupField(fieldConstrLabel.FieldId);
+                        def.AddSortGroupField(sort3);
+                    }
+
+                    // 4. По ориентации конструкции
+                    if (fieldOrientation != null)
+                    {
+                        ScheduleSortGroupField sort4 = new ScheduleSortGroupField(fieldOrientation.FieldId);
+                        def.AddSortGroupField(sort4);
+                    }
+
+                    tx.Commit();
+                }
+
+                return schedName;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+                System.Diagnostics.Debug.WriteLine(
+                    $"[HeatLossEngine] CreateOrUpdateSchedule failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        // ───────────────────────────────────────────────────────────────────
+        // Сбор уникальных типов конструкций для задания коэффициентов k
+        // ───────────────────────────────────────────────────────────────────
+        public List<HeatLossCoeffItem> GetPlacedConstructionTypes()
+        {
+            List<FamilyInstance> cubes = new FilteredElementCollector(_doc)
+                .OfClass(typeof(FamilyInstance))
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .Cast<FamilyInstance>()
+                .Where(fi => fi.LookupParameter(P_CONSTR_LABEL) != null)
+                .ToList();
+
+            Dictionary<string, string> uniqueTypes = new Dictionary<string, string>();
+
+            foreach (var cube in cubes)
+            {
+                string label = GetText(cube, P_CONSTR_LABEL);
+                if (string.IsNullOrEmpty(label)) continue;
+
+                if (!uniqueTypes.ContainsKey(label))
+                {
+                    string name = GetFriendlyTypeName(label);
+                    uniqueTypes[label] = name;
+                }
+            }
+
+            return uniqueTypes
+                .Select(kvp => new HeatLossCoeffItem
+                {
+                    Code = kvp.Key,
+                    Name = kvp.Value,
+                    CoeffK = GetDefaultCoeffK(kvp.Key)
+                })
+                .OrderBy(item => item.Code)
+                .ToList();
+        }
+
+        private static string GetFriendlyTypeName(string code)
+        {
+            if (code.StartsWith("НС")) return "Наружная стена";
+            if (code.StartsWith("ВС")) return "Внутренняя стена";
+            if (code.StartsWith("ОК")) return "Окно";
+            if (code.StartsWith("ДВ")) return "Дверь";
+            if (code.StartsWith("ПР")) return "Перекрытие / Пол";
+            if (code.StartsWith("ПОТ")) return "Потолок";
+            if (code.StartsWith("КР")) return "Кровля / Крыша";
+            return "Ограждающая конструкция";
+        }
+
+        private static double GetDefaultCoeffK(string code)
+        {
+            if (code.StartsWith("НС")) return 0.35;
+            if (code.StartsWith("ВС")) return 0.60;
+            if (code.StartsWith("ОК")) return 1.30;
+            if (code.StartsWith("ДВ")) return 1.80;
+            if (code.StartsWith("ПР")) return 0.45;
+            if (code.StartsWith("ПОТ")) return 0.50;
+            if (code.StartsWith("КР")) return 0.25;
+            return 1.0;
+        }
+
+        // ───────────────────────────────────────────────────────────────────
+        // Вторая транзакция: Создание типов конструкций в семействе кубика и запись k на ТИП
+        // ───────────────────────────────────────────────────────────────────
+        public int ApplyCoefficientsAndCalculateHeatLoss(Dictionary<string, double> coeffKMap)
+        {
+            List<FamilyInstance> cubes = new FilteredElementCollector(_doc)
+                .OfClass(typeof(FamilyInstance))
+                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .Cast<FamilyInstance>()
+                .Where(fi => fi.LookupParameter(P_CONSTR_LABEL) != null)
+                .ToList();
+
+            if (cubes.Count == 0 || coeffKMap == null || coeffKMap.Count == 0) return 0;
+
+            FamilySymbol baseSymbol = cubes.FirstOrDefault()?.Symbol;
+            Family family = baseSymbol?.Family;
+            if (family == null) return 0;
+
+            int updatedCount = 0;
+
+            using (Transaction tx = new Transaction(_doc, "BIMBCC | Создание типов кубика и запись коэффициентов k на ТИП"))
+            {
+                tx.Start();
+
+                // 1. Создать типоразмеры семейства кубика для каждого типа конструкции и задать k на ТИП
+                Dictionary<string, FamilySymbol> typeSymbolMap = new Dictionary<string, FamilySymbol>();
+
+                foreach (var kvp in coeffKMap)
+                {
+                    string label = kvp.Key;
+                    double coeffK = kvp.Value;
+                    string typeName = $"{label}";
+
+                    FamilySymbol existingSymbol = family.GetFamilySymbolIds()
+                        .Select(id => _doc.GetElement(id) as FamilySymbol)
+                        .FirstOrDefault(s => s != null && s.Name == typeName);
+
+                    if (existingSymbol == null)
+                    {
+                        try
+                        {
+                            existingSymbol = baseSymbol.Duplicate(typeName) as FamilySymbol;
+                        }
+                        catch
+                        {
+                            existingSymbol = baseSymbol;
+                        }
+                    }
+
+                    if (existingSymbol != null)
+                    {
+                        if (!existingSymbol.IsActive) existingSymbol.Activate();
+
+                        Parameter pK = existingSymbol.LookupParameter(P_COEFF_K);
+                        if (pK != null && !pK.IsReadOnly)
+                        {
+                            pK.Set(coeffK);
+                        }
+                        typeSymbolMap[label] = existingSymbol;
+                    }
+                }
+
+                // 2. Назначить созданный типоразмер каждому кубику в зависимости от его обозначения конструкции
+                foreach (FamilyInstance cube in cubes)
+                {
+                    string label = GetText(cube, P_CONSTR_LABEL);
+                    if (!string.IsNullOrEmpty(label) && coeffKMap.TryGetValue(label, out double coeffK))
+                    {
+                        if (typeSymbolMap.TryGetValue(label, out FamilySymbol targetSymbol))
+                        {
+                            if (cube.Symbol.Id != targetSymbol.Id)
+                            {
+                                cube.Symbol = targetSymbol;
+                                updatedCount++;
+                            }
+                        }
+
+                        // Если параметр k доступен на экземпляре — также заполняем его
+                        SetNumber(cube, P_COEFF_K, coeffK);
+                    }
+                }
+
+                _doc.Regenerate();
+                tx.Commit();
+            }
+
+            return updatedCount;
+        }
+
+        private static double GetNumber(Element elem, string paramName)
+        {
+            Parameter p = elem.LookupParameter(paramName);
+            if (p != null && p.HasValue)
+            {
+                if (p.StorageType == StorageType.Double)
+                    return p.AsDouble();
+                if (p.StorageType == StorageType.Integer)
+                    return p.AsInteger();
+                if (p.StorageType == StorageType.String && double.TryParse(p.AsString().Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double val))
+                    return val;
+            }
+            return 0.0;
+        }
+
+        // ───────────────────────────────────────────────────────────────────
+        // Очистка конфликтующих параметров проекта в категории OST_GenericModel
+        // ───────────────────────────────────────────────────────────────────
+        private void CleanupConflictingProjectBindings()
+        {
+            try
+            {
+                BindingMap bindMap = _doc.ParameterBindings;
+                List<Definition> defsToRemove = new List<Definition>();
+                DefinitionBindingMapIterator it = bindMap.ForwardIterator();
+                while (it.MoveNext())
+                {
+                    Definition def = it.Key;
+                    if (def != null && (AllTextParams.Contains(def.Name) || AllNumberParams.Contains(def.Name)))
+                    {
+                        defsToRemove.Add(def);
+                    }
+                }
+
+                foreach (Definition def in defsToRemove)
+                {
+                    try
+                    {
+                        bindMap.Remove(def);
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
+        private static readonly Dictionary<string, Guid> ParameterGuids = new Dictionary<string, Guid>
+        {
+            { P_ROOM_NUMBER,   new Guid("a1b2c3d4-0001-4000-8000-000000000001") },
+            { P_ROOM_NAME,     new Guid("a1b2c3d4-0002-4000-8000-000000000002") },
+            { P_TEMP_OUT,      new Guid("a1b2c3d4-0003-4000-8000-000000000003") },
+            { P_TEMP_IN,       new Guid("a1b2c3d4-0004-4000-8000-000000000004") },
+            { P_CORNER_TYPE,   new Guid("a1b2c3d4-0005-4000-8000-000000000005") },
+            { P_CONSTR_LABEL,  new Guid("a1b2c3d4-0006-4000-8000-000000000006") },
+            { P_ORIENTATION,   new Guid("a1b2c3d4-0007-4000-8000-000000000007") },
+            { P_AREA,          new Guid("a1b2c3d4-0010-4000-8000-000000000010") },
+            { P_COEFF_N,       new Guid("a1b2c3d4-0011-4000-8000-000000000011") },
+            { P_COEFF_K,       new Guid("a1b2c3d4-0012-4000-8000-000000000012") },
+            { P_ADD_B1,        new Guid("a1b2c3d4-0013-4000-8000-000000000013") },
+            { P_ADD_B2,        new Guid("a1b2c3d4-0014-4000-8000-000000000014") },
+            { P_ADD_B3,        new Guid("a1b2c3d4-0015-4000-8000-000000000015") },
+            { P_ADD_B4,        new Guid("a1b2c3d4-0016-4000-8000-000000000016") },
+            { P_COEFF_ADD,     new Guid("a1b2c3d4-0017-4000-8000-000000000017") },
+            { P_HEAT_LOSS,     new Guid("a1b2c3d4-0018-4000-8000-000000000018") }
+        };
+
+        private void EnsureCubeFamilyParametersAndFormulas(FamilySymbol symbol)
+        {
+            if (symbol == null || symbol.Family == null || !symbol.Family.IsEditable) return;
+
+            try
+            {
+                Family family = symbol.Family;
+                Document famDoc = _doc.EditFamily(family);
+                if (famDoc == null) return;
+
+                string originalSharedParamFile = _doc.Application.SharedParametersFilename;
+                string tempFile = System.IO.Path.GetTempFileName();
+
+                try
+                {
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    sb.AppendLine("# This is a Revit shared parameter file.");
+                    sb.AppendLine("# Do not edit manually.");
+                    sb.AppendLine("*META\tVERSION\tMINVERSION");
+                    sb.AppendLine("META\t2\t1");
+                    sb.AppendLine("*GROUP\tID\tNAME");
+                    sb.AppendLine("GROUP\t1\tBIMBCC_HeatLoss");
+                    sb.AppendLine("*PARAM\tGUID\tNAME\tDATATYPE\tDATACATEGORY\tGROUP\tVISIBLE\tDESCRIPTION\tUSERMODIFIABLE\tHIDEWHENNOVALUE");
+
+                    foreach (string name in AllTextParams)
+                    {
+                        Guid g = ParameterGuids[name];
+                        sb.AppendLine($"PARAM\t{g}\t{name}\tTEXT\t\t1\t1\t\t1\t0");
+                    }
+                    foreach (string name in AllNumberParams)
+                    {
+                        Guid g = ParameterGuids[name];
+                        sb.AppendLine($"PARAM\t{g}\t{name}\tNUMBER\t\t1\t1\t\t1\t0");
+                    }
+
+                    System.IO.File.WriteAllText(tempFile, sb.ToString(), System.Text.Encoding.UTF8);
+
+                    _doc.Application.SharedParametersFilename = tempFile;
+                    DefinitionFile defFile = _doc.Application.OpenSharedParameterFile();
+                    if (defFile == null) return;
+
+                    DefinitionGroup grp = defFile.Groups.get_Item("BIMBCC_HeatLoss") ?? defFile.Groups.Create("BIMBCC_HeatLoss");
+
+                    bool modified = false;
+
+                    using (Transaction tx = new Transaction(famDoc, "BIMBCC — Добавление параметров и формул в семейство кубика"))
+                    {
+                        tx.Start();
+                        FamilyManager famMgr = famDoc.FamilyManager;
+
+                        // 1. Убедиться, что ВСЕ текстовые общие параметры добавлены в семейство
+                        foreach (string name in AllTextParams)
+                        {
+                            EnsureFamilyParameter(famMgr, grp, name, SpecTypeId.String.Text, ref modified);
+                        }
+
+                        // 2. Убедиться, что ВСЕ числовые общие параметры добавлены в семейство
+                        foreach (string name in AllNumberParams)
+                        {
+                            bool isInstanceParam = (name != P_COEFF_K); // P_COEFF_K — параметр ТИПА
+                            EnsureFamilyParameter(famMgr, grp, name, SpecTypeId.Number, ref modified, isInstanceParam);
+                        }
+
+                        // 3. Снять формулу с P_AREA (если была)
+                        FamilyParameter fpArea = famMgr.get_Parameter(P_AREA);
+                        if (fpArea != null && !string.IsNullOrEmpty(fpArea.Formula))
+                        {
+                            try
+                            {
+                                famMgr.SetFormula(fpArea, null);
+                                modified = true;
+                            }
+                            catch { }
+                        }
+
+                        // 4. Словарь формул для параметров кубика
+                        Dictionary<string, string> formulas = new Dictionary<string, string>
+                        {
+                            { P_COEFF_ADD, $"1 + [{P_ADD_B1}] + [{P_ADD_B2}] + [{P_ADD_B3}] + [{P_ADD_B4}]" },
+                            { P_HEAT_LOSS, $"([{P_TEMP_IN}] - [{P_TEMP_OUT}]) * [{P_AREA}] * [{P_COEFF_N}] * [{P_COEFF_K}] * [{P_COEFF_ADD}]" }
+                        };
+
+                        foreach (var kvp in formulas)
+                        {
+                            string pName = kvp.Key;
+                            string pFormula = kvp.Value;
+
+                            FamilyParameter fp = famMgr.get_Parameter(pName);
+                            if (fp != null)
+                            {
+                                try
+                                {
+                                    famMgr.SetFormula(fp, pFormula);
+                                    modified = true;
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"[EnsureCubeFamilyFormulas] Error setting formula for {pName}: {ex.Message}");
+                                }
+                            }
+                        }
+
+                        tx.Commit();
+                    }
+
+                    if (modified)
+                    {
+                        famDoc.LoadFamily(_doc, new CustomFamilyLoadOptions());
+                    }
+                }
+                finally
+                {
+                    try
+                    {
+                        _doc.Application.SharedParametersFilename =
+                            string.IsNullOrEmpty(originalSharedParamFile) ? "" : originalSharedParamFile;
+                    }
+                    catch { }
+
+                    try { System.IO.File.Delete(tempFile); } catch { }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EnsureCubeFamilyFormulas] Error: {ex.Message}");
+            }
+        }
+
+        private static FamilyParameter EnsureFamilyParameter(FamilyManager famMgr, DefinitionGroup grp, string paramName, ForgeTypeId specTypeId, ref bool modified, bool isInstance = true)
+        {
+            FamilyParameter fp = famMgr.get_Parameter(paramName);
+            if (fp != null) return fp;
+
+            try
+            {
+                Definition def = grp.Definitions.get_Item(paramName);
+                if (def == null)
+                {
+                    Guid paramGuid = ParameterGuids.ContainsKey(paramName) ? ParameterGuids[paramName] : Guid.NewGuid();
+                    ExternalDefinitionCreationOptions extOpts = new ExternalDefinitionCreationOptions(paramName, specTypeId)
+                    {
+                        GUID = paramGuid,
+                        UserModifiable = true
+                    };
+                    def = grp.Definitions.Create(extOpts);
+                }
+
+                if (def is ExternalDefinition extDef)
+                {
+#if NET48
+#pragma warning disable CS0618
+                    fp = famMgr.AddParameter(extDef, BuiltInParameterGroup.PG_DATA, isInstance: isInstance);
+#pragma warning restore CS0618
+#else
+                    fp = famMgr.AddParameter(extDef, GroupTypeId.Data, isInstance: isInstance);
+#endif
+                    modified = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[EnsureFamilyParameter] Failed for {paramName}: {ex.Message}");
+            }
+
+            return fp;
+        }
+
+        public class CustomFamilyLoadOptions : IFamilyLoadOptions
+        {
+            public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues)
+            {
+                overwriteParameterValues = true;
+                return true;
+            }
+
+            public bool OnSharedFamilyFound(Family sharedFamily, bool familyInUse, out FamilySource source, out bool overwriteParameterValues)
+            {
+                source = FamilySource.Family;
+                overwriteParameterValues = true;
+                return true;
+            }
+        }
+
+        // ───────────────────────────────────────────────────────────────────
+        // Вспомогательные: геометрия
+        // ───────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// <summary>
+        /// Точка размещения кубика — центр грани ограждения.
+        /// </summary>
+        private XYZ GetPlacementPoint(
+            Element elem, RevitLinkInstance linkInst, Space space, BoundarySegment seg, double roomHeightFt)
+        {
+            try
+            {
+                // 1. Для сегмента границы наиболее точно — середина сегмента на высоте 1/2 пространства
+                if (seg != null)
+                {
+                    Curve c = seg.GetCurve();
+                    if (c != null)
+                    {
+                        XYZ mid = c.Evaluate(0.5, true);
+                        BoundingBoxXYZ sbb = space.get_BoundingBox(null);
+                        double spaceBottomZ = sbb != null ? sbb.Min.Z : (space.Level != null ? space.Level.ProjectElevation : mid.Z);
+                        return new XYZ(mid.X, mid.Y, spaceBottomZ + roomHeightFt / 2.0);
+                    }
+                }
+
+                // 2. Фолбэк на BoundingBox элемента (с трансформацией связанной модели)
+                if (elem != null)
+                {
+                    BoundingBoxXYZ bb = elem.get_BoundingBox(null);
+                    if (bb != null)
+                    {
+                        XYZ centerLocal = (bb.Min + bb.Max) / 2.0;
+                        return linkInst != null ? linkInst.GetTotalTransform().OfPoint(centerLocal) : centerLocal;
+                    }
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private double ProcessWallOpenings(
+            Element wallElem,
+            RevitLinkInstance linkInst,
+            Space space,
+            string roomNumber,
+            string roomName,
+            string cornerTypeStr,
+            bool isCornerSpace,
+            double tempOutside,
+            double tempInside,
+            FamilySymbol symbol,
+            BoundarySegment seg,
+            double roomHeightFt,
+            bool processDoors,
+            bool processWindows,
+            bool isInteriorWall,
+            bool processInteriorWalls,
+            HashSet<string> processedKeys,
+            ref int placedCount,
+            bool processExteriorWalls = true,
+            ExteriorDetectionOptions exteriorOptions = null)
+        {
+            double totalOpeningsAreaSqM = 0;
+            try
+            {
+                Document doc = wallElem.Document;
+                List<FamilyInstance> openings = new FilteredElementCollector(doc)
+                    .OfClass(typeof(FamilyInstance))
+                    .Cast<FamilyInstance>()
+                    .Where(fi => fi.Host != null && fi.Host.Id == wallElem.Id)
+                    .Where(fi =>
+                    {
+                        if (fi.Category == null) return false;
+#pragma warning disable CS0618
+                        long cId = fi.Category.Id.IntegerValue;
+#pragma warning restore CS0618
+                        bool isD = (cId == (long)BuiltInCategory.OST_Doors);
+                        bool isW = (cId == (long)BuiltInCategory.OST_Windows);
+
+                        // Проверяем принадлежность проёма к наружной/внутренней конструкции
+                        bool openingIsInterior = isInteriorWall;
+                        if (exteriorOptions != null && exteriorOptions.Mode == ExteriorDetectionMode.ByParameter)
+                        {
+                            openingIsInterior = IsInteriorElement(fi, isD ? BuiltInCategory.OST_Doors : BuiltInCategory.OST_Windows, null, null, exteriorOptions);
+                        }
+
+                        if (isW && processWindows)
+                        {
+                            if (openingIsInterior && !processInteriorWalls) return false;
+                            if (!openingIsInterior && !processExteriorWalls) return false;
+                            return true;
+                        }
+
+                        if (isD && processDoors)
+                        {
+                            if (openingIsInterior && !processInteriorWalls) return false;
+                            if (!openingIsInterior && !processExteriorWalls) return false;
+                            return true;
+                        }
+
+                        return false;
+                    })
+                    .ToList();
+
+                if (openings.Count == 0) return 0;
+
+                BoundingBoxXYZ spaceBbox = space.get_BoundingBox(null);
+                Transform linkTransform = linkInst != null ? linkInst.GetTotalTransform() : Transform.Identity;
+
+                foreach (FamilyInstance opening in openings)
+                {
+#pragma warning disable CS0618
+                    string openingKey = (linkInst != null ? linkInst.Id.IntegerValue.ToString() + "_" : "") + opening.Id.IntegerValue.ToString();
+#pragma warning restore CS0618
+                    if (!processedKeys.Add(openingKey)) continue;
+
+                    XYZ worldPt = null;
+                    LocationPoint locPt = opening.Location as LocationPoint;
+                    if (locPt != null)
+                    {
+                        worldPt = linkTransform.OfPoint(locPt.Point);
+                    }
+                    else
+                    {
+                        BoundingBoxXYZ obb = opening.get_BoundingBox(null);
+                        if (obb != null)
+                        {
+                            XYZ centerLocal = (obb.Min + obb.Max) / 2.0;
+                            worldPt = linkTransform.OfPoint(centerLocal);
+                        }
+                    }
+
+                    if (worldPt == null) continue;
+
+                    // 1. Проверка близости проёма к габаритам пространства (с допуском 4 фута / 1.2 м)
+                    if (spaceBbox != null)
+                    {
+                        double tol = 4.0;
+                        if (worldPt.X < spaceBbox.Min.X - tol || worldPt.X > spaceBbox.Max.X + tol ||
+                            worldPt.Y < spaceBbox.Min.Y - tol || worldPt.Y > spaceBbox.Max.Y + tol ||
+                            worldPt.Z < spaceBbox.Min.Z - tol || worldPt.Z > spaceBbox.Max.Z + tol)
+                        {
+                            continue;
+                        }
+                    }
+
+                    // 2. Проверка расположения проема строго в створе сегмента стены текущего помещения
+                    if (seg != null && seg.GetCurve() != null)
+                    {
+                        Curve segCurve = seg.GetCurve();
+                        XYZ p0 = segCurve.GetEndPoint(0);
+                        XYZ p1 = segCurve.GetEndPoint(1);
+                        XYZ vSeg = p1 - p0;
+                        double lenSeg = vSeg.GetLength();
+                        if (lenSeg > 0.05)
+                        {
+                            XYZ uSeg = vSeg.Normalize();
+                            XYZ toPt = worldPt - p0;
+                            double proj = toPt.DotProduct(uSeg);
+                            double distPerp = (toPt - uSeg * proj).GetLength();
+
+                            // Допуск по длине сегмента 1.5 фута (0.45 м) и перпендикулярно стене 3.5 фута (1.0 м)
+                            if (proj < -1.5 || proj > lenSeg + 1.5 || distPerp > 3.5)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+
+                    FamilyInstance inst = _doc.Create.NewFamilyInstance(
+                        worldPt,
+                        symbol,
+                        Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+
+                    if (inst != null)
+                    {
+                        BuiltInCategory openCat = GetBuiltInCategory(opening);
+                        double lMm = 0, hMm = 0, aSqM = 0;
+                        GetConstructionDimensions(opening, openCat, seg, null, null, null, 0, roomHeightFt, out lMm, out hMm, out aSqM);
+                        string label = GetConstructionLabel(opening, openCat, exteriorOptions);
+                        string orient = GetOrientation(opening, openCat, seg);
+
+                        double b1 = GetB1OrientationAddon(orient);
+                        double b2 = isCornerSpace ? 0.05 : 0.00;
+                        double b3 = 0.00;
+                        double b4 = 0.00;
+
+                        double openingAreaSqM = Math.Round(aSqM, 2);
+
+                        SetText(inst, P_ROOM_NUMBER, roomNumber);
+                        SetText(inst, P_ROOM_NAME, roomName);
+                        SetText(inst, P_CONSTR_LABEL, label);
+                        SetText(inst, P_ORIENTATION, orient);
+                        SetText(inst, P_CORNER_TYPE, cornerTypeStr);
+
+                        SetNumber(inst, P_TEMP_OUT, tempOutside);
+                        SetNumber(inst, P_TEMP_IN, tempInside);
+                        SetNumber(inst, P_AREA, openingAreaSqM);
+                        SetNumber(inst, P_COEFF_N, 1);
+                        SetNumber(inst, P_COEFF_K, 0);
+                        SetNumber(inst, P_ADD_B1, b1);
+                        SetNumber(inst, P_ADD_B2, b2);
+                        SetNumber(inst, P_ADD_B3, b3);
+                        SetNumber(inst, P_ADD_B4, b4);
+
+                        try
+                        {
+                            Parameter pMark = inst.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
+                            if (pMark != null && !pMark.IsReadOnly) pMark.Set("BCC_HL_CUBE");
+                        }
+                        catch { }
+
+                        totalOpeningsAreaSqM += openingAreaSqM;
+                        placedCount++;
+                    }
+                }
+            }
+            catch { }
+
+            return totalOpeningsAreaSqM;
+        }
+
+        private void GetConstructionDimensions(
+            Element elem,
+            BuiltInCategory cat,
+            BoundarySegment seg,
+            BoundarySegment prevSeg,
+            BoundarySegment nextSeg,
+            IList<BoundarySegment> loop,
+            int segIndex,
+            double roomHeightFt,
+            out double lengthMm,
+            out double heightMm,
+            out double areaSqM)
+        {
+            lengthMm = 0;
+            heightMm = 0;
+            areaSqM  = 0;
+
+            const double ft2mm = 304.8;
+            const double ft2m  = 0.3048;
+
+            try
+            {
+                // 1. Двери и Окна (проемы)
+                if (cat == BuiltInCategory.OST_Doors || cat == BuiltInCategory.OST_Windows)
+                {
+                    GetOpeningDimensions(elem, cat, out lengthMm, out heightMm, out areaSqM);
+                }
+                // 2. Перекрытия, полы, потолки
+                else if (cat == BuiltInCategory.OST_Floors ||
+                         cat == BuiltInCategory.OST_Ceilings ||
+                         cat == BuiltInCategory.OST_StructuralFoundation)
+                {
+                    Parameter areaParam = elem.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED);
+                    areaSqM = areaParam != null ? areaParam.AsDouble() * ft2m * ft2m : 0;
+
+                    if (areaSqM == 0)
+                    {
+                        BoundingBoxXYZ bb = elem.get_BoundingBox(null);
+                        if (bb != null)
+                        {
+                            lengthMm = Math.Abs(bb.Max.X - bb.Min.X) * ft2mm;
+                            heightMm = Math.Abs(bb.Max.Y - bb.Min.Y) * ft2mm;
+                            areaSqM = (lengthMm / 1000.0) * (heightMm / 1000.0);
+                        }
+                    }
+                }
+                // 3. Все виды стен (обычные стены, витражи/фасады, стеновые панели) и линии границ
+                else
+                {
+                    Element prevElem = GetElementFromSegment(prevSeg);
+                    Element nextElem = GetElementFromSegment(nextSeg);
+
+                    double tPrevFt = GetWallThicknessFt(prevElem);
+                    double tNextFt = GetWallThicknessFt(nextElem);
+
+                    double calcLengthFt = GetSpaceCroppedWallLengthFt(seg, loop, segIndex, tPrevFt, tNextFt);
+                    lengthMm = calcLengthFt * ft2mm;
+                    heightMm = roomHeightFt * ft2mm;
+
+                    areaSqM = (lengthMm / 1000.0) * (heightMm / 1000.0);
+                }
+            }
+            catch { /* Оставляем нули */ }
+        }
+
+        private static double GetSpaceHeightFt(Space space)
+        {
+            if (space == null) return 9.84252; // 3.00 м по умолчанию
+
+            // 1. Попытка через объем и площадь (если включен расчет объемов в Revit)
+            try
+            {
+                if (space.Area > 0.001 && space.Volume > 0.001)
+                {
+                    double hCalc = space.Volume / space.Area;
+                    if (hCalc >= 6.5 && hCalc <= 25.0) // От 2.0 м до 7.6 м
+                        return hCalc;
+                }
+            }
+            catch { }
+
+            // 2. Попытка через LimitOffset - BaseOffset
+            try
+            {
+                double limitOffset = space.LimitOffset;
+                double baseOffset = space.BaseOffset;
+                double hOffset = limitOffset - baseOffset;
+                if (hOffset >= 6.5 && hOffset <= 25.0)
+                    return hOffset;
+            }
+            catch { }
+
+            // 3. Попытка через параметр ROOM_HEIGHT
+            try
+            {
+                Parameter pHeight = space.get_Parameter(BuiltInParameter.ROOM_HEIGHT);
+                if (pHeight != null && pHeight.HasValue)
+                {
+                    double hVal = pHeight.AsDouble();
+                    if (hVal >= 6.5 && hVal <= 25.0)
+                        return hVal;
+                }
+            }
+            catch { }
+
+            // 4. Попытка через UnboundedHeight (если оно в разумных пределах <= 25 футов / 7.6 м)
+            try
+            {
+                double uHeight = space.UnboundedHeight;
+                if (uHeight >= 6.5 && uHeight <= 25.0)
+                    return uHeight;
+            }
+            catch { }
+
+            // 5. Стандартная высота помещения по умолчанию: 3.00 м (9.84252 фута)
+            return 9.84252;
+        }
+
+        private static double GetSpaceInternalTemperature(Space space, double defaultTempIn, ref int fromSpaceCount, ref int defaultCount)
+        {
+            if (space != null)
+            {
+                // 1. Поиск встроенных параметров температуры нагрева пространства (Расчетная температура нагрева / Design Heating Temperature)
+                try
+                {
+                    foreach (Parameter p in space.Parameters)
+                    {
+                        if (p != null && p.Definition != null)
+                        {
+                            string pName = p.Definition.Name.ToLower();
+                            if (pName.Contains("нагрев") || pName.Contains("heating") || pName.Contains("отопл"))
+                            {
+                                if (p.HasValue && p.StorageType == StorageType.Double)
+                                {
+                                    double val = p.AsDouble();
+                                    if (val > 100 && val < 400) val -= 273.15; // Перевод из Кельвинов в Цельсии
+                                    if (val > -50 && val < 100 && val != 0)
+                                    {
+                                        fromSpaceCount++;
+                                        return Math.Round(val, 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+
+                // 2. Параметры пространств
+                string[] paramNames = new[] { "BCC_HL_Температура внутреннего воздуха", "Температура внутреннего воздуха", "t_вн", "Температура воздуха" };
+                foreach (string pName in paramNames)
+                {
+                    Parameter p = space.LookupParameter(pName);
+                    if (p != null && p.HasValue)
+                    {
+                        double val = 0;
+                        if (p.StorageType == StorageType.Double)
+                        {
+                            val = p.AsDouble();
+                            if (val > 100 && val < 400) val -= 273.15;
+                        }
+                        else if (p.StorageType == StorageType.String && double.TryParse(p.AsString().Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedVal))
+                        {
+                            val = parsedVal;
+                        }
+
+                        if (val > -50 && val < 100 && val != 0)
+                        {
+                            fromSpaceCount++;
+                            return Math.Round(val, 1);
+                        }
+                    }
+                }
+            }
+
+            defaultCount++;
+            return defaultTempIn;
+        }
+
+        private static Dictionary<string, int> BuildWallSpaceCountMap(List<Space> spaces, SpatialElementBoundaryOptions boundaryOpts)
+        {
+            Dictionary<string, int> map = new Dictionary<string, int>();
+            if (spaces == null) return map;
+
+            foreach (Space space in spaces)
+            {
+                IList<IList<BoundarySegment>> boundaries = space.GetBoundarySegments(boundaryOpts);
+                if (boundaries == null) continue;
+
+                HashSet<string> spaceWallKeys = new HashSet<string>();
+
+                foreach (IList<BoundarySegment> loop in boundaries)
+                {
+                    if (loop == null) continue;
+                    foreach (BoundarySegment seg in loop)
+                    {
+                        if (seg == null || seg.ElementId == ElementId.InvalidElementId) continue;
+
+                        string key = (seg.LinkElementId != null && seg.LinkElementId != ElementId.InvalidElementId)
+                            ? seg.ElementId.IntegerValue.ToString() + "_" + seg.LinkElementId.IntegerValue.ToString()
+                            : seg.ElementId.IntegerValue.ToString();
+
+                        spaceWallKeys.Add(key);
+                    }
+                }
+
+                foreach (string key in spaceWallKeys)
+                {
+                    if (!map.ContainsKey(key))
+                        map[key] = 0;
+                    map[key]++;
+                }
+            }
+            return map;
+        }
+
+        public static bool IsInteriorElement(
+            Element boundElem,
+            BuiltInCategory cat,
+            string wallKey,
+            Dictionary<string, int> wallSpaceCountMap,
+            ExteriorDetectionOptions options)
+        {
+            if (options != null && options.Mode == ExteriorDetectionMode.ByParameter && !string.IsNullOrWhiteSpace(options.ParameterName))
+            {
+                bool paramEvaluated = false;
+                bool isConditionMet = false;
+
+                if (boundElem != null)
+                {
+                    // 1. Поиск параметра в экземпляре
+                    Parameter p = FindParameterByName(boundElem, options.ParameterName);
+                    // 2. Если не найден в экземпляре — поиск в типе элемента
+                    if (p == null)
+                    {
+                        ElementId typeId = boundElem.GetTypeId();
+                        if (typeId != null && typeId != ElementId.InvalidElementId)
+                        {
+                            Document elDoc = boundElem.Document;
+                            if (elDoc != null)
+                            {
+                                Element typeElem = elDoc.GetElement(typeId);
+                                if (typeElem != null)
+                                {
+                                    p = FindParameterByName(typeElem, options.ParameterName);
+                                }
+                            }
+                        }
+                    }
+
+                    if (p != null)
+                    {
+                        paramEvaluated = true;
+                        isConditionMet = EvaluateParameterCondition(p, options.Condition, options.TargetValue);
+                    }
+                }
+
+                if (paramEvaluated)
+                {
+                    if (options.Classification == ExteriorClassificationResult.MatchesExterior)
+                    {
+                        // Если условие выполнено -> это наружная конструкция => isInterior = false
+                        return !isConditionMet;
+                    }
+                    else
+                    {
+                        // Если условие выполнено -> это внутренняя конструкция => isInterior = true
+                        return isConditionMet;
+                    }
+                }
+
+                if (!options.FallbackToAuto)
+                {
+                    return options.Classification == ExteriorClassificationResult.MatchesExterior;
+                }
+            }
+
+            // Стандартный fallback-алгоритм Revit
+            return IsInteriorWallAuto(boundElem, wallKey, wallSpaceCountMap);
+        }
+
+        private static Parameter FindParameterByName(Element elem, string paramName)
+        {
+            if (elem == null || string.IsNullOrWhiteSpace(paramName)) return null;
+
+            try
+            {
+                Parameter p = elem.LookupParameter(paramName);
+                if (p != null) return p;
+
+                foreach (Parameter param in elem.Parameters)
+                {
+                    if (param != null && param.Definition != null)
+                    {
+                        if (string.Equals(param.Definition.Name, paramName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return param;
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
+        private static bool EvaluateParameterCondition(Parameter p, ParameterConditionType condition, string targetValue)
+        {
+            if (p == null) return false;
+
+            try
+            {
+                switch (condition)
+                {
+                    case ParameterConditionType.CheckboxChecked:
+                    {
+                        if (p.StorageType == StorageType.Integer)
+                        {
+                            return p.AsInteger() == 1;
+                        }
+                        string strVal = GetParameterStringValue(p).Trim().ToLowerInvariant();
+                        return strVal == "1" || strVal == "да" || strVal == "true" || strVal == "yes" || strVal == "истина";
+                    }
+
+                    case ParameterConditionType.CheckboxUnchecked:
+                    {
+                        if (p.StorageType == StorageType.Integer)
+                        {
+                            return p.AsInteger() == 0;
+                        }
+                        string strVal = GetParameterStringValue(p).Trim().ToLowerInvariant();
+                        return strVal == "0" || strVal == "нет" || strVal == "false" || strVal == "no" || strVal == "ложь" || string.IsNullOrEmpty(strVal);
+                    }
+
+                    case ParameterConditionType.IsNotEmpty:
+                    {
+                        if (!p.HasValue) return false;
+                        if (p.StorageType == StorageType.String)
+                        {
+                            return !string.IsNullOrWhiteSpace(p.AsString());
+                        }
+                        return true;
+                    }
+
+                    case ParameterConditionType.TextEquals:
+                    {
+                        string val = GetParameterStringValue(p).Trim();
+                        return string.Equals(val, targetValue ?? "", StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    case ParameterConditionType.TextContains:
+                    {
+                        string val = GetParameterStringValue(p);
+                        return !string.IsNullOrEmpty(val) &&
+                               !string.IsNullOrEmpty(targetValue) &&
+                               val.IndexOf(targetValue, StringComparison.OrdinalIgnoreCase) >= 0;
+                    }
+                }
+            }
+            catch { }
+
+            return false;
+        }
+
+        private static string GetParameterStringValue(Parameter p)
+        {
+            if (p == null || !p.HasValue) return "";
+            try
+            {
+                switch (p.StorageType)
+                {
+                    case StorageType.String:
+                        return p.AsString() ?? "";
+                    case StorageType.Integer:
+                        return p.AsValueString() ?? p.AsInteger().ToString();
+                    case StorageType.Double:
+                        return p.AsValueString() ?? p.AsDouble().ToString(System.Globalization.CultureInfo.InvariantCulture);
+                    case StorageType.ElementId:
+                        return p.AsElementId()?.IntegerValue.ToString() ?? "";
+                    default:
+                        return p.AsValueString() ?? "";
+                }
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private static bool IsInteriorWallAuto(Element boundElem, string wallKey, Dictionary<string, int> wallSpaceCountMap)
+        {
+            if (boundElem is Wall w)
+            {
+                // 1. Проверка свойства WallType.Function
+                if (w.WallType != null && w.WallType.Function == WallFunction.Interior)
+                    return true;
+
+                // 2. Проверка наименования типа стены
+                string typeName = w.WallType != null ? w.WallType.Name.ToLower() : "";
+                string familyName = w.WallType != null ? w.WallType.FamilyName.ToLower() : "";
+                string combinedName = typeName + " " + familyName;
+
+                if (combinedName.Contains("внутр") ||
+                    combinedName.Contains("перегород") ||
+                    combinedName.Contains("межкомн") ||
+                    combinedName.Contains("межквар") ||
+                    combinedName.Contains("панель вн") ||
+                    combinedName.Contains("int") ||
+                    combinedName.Contains("part"))
+                {
+                    return true;
+                }
+            }
+
+            // 3. Топологическая проверка (стена разделяет 2 или более помещений в модели)
+            if (!string.IsNullOrEmpty(wallKey) && wallSpaceCountMap != null && wallSpaceCountMap.TryGetValue(wallKey, out int count))
+            {
+                if (count >= 2)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsColinear(BoundarySegment s1, BoundarySegment s2)
+        {
+            if (s1 == null || s2 == null) return false;
+            Curve c1 = s1.GetCurve();
+            Curve c2 = s2.GetCurve();
+            if (c1 == null || c2 == null) return false;
+
+            XYZ p1_0 = c1.GetEndPoint(0);
+            XYZ p1_1 = c1.GetEndPoint(1);
+            XYZ p2_0 = c2.GetEndPoint(0);
+            XYZ p2_1 = c2.GetEndPoint(1);
+
+            XYZ v1 = (p1_1 - p1_0);
+            XYZ v2 = (p2_1 - p2_0);
+            if (v1.GetLength() < 0.001 || v2.GetLength() < 0.001) return false;
+
+            XYZ u1 = v1.Normalize();
+            XYZ u2 = v2.Normalize();
+
+            XYZ cross = u1.CrossProduct(u2);
+            return cross.GetLength() < 0.1;
+        }
+
+        private Transform GetSegmentTransform(BoundarySegment seg)
+        {
+            if (seg == null) return Transform.Identity;
+            ElementId elemId = seg.ElementId;
+            if (elemId == ElementId.InvalidElementId) return Transform.Identity;
+
+            Element hostElem = _doc.GetElement(elemId);
+            if (hostElem is RevitLinkInstance rvtLink)
+            {
+                return rvtLink.GetTotalTransform();
+            }
+            return Transform.Identity;
+        }
+
+        private double GetIntersectionParam2D(XYZ p0, double ux, double uy, BoundarySegment cornerSeg)
+        {
+            if (cornerSeg == null) return 0.0;
+            Transform trans = GetSegmentTransform(cornerSeg);
+            Curve curve = cornerSeg.GetCurve();
+            if (curve == null) return 0.0;
+
+            XYZ q0 = trans.OfPoint(curve.GetEndPoint(0));
+            XYZ q1 = trans.OfPoint(curve.GetEndPoint(1));
+
+            double vx = q1.X - q0.X;
+            double vy = q1.Y - q0.Y;
+
+            double det = ux * vy - uy * vx;
+            if (Math.Abs(det) > 0.001)
+            {
+                double num = (q0.X - p0.X) * vy - (q0.Y - p0.Y) * vx;
+                return num / det;
+            }
+
+            // Fallback если детерминант близко к 0 (параллельные линии)
+            double t0 = (q0.X - p0.X) * ux + (q0.Y - p0.Y) * uy;
+            double t1 = (q1.X - p0.X) * ux + (q1.Y - p0.Y) * uy;
+            double d0 = (q0 - (p0 + new XYZ(ux, uy, 0) * t0)).GetLength();
+            double d1 = (q1 - (p0 + new XYZ(ux, uy, 0) * t1)).GetLength();
+            return (d0 < d1) ? t0 : t1;
+        }
+
+        private double GetSpaceCroppedWallLengthFt(
+            BoundarySegment seg,
+            IList<BoundarySegment> loop,
+            int segIndex,
+            double tPrevFt,
+            double tNextFt)
+        {
+            if (seg == null || seg.GetCurve() == null) return 0.0;
+
+            // Чистая длина грани помещения (в футах), полученная от сегмента границы пространства
+            double innerLengthFt = seg.GetCurve().Length;
+
+            BoundarySegment prevSeg = (loop != null && segIndex >= 0 && segIndex < loop.Count) ? loop[(segIndex - 1 + loop.Count) % loop.Count] : null;
+            BoundarySegment nextSeg = (loop != null && segIndex >= 0 && segIndex < loop.Count) ? loop[(segIndex + 1) % loop.Count] : null;
+
+            bool prevColinear = IsColinear(seg, prevSeg);
+            bool nextColinear = IsColinear(seg, nextSeg);
+
+            double extraPrevFt = prevColinear ? 0.0 : (tPrevFt / 2.0);
+            double extraNextFt = nextColinear ? 0.0 : (tNextFt / 2.0);
+
+            return innerLengthFt + extraPrevFt + extraNextFt;
+        }
+
+        private Element GetElementFromSegment(BoundarySegment seg)
+        {
+            if (seg == null) return null;
+            ElementId elemId = seg.ElementId;
+            if (elemId == ElementId.InvalidElementId) return null;
+
+            Element hostElem = _doc.GetElement(elemId);
+            if (hostElem is RevitLinkInstance rvtLink)
+            {
+                Document linkedDoc = rvtLink.GetLinkDocument();
+                if (linkedDoc != null)
+                {
+                    try
+                    {
+                        ElementId linkedElemId = seg.LinkElementId;
+                        if (linkedElemId != null && linkedElemId != ElementId.InvalidElementId)
+                        {
+                            return linkedDoc.GetElement(linkedElemId);
+                        }
+                    }
+                    catch { }
+                }
+            }
+            return hostElem;
+        }
+
+        private static double GetWallThicknessFt(Element elem)
+        {
+            if (elem is Wall wall)
+            {
+                try
+                {
+                    return wall.Width; // Толщина стены в футах
+                }
+                catch { }
+            }
+            return 0.0;
+        }
+
+        /// <summary>
+        /// Ориентация конструкции по сторонам света (для стен) или горизонтальная.
+        /// </summary>
+        private string GetOrientation(Element elem, BuiltInCategory cat, BoundarySegment seg)
+        {
+            if (cat == BuiltInCategory.OST_Floors ||
+                cat == BuiltInCategory.OST_Ceilings ||
+                cat == BuiltInCategory.OST_StructuralFoundation)
+                return "Горизонтальная";
+
+            try
+            {
+                // Нормаль стены или направление сегмента
+                XYZ normal = XYZ.BasisX;
+
+                if (elem is Wall wall)
+                {
+                    normal = wall.Orientation;
+                }
+                else
+                {
+                    Curve c = seg.GetCurve();
+                    XYZ dir = (c.GetEndPoint(1) - c.GetEndPoint(0)).Normalize();
+                    // Нормаль к сегменту (перпендикуляр в плане)
+                    normal = new XYZ(-dir.Y, dir.X, 0);
+                }
+
+                return CompassFromVector(normal);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
+        private static string CompassFromVector(XYZ v)
+        {
+            // Проецируем на XY и определяем сторону света
+            double angle = Math.Atan2(v.Y, v.X) * 180.0 / Math.PI;
+            if (angle < 0) angle += 360.0;
+
+            // Восемь секторов
+            if (angle < 22.5  || angle >= 337.5) return "В";   // Восток
+            if (angle < 67.5)                    return "СВ";
+            if (angle < 112.5)                   return "С";    // Север
+            if (angle < 157.5)                   return "СЗ";
+            if (angle < 202.5)                   return "З";    // Запад
+            if (angle < 247.5)                   return "ЮЗ";
+            if (angle < 292.5)                   return "Ю";    // Юг
+            return "ЮВ";
+        }
+
+        /// <summary>
+        /// Метка конструкции с использованием сокращений: НС1, НС2, ВС1, ДВ1, ОК1, ПР1, ПОТ1, КР1...
+        /// </summary>
+        private string GetConstructionLabel(Element elem, BuiltInCategory cat, ExteriorDetectionOptions exteriorOptions = null)
+        {
+            if (elem == null) return "НС1";
+
+            ElementId typeId = elem.GetTypeId();
+            if (typeId == null || typeId == ElementId.InvalidElementId) typeId = elem.Id;
+
+            if (_typeCodeMap != null && _typeCodeMap.TryGetValue(typeId, out string existingCode))
+            {
+                return existingCode;
+            }
+
+            string prefix = "НС"; // По умолчанию для ограждений — Наружная Стена (НС)
+
+            Category category = elem.Category;
+            BuiltInCategory bCat = cat;
+            if (category != null)
+            {
+                try { bCat = category.BuiltInCategory; } catch { }
+            }
+
+            string catName = category?.Name ?? "";
+
+            // 1. Стены
+            if (elem is Wall || bCat == BuiltInCategory.OST_Walls || catName.IndexOf("Стен", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                bool isInterior = IsInteriorElement(elem, BuiltInCategory.OST_Walls, null, null, exteriorOptions);
+                prefix = isInterior ? "ВС" : "НС";
+            }
+            // 2. Окна
+            else if (bCat == BuiltInCategory.OST_Windows || catName.IndexOf("Окн", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "ОК";
+            }
+            // 3. Двери
+            else if (bCat == BuiltInCategory.OST_Doors || catName.IndexOf("Двер", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "ДВ";
+            }
+            // 4. Перекрытия и полы
+            else if (elem is Floor || bCat == BuiltInCategory.OST_Floors || bCat == BuiltInCategory.OST_StructuralFoundation ||
+                     catName.IndexOf("Перекрыт", StringComparison.OrdinalIgnoreCase) >= 0 || catName.IndexOf("Фундамент", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     catName.IndexOf("Пол", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "ПР";
+            }
+            // 5. Потолки
+            else if (bCat == BuiltInCategory.OST_Ceilings || catName.IndexOf("Потол", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "ПОТ";
+            }
+            // 6. Кровля / Крыши
+            else if (elem is RoofBase || bCat == BuiltInCategory.OST_Roofs ||
+                     catName.IndexOf("Кровл", StringComparison.OrdinalIgnoreCase) >= 0 || catName.IndexOf("Крыш", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                prefix = "КР";
+            }
+
+            if (_prefixCounterMap == null) _prefixCounterMap = new Dictionary<string, int>();
+            if (_typeCodeMap == null) _typeCodeMap = new Dictionary<ElementId, string>();
+
+            if (!_prefixCounterMap.ContainsKey(prefix))
+            {
+                _prefixCounterMap[prefix] = 1;
+            }
+            else
+            {
+                _prefixCounterMap[prefix]++;
+            }
+
+            string code = $"{prefix}{_prefixCounterMap[prefix]}";
+            _typeCodeMap[typeId] = code;
+            return code;
+        }
+
+        // ───────────────────────────────────────────────────────────────────
+        // Вспомогательные: параметры
+        // ───────────────────────────────────────────────────────────────────
+
+        private static void SetText(Element elem, string paramName, string value)
+        {
+            Parameter p = elem.LookupParameter(paramName);
+            if (p != null && !p.IsReadOnly && p.StorageType == StorageType.String)
+                p.Set(value ?? "");
+        }
+
+        private static string GetText(Element elem, string paramName)
+        {
+            Parameter p = elem.LookupParameter(paramName);
+            return p?.AsString() ?? "";
+        }
+
+        private static void SetNumber(Element elem, string paramName, double value)
+        {
+            Parameter p = elem.LookupParameter(paramName);
+            if (p == null || p.IsReadOnly) return;
+
+            if (p.StorageType == StorageType.Double)
+                p.Set(value);
+            else if (p.StorageType == StorageType.Integer)
+                p.Set((int)Math.Round(value));
+            else if (p.StorageType == StorageType.String)
+                p.Set(value.ToString("G"));
+        }
+
+        private static BuiltInCategory GetBuiltInCategory(Element elem)
+        {
+            if (elem?.Category == null) return BuiltInCategory.INVALID;
+            try
+            {
+                return elem.Category.BuiltInCategory;
+            }
+            catch
+            {
+#pragma warning disable CS0618
+                return (BuiltInCategory)elem.Category.Id.IntegerValue;
+#pragma warning restore CS0618
+            }
+        }
+        private static void GetOpeningDimensions(
+            Element elem,
+            BuiltInCategory cat,
+            out double widthMm,
+            out double heightMm,
+            out double areaSqM)
+        {
+            widthMm = 0;
+            heightMm = 0;
+            areaSqM = 0;
+            if (elem == null) return;
+
+            double bestWidthM = 0;
+            double bestHeightM = 0;
+
+            // 1. Сбор типа элемента
+            Element typeElem = null;
+            if (elem is FamilyInstance fi && fi.Symbol != null)
+            {
+                typeElem = fi.Symbol;
+            }
+            else if (elem.Document != null)
+            {
+                ElementId typeId = elem.GetTypeId();
+                if (typeId != null && typeId != ElementId.InvalidElementId)
+                    typeElem = elem.Document.GetElement(typeId);
+            }
+
+            // 2. Сканируем ВСЕ параметры экземпляра и типа по маске "ширин/width" и "высот/height"
+            bestWidthM = ScanOpeningDimension(elem, typeElem, true);
+            bestHeightM = ScanOpeningDimension(elem, typeElem, false);
+
+            // 3. Если параметры не дали адекватных размеров (в пределах 0.25 м .. 10.0 м),
+            // извлекаем размеры напрямую из 3D геометрии семейства (Solid / BoundingBox вдоль вектора HandOrientation)
+            if (bestWidthM < 0.25 || bestHeightM < 0.25 || bestWidthM > 12.0 || bestHeightM > 12.0)
+            {
+                GetOpeningDimensionsFromGeometry(elem, out double geomWM, out double geomHM);
+                if (geomWM >= 0.25 && (bestWidthM < 0.25 || bestWidthM > 12.0)) bestWidthM = geomWM;
+                if (geomHM >= 0.25 && (bestHeightM < 0.25 || bestHeightM > 12.0)) bestHeightM = geomHM;
+            }
+
+            // 4. Попытка распарсить размеры из имени типоразмера (например "ОК 1 (2140x1930)" или "2140 x 1930(h)")
+            if (bestWidthM < 0.25 || bestHeightM < 0.25)
+            {
+                string typeName = typeElem != null ? typeElem.Name : (elem.Name ?? "");
+                ParseDimensionsFromName(typeName, ref bestWidthM, ref bestHeightM);
+            }
+
+            // Разумные значения по умолчанию, если ничего не определилось
+            if (bestWidthM < 0.25) bestWidthM = (cat == BuiltInCategory.OST_Doors) ? 0.90 : 1.50;
+            if (bestHeightM < 0.25) bestHeightM = (cat == BuiltInCategory.OST_Doors) ? 2.10 : 1.50;
+
+            widthMm = Math.Round(bestWidthM * 1000.0, 1);
+            heightMm = Math.Round(bestHeightM * 1000.0, 1);
+            areaSqM = Math.Round(bestWidthM * bestHeightM, 2);
+        }
+
+        private static double ScanOpeningDimension(Element instElem, Element typeElem, bool isWidth)
+        {
+            // Приоритетные встроенные параметры
+            BuiltInParameter[] bips = isWidth
+                ? new[] { BuiltInParameter.WINDOW_WIDTH, BuiltInParameter.DOOR_WIDTH, BuiltInParameter.FAMILY_WIDTH_PARAM, BuiltInParameter.GENERIC_WIDTH, BuiltInParameter.CASEWORK_WIDTH }
+                : new[] { BuiltInParameter.WINDOW_HEIGHT, BuiltInParameter.DOOR_HEIGHT, BuiltInParameter.FAMILY_HEIGHT_PARAM, BuiltInParameter.GENERIC_HEIGHT, BuiltInParameter.CASEWORK_HEIGHT };
+
+            // 1. Проверяем BIP на типе
+            if (typeElem != null)
+            {
+                foreach (var bip in bips)
+                {
+                    try
+                    {
+                        Parameter p = typeElem.get_Parameter(bip);
+                        if (p != null && p.HasValue && p.StorageType == StorageType.Double)
+                        {
+                            double valFt = p.AsDouble();
+                            double valM = valFt * 0.3048;
+                            if (valM >= 0.25 && valM <= 12.0) return valM;
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            // 2. Проверяем BIP на экземпляре
+            if (instElem != null)
+            {
+                foreach (var bip in bips)
+                {
+                    try
+                    {
+                        Parameter p = instElem.get_Parameter(bip);
+                        if (p != null && p.HasValue && p.StorageType == StorageType.Double)
+                        {
+                            double valFt = p.AsDouble();
+                            double valM = valFt * 0.3048;
+                            if (valM >= 0.25 && valM <= 12.0) return valM;
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            // 3. Поиск по ключевым именам параметров в порядке приоритета
+            string[] keywords = isWidth
+                ? new[] { "adsk_размер_ширина", "ширина проема", "ширина_проема", "ширина окна", "ширина двери", "примерная ширина", "габаритная ширина", "ширина", "width", "rough width", "размер_ширина" }
+                : new[] { "adsk_размер_высота", "высота проема", "высота_проема", "высота окна", "высота двери", "примерная высота", "габаритная высота", "высота", "height", "rough height", "размер_высота" };
+
+            Element[] targets = new[] { typeElem, instElem };
+            foreach (var target in targets)
+            {
+                if (target == null) continue;
+
+                // Точное совпадение по списку
+                foreach (string kw in keywords)
+                {
+                    Parameter p = target.LookupParameter(kw);
+                    if (p != null && p.HasValue)
+                    {
+                        double parsed = ExtractParamValueInMeters(p);
+                        if (parsed >= 0.25 && parsed <= 12.0) return parsed;
+                    }
+                }
+
+                // Общий перебор всех параметров объекта, если точные имена не совпали
+                foreach (Parameter p in target.Parameters)
+                {
+                    if (p == null || p.Definition == null || !p.HasValue) continue;
+                    string pName = p.Definition.Name.ToLowerInvariant();
+
+                    bool match = isWidth
+                        ? (pName.Contains("ширин") || pName.Contains("width"))
+                        : (pName.Contains("высот") || pName.Contains("height"));
+
+                    if (match && !pName.Contains("рамы") && !pName.Contains("коробк") && !pName.Contains("подокон") && !pName.Contains("откос"))
+                    {
+                        double parsed = ExtractParamValueInMeters(p);
+                        if (parsed >= 0.25 && parsed <= 12.0) return parsed;
+                    }
+                }
+            }
+
+            return 0.0;
+        }
+
+        private static double ExtractParamValueInMeters(Parameter p)
+        {
+            if (p == null || !p.HasValue) return 0.0;
+            if (p.StorageType == StorageType.Double)
+            {
+                double raw = p.AsDouble();
+                // В Revit API длина хранится в футах (1 фут = 0.3048 м).
+                // Но если в параметр записали число в мм (например 2140):
+                if (raw > 50.0) return raw / 1000.0;
+                return raw * 0.3048;
+            }
+            if (p.StorageType == StorageType.Integer)
+            {
+                int rawInt = p.AsInteger();
+                if (rawInt > 50) return rawInt / 1000.0;
+                return rawInt * 0.3048;
+            }
+            if (p.StorageType == StorageType.String)
+            {
+                string s = p.AsString();
+                if (!string.IsNullOrEmpty(s) && double.TryParse(s.Replace(',', '.').Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out double v))
+                {
+                    if (v > 50.0) return v / 1000.0;
+                    return v;
+                }
+            }
+            return 0.0;
+        }
+
+        private static void ParseDimensionsFromName(string name, ref double widthM, ref double heightM)
+        {
+            if (string.IsNullOrEmpty(name)) return;
+            try
+            {
+                // Поиск шаблона: 2140x1930 или 2140*1930 или 2140х1930
+                var match = System.Text.RegularExpressions.Regex.Match(name, @"(\d{3,4})\s*[\*xхXХ×]\s*(\d{3,4})");
+                if (match.Success)
+                {
+                    if (double.TryParse(match.Groups[1].Value, out double wMm) &&
+                        double.TryParse(match.Groups[2].Value, out double hMm))
+                    {
+                        if (wMm >= 300 && wMm <= 6000 && widthM < 0.25) widthM = wMm / 1000.0;
+                        if (hMm >= 300 && hMm <= 6000 && heightM < 0.25) heightM = hMm / 1000.0;
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private static void GetOpeningDimensionsFromGeometry(Element elem, out double widthM, out double heightM)
+        {
+            widthM = 0;
+            heightM = 0;
+            if (elem == null) return;
+
+            try
+            {
+                if (elem is FamilyInstance fi)
+                {
+                    XYZ hand = fi.HandOrientation; // Вектор вдоль стены
+                    if (hand != null && hand.GetLength() > 0.01)
+                    {
+                        XYZ uHand = new XYZ(hand.X, hand.Y, 0).Normalize();
+
+                        BoundingBoxXYZ bb = elem.get_BoundingBox(null);
+                        if (bb != null)
+                        {
+                            double dzFt = Math.Abs(bb.Max.Z - bb.Min.Z);
+                            heightM = dzFt * 0.3048;
+
+                            XYZ min = bb.Min;
+                            XYZ max = bb.Max;
+                            XYZ[] pts = new XYZ[]
+                            {
+                                new XYZ(min.X, min.Y, 0),
+                                new XYZ(max.X, min.Y, 0),
+                                new XYZ(min.X, max.Y, 0),
+                                new XYZ(max.X, max.Y, 0)
+                            };
+
+                            double minP = double.MaxValue;
+                            double maxP = double.MinValue;
+                            foreach (var pt in pts)
+                            {
+                                double proj = pt.DotProduct(uHand);
+                                if (proj < minP) minP = proj;
+                                if (proj > maxP) maxP = proj;
+                            }
+                            double wFt = maxP - minP;
+                            widthM = wFt * 0.3048;
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+    }
+}

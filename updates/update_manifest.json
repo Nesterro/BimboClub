@@ -1,14 +1,14 @@
 ﻿{
-    "latestVersion":  "2.0.1",
+    "latestVersion":  "2.1.0",
     "releaseDate":  "2026-08-19",
     "changelog":  [
-                      "Добавлена иконка icon_manager.ico для BimboClubManager.exe",
-                      "Вкладка ленты переименована в ⚫ BimboClub для быстрого визуального поиска",
-                      "Добавлена кнопка Инфо v2.0.1 прямо на ленту с информацией о плагине",
-                      "Удалены устаревшие инструменты Теплопотери, Редактор правил, Заполнение параметров, Добавить параметры"
+                      "Full port of all 11 tools from BCCBIM repository",
+                      "AdWindows WPF gold badge dot on Revit ribbon tab header",
+                      "Antigravity dark UI overhaul across all WPF windows",
+                      "Support for Revit 2021-2026 (.NET 4.8 and .NET 8.0)"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.0.1/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.0.1/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.0/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.0/bimboclub_net8.zip"
                  }
 }
