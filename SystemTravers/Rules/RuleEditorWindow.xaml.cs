@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace BimboClub.Rules
 
         private void LoadInitialRules()
         {
-            // Check default rule file in AppData or Plugins folder
+            // Try default path in AppData
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string defPath = Path.Combine(appData, "BimboClub", "Rules", "BimboClub_def.xml");
 
@@ -37,18 +38,16 @@ namespace BimboClub.Rules
                 try
                 {
                     _currentRuleSet = RuleXmlService.LoadFromFile(defPath);
+                    BindRulesList();
+                    TxtStatus.Text = $"Загружено правил: {_currentRuleSet.Rules.Count} (BimboClub_def.xml)";
+                    return;
                 }
-                catch
-                {
-                    _currentRuleSet = CreateDefaultRuleSet();
-                }
-            }
-            else
-            {
-                _currentRuleSet = CreateDefaultRuleSet();
+                catch { }
             }
 
+            _currentRuleSet = CreateDefaultRuleSet();
             BindRulesList();
+            TxtStatus.Text = $"Загружено базовых правил: {_currentRuleSet.Rules.Count}";
         }
 
         private RuleSet CreateDefaultRuleSet()
@@ -61,6 +60,7 @@ namespace BimboClub.Rules
                 Index = 1,
                 Name = "Воздуховоды — Толщина стенки",
                 Comment = "Заполнение толщины стенки воздуховода по размерам",
+                FormulaDescription = "Запись в параметр 'ADSK_Толщина стенки': [Толщина стенок воздуховода]",
                 TargetParam = new ParamIdentifier { Name = "ADSK_Толщина стенки" }
             };
             r1.Filters.Add(new RuleFilter
@@ -86,6 +86,7 @@ namespace BimboClub.Rules
                 Index = 2,
                 Name = "Заполнение ADSK_Система",
                 Comment = "Копирование имени системы в параметр ADSK_Система",
+                FormulaDescription = "Запись в параметр 'ADSK_Система': [Имя системы]",
                 TargetParam = new ParamIdentifier { Name = "ADSK_Система" }
             };
             r2.Filters.Add(new RuleFilter
@@ -95,7 +96,7 @@ namespace BimboClub.Rules
             });
             r2.Fragments.Add(new RuleFragment
             {
-                FragmentType = "Parameter",
+                FragmentType = "ParameterValue",
                 ParamId = new ParamIdentifier { Name = "Имя системы" },
                 ParamMode = ParamGettingMode.Self
             });
@@ -104,12 +105,24 @@ namespace BimboClub.Rules
             return set;
         }
 
-        private void BindRulesList()
+        private void BindRulesList(string? filterText = null)
         {
-            LstRules.ItemsSource = _currentRuleSet.Rules;
-            TxtRulesCount.Text = $"{_currentRuleSet.Rules.Count} правил";
+            IEnumerable<RuleItem> items = _currentRuleSet.Rules;
 
-            if (_currentRuleSet.Rules.Count > 0)
+            if (!string.IsNullOrWhiteSpace(filterText))
+            {
+                string search = filterText.Trim();
+                items = items.Where(r => 
+                    (r.Name != null && r.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    (r.TargetParam?.Name != null && r.TargetParam.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    (r.Comment != null && r.Comment.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0));
+            }
+
+            var list = items.ToList();
+            LstRules.ItemsSource = list;
+            TxtRulesCount.Text = $"{list.Count} из {_currentRuleSet.Rules.Count} правил";
+
+            if (list.Count > 0)
             {
                 LstRules.SelectedIndex = 0;
             }
@@ -117,6 +130,11 @@ namespace BimboClub.Rules
             {
                 SelectRule(null);
             }
+        }
+
+        private void TxtSearchRule_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            BindRulesList(TxtSearchRule.Text);
         }
 
         private void LstRules_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -139,6 +157,7 @@ namespace BimboClub.Rules
                 PnlRuleDetails.IsEnabled = false;
                 TxtRuleName.Text = string.Empty;
                 TxtTargetParam.Text = string.Empty;
+                BrdFormulaDesc.Visibility = System.Windows.Visibility.Collapsed;
                 IcFilters.ItemsSource = null;
                 IcFragments.ItemsSource = null;
                 return;
@@ -147,6 +166,17 @@ namespace BimboClub.Rules
             PnlRuleDetails.IsEnabled = true;
             TxtRuleName.Text = rule.Name;
             TxtTargetParam.Text = rule.TargetParam?.Name ?? string.Empty;
+
+            if (!string.IsNullOrEmpty(rule.FormulaDescription))
+            {
+                BrdFormulaDesc.Visibility = System.Windows.Visibility.Visible;
+                TxtFormulaDesc.Text = rule.FormulaDescription;
+            }
+            else
+            {
+                BrdFormulaDesc.Visibility = System.Windows.Visibility.Collapsed;
+            }
+
             IcFilters.ItemsSource = rule.Filters;
             IcFragments.ItemsSource = rule.Fragments;
         }
@@ -179,7 +209,7 @@ namespace BimboClub.Rules
             newRule.Filters.Add(new RuleFilter { FilterType = "ElementIsElementType", Inverted = true });
 
             _currentRuleSet.Rules.Add(newRule);
-            TxtRulesCount.Text = $"{_currentRuleSet.Rules.Count} правил";
+            BindRulesList(TxtSearchRule.Text);
             LstRules.SelectedItem = newRule;
         }
 
@@ -192,6 +222,7 @@ namespace BimboClub.Rules
                 Index = _currentRuleSet.Rules.Count + 1,
                 Name = _selectedRule.Name + " (копия)",
                 Comment = _selectedRule.Comment,
+                FormulaDescription = _selectedRule.FormulaDescription,
                 TargetParam = new ParamIdentifier
                 {
                     Name = _selectedRule.TargetParam.Name,
@@ -209,7 +240,8 @@ namespace BimboClub.Rules
                     Inverted = f.Inverted,
                     MatchType = f.MatchType,
                     Value = f.Value,
-                    ParamId = new ParamIdentifier { Name = f.ParamId.Name, Guid = f.ParamId.Guid }
+                    ParamId = new ParamIdentifier { Name = f.ParamId.Name, Guid = f.ParamId.Guid },
+                    RawElement = f.RawElement != null ? new System.Xml.Linq.XElement(f.RawElement) : null
                 };
                 foreach (var cat in f.Categories) fCopy.Categories.Add(cat);
                 copy.Filters.Add(fCopy);
@@ -221,16 +253,18 @@ namespace BimboClub.Rules
                 {
                     FragmentType = frag.FragmentType,
                     StaticText = frag.StaticText,
+                    Description = frag.Description,
                     ParamMode = frag.ParamMode,
                     ConvertToMillimeters = frag.ConvertToMillimeters,
                     RoundDecimal = frag.RoundDecimal,
                     ParamId = new ParamIdentifier { Name = frag.ParamId.Name, Guid = frag.ParamId.Guid },
-                    DuctThicknessData = frag.DuctThicknessData
+                    DuctThicknessData = frag.DuctThicknessData,
+                    RawElement = frag.RawElement != null ? new System.Xml.Linq.XElement(frag.RawElement) : null
                 });
             }
 
             _currentRuleSet.Rules.Add(copy);
-            TxtRulesCount.Text = $"{_currentRuleSet.Rules.Count} правил";
+            BindRulesList(TxtSearchRule.Text);
             LstRules.SelectedItem = copy;
         }
 
@@ -242,6 +276,7 @@ namespace BimboClub.Rules
             {
                 _currentRuleSet.Rules.Move(idx, idx - 1);
                 ReindexRules();
+                BindRulesList(TxtSearchRule.Text);
                 LstRules.SelectedItem = _selectedRule;
             }
         }
@@ -254,6 +289,7 @@ namespace BimboClub.Rules
             {
                 _currentRuleSet.Rules.Move(idx, idx + 1);
                 ReindexRules();
+                BindRulesList(TxtSearchRule.Text);
                 LstRules.SelectedItem = _selectedRule;
             }
         }
@@ -303,7 +339,7 @@ namespace BimboClub.Rules
             if (_selectedRule == null) return;
             var frag = new RuleFragment
             {
-                FragmentType = "StaticText",
+                FragmentType = "Const",
                 StaticText = " - "
             };
             _selectedRule.Fragments.Add(frag);
@@ -314,7 +350,7 @@ namespace BimboClub.Rules
             if (_selectedRule == null) return;
             var frag = new RuleFragment
             {
-                FragmentType = "Parameter",
+                FragmentType = "ParameterValue",
                 ParamId = new ParamIdentifier { Name = "ADSK_Марка" },
                 ParamMode = ParamGettingMode.Self
             };
@@ -337,7 +373,7 @@ namespace BimboClub.Rules
             if (_selectedRule == null) return;
             var frag = new RuleFragment
             {
-                FragmentType = "Level"
+                FragmentType = "FloorLevelName"
             };
             _selectedRule.Fragments.Add(frag);
         }
@@ -364,7 +400,10 @@ namespace BimboClub.Rules
                 {
                     _currentRuleSet = RuleXmlService.LoadFromFile(dlg.FileName);
                     BindRulesList();
-                    TaskDialog.Show("BimboClub", $"Загружено правил: {_currentRuleSet.Rules.Count} из файла:\n{dlg.FileName}");
+                    string fileName = Path.GetFileName(dlg.FileName);
+                    Title = $"BimboClub — Редактор правил — {fileName} ({_currentRuleSet.Rules.Count} правил)";
+                    TxtSubtitle.Text = $"Загружен файл: {dlg.FileName}";
+                    TxtStatus.Text = $"🟢 Загружено правил: {_currentRuleSet.Rules.Count} из {fileName}";
                 }
                 catch (Exception ex)
                 {
@@ -379,7 +418,7 @@ namespace BimboClub.Rules
             {
                 Filter = "XML Файлы правил (*.xml)|*.xml",
                 Title = "Сохранить правила в XML",
-                FileName = "Правила_BimboClub.xml"
+                FileName = !string.IsNullOrEmpty(_currentRuleSet.FilePath) ? Path.GetFileName(_currentRuleSet.FilePath) : "Правила_BimboClub.xml"
             };
 
             if (dlg.ShowDialog() == true)
@@ -387,7 +426,9 @@ namespace BimboClub.Rules
                 try
                 {
                     RuleXmlService.SaveToFile(_currentRuleSet, dlg.FileName);
-                    TaskDialog.Show("BimboClub", $"Правила успешно сохранены:\n{dlg.FileName}");
+                    _currentRuleSet.FilePath = dlg.FileName;
+                    string fileName = Path.GetFileName(dlg.FileName);
+                    TxtStatus.Text = $"💾 Правила успешно сохранены в {fileName}";
                 }
                 catch (Exception ex)
                 {
@@ -413,8 +454,13 @@ namespace BimboClub.Rules
 
             PrgBar.Visibility = System.Windows.Visibility.Visible;
             PrgBar.Value = 0;
+            TxtStatus.Text = "Выполнение правил...";
 
-            var progress = new Progress<double>(val => PrgBar.Value = val);
+            var progress = new Progress<double>(val => 
+            {
+                PrgBar.Value = val;
+                TxtStatus.Text = $"Обработка правил ({val:F0}%)...";
+            });
 
             try
             {
@@ -431,10 +477,12 @@ namespace BimboClub.Rules
                     report += $"\nПредупреждения ({result.Errors.Count}):\n" + string.Join("\n", result.Errors.Take(5));
                 }
 
+                TxtStatus.Text = $"✅ Обработка завершена! Обновлено: {result.UpdatedElementsCount} элементов.";
                 TaskDialog.Show("BimboClub | Результат", report);
             }
             catch (Exception ex)
             {
+                TxtStatus.Text = $"❌ Ошибка выполнения: {ex.Message}";
                 TaskDialog.Show("BimboClub | Ошибка", $"Ошибка при выполнении правил:\n{ex.Message}");
             }
             finally

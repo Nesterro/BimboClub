@@ -27,7 +27,8 @@ namespace BimboClub.Rules
 
             var ruleSet = new RuleSet
             {
-                Comment = root.Element("comment")?.Value ?? string.Empty
+                Comment = root.Element("comment")?.Value ?? string.Empty,
+                FilePath = filePath
             };
 
             int defaultIndex = 1;
@@ -35,7 +36,6 @@ namespace BimboClub.Rules
             {
                 var ruleItem = new RuleItem();
 
-                // Index and Enable attributes
                 string? indexAttr = ruleEl.Attribute("index")?.Value;
                 ruleItem.Index = int.TryParse(indexAttr, out int parsedIdx) ? parsedIdx : defaultIndex++;
 
@@ -59,6 +59,8 @@ namespace BimboClub.Rules
                     var fragmentsEl = actionEl.Element("fragments");
                     if (fragmentsEl != null)
                     {
+                        ruleItem.FormulaDescription = fragmentsEl.Attribute("desc")?.Value ?? string.Empty;
+
                         foreach (var fragEl in fragmentsEl.Elements("fragment"))
                         {
                             var frag = ParseFragment(fragEl);
@@ -114,6 +116,11 @@ namespace BimboClub.Rules
 
                 // Fragments
                 var fragmentsEl = new XElement("fragments");
+                if (!string.IsNullOrEmpty(item.FormulaDescription))
+                {
+                    fragmentsEl.Add(new XAttribute("desc", item.FormulaDescription));
+                }
+
                 foreach (var frag in item.Fragments)
                 {
                     fragmentsEl.Add(SerializeFragment(frag));
@@ -155,6 +162,12 @@ namespace BimboClub.Rules
                 param.BuiltInParamId = bip;
             }
 
+            string? stStr = el.Element("storageType")?.Value;
+            if (!string.IsNullOrEmpty(stStr) && Enum.TryParse(stStr, true, out StorageType st))
+            {
+                param.StorageType = st;
+            }
+
             return param;
         }
 
@@ -179,14 +192,17 @@ namespace BimboClub.Rules
 
         private static RuleFragment? ParseFragment(XElement el)
         {
-            string type = el.Attribute("type")?.Value ?? "String";
-            var frag = new RuleFragment();
+            string type = el.Attribute("type")?.Value ?? "Const";
+            var frag = new RuleFragment
+            {
+                FragmentType = type,
+                RawElement = el,
+                Description = el.Attribute("desc")?.Value ?? string.Empty
+            };
 
             if (type == "DuctThickness")
             {
-                frag.FragmentType = "DuctThickness";
                 var table = new DuctThicknessTable();
-
                 var rectEl = el.Element("rectangle");
                 if (rectEl != null)
                 {
@@ -209,9 +225,8 @@ namespace BimboClub.Rules
                 return frag;
             }
 
-            if (type == "Param" || type == "Parameter")
+            if (type == "ParameterValue" || type == "Param" || type == "Parameter" || type == "StringOperation")
             {
-                frag.FragmentType = "Parameter";
                 var paramEl = el.Element("paramId");
                 if (paramEl != null)
                 {
@@ -236,8 +251,37 @@ namespace BimboClub.Rules
                 return frag;
             }
 
-            // Fallback to StaticText / String
-            frag.FragmentType = "StaticText";
+            if (type == "Const" || type == "Symbol" || type == "String")
+            {
+                frag.StaticText = el.Element("value")?.Value ?? el.Value ?? string.Empty;
+                return frag;
+            }
+
+            if (type == "FloorLevelName")
+            {
+                frag.FragmentType = "FloorLevelName";
+                return frag;
+            }
+
+            if (type == "MEPSize")
+            {
+                frag.FragmentType = "MEPSize";
+                return frag;
+            }
+
+            if (type == "FittingAngle")
+            {
+                frag.FragmentType = "FittingAngle";
+                return frag;
+            }
+
+            if (type == "MEPsystem01" || type == "MEPsystem02")
+            {
+                frag.FragmentType = type;
+                return frag;
+            }
+
+            // Fallback
             frag.StaticText = el.Element("value")?.Value ?? el.Value ?? string.Empty;
             return frag;
         }
@@ -271,6 +315,11 @@ namespace BimboClub.Rules
 
         private static XElement SerializeFragment(RuleFragment frag)
         {
+            if (frag.RawElement != null)
+            {
+                return new XElement(frag.RawElement);
+            }
+
             if (frag.FragmentType == "DuctThickness" && frag.DuctThicknessData != null)
             {
                 var el = new XElement("fragment", new XAttribute("type", "DuctThickness"));
@@ -299,9 +348,9 @@ namespace BimboClub.Rules
                 return el;
             }
 
-            if (frag.FragmentType == "Parameter")
+            if (frag.FragmentType == "ParameterValue" || frag.FragmentType == "Param" || frag.FragmentType == "Parameter")
             {
-                var el = new XElement("fragment", new XAttribute("type", "Param"));
+                var el = new XElement("fragment", new XAttribute("type", "ParameterValue"));
                 el.Add(SerializeParamIdentifier(frag.ParamId));
                 el.Add(new XElement("mode", frag.ParamMode.ToString()));
                 el.Add(new XElement("convertToMillimeters", frag.ConvertToMillimeters.ToString().ToLowerInvariant()));
@@ -314,7 +363,7 @@ namespace BimboClub.Rules
 
             // Static text
             return new XElement("fragment",
-                new XAttribute("type", "String"),
+                new XAttribute("type", "Const"),
                 new XElement("value", frag.StaticText ?? string.Empty)
             );
         }
@@ -324,7 +373,8 @@ namespace BimboClub.Rules
             string filterType = el.Attribute("filterType")?.Value ?? "ByCategories";
             var filter = new RuleFilter
             {
-                FilterType = filterType
+                FilterType = filterType,
+                RawElement = el
             };
 
             string? invAttr = el.Attribute("inverted")?.Value;
@@ -374,6 +424,11 @@ namespace BimboClub.Rules
 
         private static XElement SerializeFilter(RuleFilter filter)
         {
+            if (filter.RawElement != null)
+            {
+                return new XElement(filter.RawElement);
+            }
+
             var el = new XElement("filter", new XAttribute("filterType", filter.FilterType));
             if (filter.Inverted)
             {

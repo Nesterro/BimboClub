@@ -1,13 +1,14 @@
 ﻿{
-    "latestVersion":  "2.1.6",
+    "latestVersion":  "2.1.7",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Rewrote Rule Editor from scratch with clean independent WPF architecture",
-                      "Removed legacy LTools folder and dependencies",
-                      "Added full XML rule import/export compatibility and dark modern UI"
+                      "Full support for all LTools XML fragment types (StringOperation, Calculator, MEPSize, DuctThickness, PipeThickness, FittingAngle, FloorLevelName)",
+                      "Replaced blocking TaskDialog on XML open with instant search and status bar",
+                      "Added rule filtering search box and formula descriptions display",
+                      "Fully independent clean WPF Rule Editor engine in BimboClub"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.6/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.6/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.7/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.7/bimboclub_net8.zip"
                  }
 }

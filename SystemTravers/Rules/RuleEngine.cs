@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Xml.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.DB.Plumbing;
@@ -91,7 +92,7 @@ namespace BimboClub.Rules
                 result.UpdatedElementsCount = updatedElementIds.Count;
             }
 
-            result.Messages.Add($"Успешно обновлено параметров у {result.UpdatedElementsCount} элементов.");
+            result.Messages.Add($"Успешно обработано: {result.UpdatedElementsCount} элементов обновлено.");
             return result;
         }
 
@@ -176,7 +177,6 @@ namespace BimboClub.Rules
                 }
                 else
                 {
-                    // No insulation on element
                     matches = CompareValues(null, filter.Value, filter.MatchType, filter.ParamId.StorageType);
                 }
             }
@@ -226,33 +226,239 @@ namespace BimboClub.Rules
 
             foreach (var frag in fragments)
             {
-                if (frag.FragmentType == "StaticText")
+                string fragType = frag.FragmentType;
+
+                if (fragType == "Const" || fragType == "String" || fragType == "Symbol")
                 {
                     parts.Add(frag.StaticText ?? string.Empty);
                 }
-                else if (frag.FragmentType == "Parameter")
+                else if (fragType == "ParameterValue" || fragType == "Param" || fragType == "Parameter")
                 {
                     string? val = GetParameterStringValue(elem, frag.ParamId, frag.ParamMode, frag.ConvertToMillimeters, frag.RoundDecimal);
                     if (val != null) parts.Add(val);
                 }
-                else if (frag.FragmentType == "DuctThickness")
+                else if (fragType == "StringOperation")
+                {
+                    string? rawVal = GetParameterStringValue(elem, frag.ParamId, frag.ParamMode, frag.ConvertToMillimeters, frag.RoundDecimal);
+                    string processed = ApplyStringOperation(rawVal, frag.RawElement);
+                    if (!string.IsNullOrEmpty(processed)) parts.Add(processed);
+                }
+                else if (fragType == "Calculator")
+                {
+                    string calcVal = EvaluateCalculator(elem, frag.RawElement);
+                    if (!string.IsNullOrEmpty(calcVal)) parts.Add(calcVal);
+                }
+                else if (fragType == "DuctThickness")
                 {
                     string? val = CalculateDuctThickness(elem, frag.DuctThicknessData ?? DuctThicknessTable.CreateDefault());
                     if (val != null) parts.Add(val);
                 }
-                else if (frag.FragmentType == "Level")
+                else if (fragType == "PipeThickness")
+                {
+                    string? val = CalculatePipeThickness(elem);
+                    if (val != null) parts.Add(val);
+                }
+                else if (fragType == "FloorLevelName" || fragType == "Level")
                 {
                     string? levelName = GetElementLevelName(elem);
                     if (levelName != null) parts.Add(levelName);
+                }
+                else if (fragType == "MEPSize")
+                {
+                    string? sizeStr = GetMEPSizeString(elem);
+                    if (sizeStr != null) parts.Add(sizeStr);
+                }
+                else if (fragType == "FittingAngle")
+                {
+                    string? angleStr = GetFittingAngleString(elem);
+                    if (angleStr != null) parts.Add(angleStr);
+                }
+                else if (fragType == "MEPsystem01" || fragType == "MEPsystem02")
+                {
+                    string? sysStr = GetMEPSystemString(elem, frag.RawElement);
+                    if (sysStr != null) parts.Add(sysStr);
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(frag.StaticText)) parts.Add(frag.StaticText);
                 }
             }
 
             return string.Concat(parts);
         }
 
+        private string ApplyStringOperation(string? rawVal, XElement? rawEl)
+        {
+            if (string.IsNullOrEmpty(rawVal)) return string.Empty;
+            if (rawEl == null) return rawVal;
+
+            var opEl = rawEl.Element("strOperation");
+            if (opEl == null) return rawVal;
+
+            string opType = opEl.Attribute("type")?.Value ?? string.Empty;
+
+            try
+            {
+                if (opType == "LeftN" && int.TryParse(opEl.Element("count")?.Value, out int leftCount))
+                {
+                    return rawVal.Length <= leftCount ? rawVal : rawVal.Substring(0, leftCount);
+                }
+                if (opType == "RightN" && int.TryParse(opEl.Element("count")?.Value, out int rightCount))
+                {
+                    return rawVal.Length <= rightCount ? rawVal : rawVal.Substring(rawVal.Length - rightCount);
+                }
+                if (opType == "IgnoreLeftN" && int.TryParse(opEl.Element("count")?.Value, out int ignLeft))
+                {
+                    return rawVal.Length > ignLeft ? rawVal.Substring(ignLeft) : string.Empty;
+                }
+                if (opType == "IgnoreRightN" && int.TryParse(opEl.Element("count")?.Value, out int ignRight))
+                {
+                    return rawVal.Length > ignRight ? rawVal.Substring(0, rawVal.Length - ignRight) : string.Empty;
+                }
+                if (opType == "Substring")
+                {
+                    int start = int.TryParse(opEl.Element("startIndex")?.Value, out int s) ? s : 0;
+                    int length = int.TryParse(opEl.Element("length")?.Value, out int l) ? l : rawVal.Length;
+                    if (start < rawVal.Length)
+                    {
+                        return rawVal.Substring(start, Math.Min(length, rawVal.Length - start));
+                    }
+                }
+                if (opType == "Replace")
+                {
+                    string oldV = opEl.Element("oldValue")?.Value ?? string.Empty;
+                    string newV = opEl.Element("newValue")?.Value ?? string.Empty;
+                    if (!string.IsNullOrEmpty(oldV))
+                    {
+                        return rawVal.Replace(oldV, newV);
+                    }
+                }
+                if (opType == "LetterCase")
+                {
+                    string letterCase = opEl.Element("case")?.Value ?? string.Empty;
+                    if (letterCase == "Upper") return rawVal.ToUpperInvariant();
+                    if (letterCase == "Lower") return rawVal.ToLowerInvariant();
+                }
+            }
+            catch { }
+
+            return rawVal;
+        }
+
+        private string EvaluateCalculator(Element elem, XElement? rawEl)
+        {
+            if (rawEl == null) return string.Empty;
+
+            try
+            {
+                var firstEl = rawEl.Element("firstOperand");
+                var secondEl = rawEl.Element("secondOperand");
+                var opEl = rawEl.Element("operation");
+
+                double v1 = GetOperandValue(elem, firstEl);
+                double v2 = GetOperandValue(elem, secondEl);
+                string op = opEl?.Value ?? "Add";
+
+                double result = op switch
+                {
+                    "Multiply" => v1 * v2,
+                    "Division" => v2 != 0 ? v1 / v2 : 0,
+                    "Subtraction" => v1 - v2,
+                    _ => v1 + v2
+                };
+
+                return result.ToString("0.##", CultureInfo.InvariantCulture).Replace('.', ',');
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        private double GetOperandValue(Element elem, XElement? opEl)
+        {
+            if (opEl == null) return 0;
+
+            string? constVal = opEl.Element("const")?.Value ?? opEl.Element("value")?.Value;
+            if (!string.IsNullOrEmpty(constVal) && double.TryParse(constVal.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double cv))
+            {
+                return cv;
+            }
+
+            var paramEl = opEl.Element("paramId");
+            if (paramEl != null)
+            {
+                string paramName = paramEl.Element("name")?.Value ?? string.Empty;
+                if (!string.IsNullOrEmpty(paramName))
+                {
+                    Parameter? p = elem.LookupParameter(paramName);
+                    if (p != null && p.HasValue && p.StorageType == StorageType.Double)
+                    {
+                        return p.AsDouble();
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        private string? GetMEPSizeString(Element elem)
+        {
+            Parameter? p = elem.get_Parameter(BuiltInParameter.RBS_CALCULATED_SIZE) ?? 
+                           elem.get_Parameter(BuiltInParameter.RBS_REFERENCE_OVERALLSIZE) ??
+                           elem.LookupParameter("Размер");
+            if (p != null && p.HasValue)
+            {
+                return p.AsString() ?? p.AsValueString();
+            }
+            return null;
+        }
+
+        private string? GetFittingAngleString(Element elem)
+        {
+            Parameter? p = elem.LookupParameter("Угол") ?? 
+                           elem.LookupParameter("Angle");
+            if (p != null && p.HasValue && p.StorageType == StorageType.Double)
+            {
+                double angleDeg = p.AsDouble() * (180.0 / Math.PI);
+                return angleDeg.ToString("0.#", CultureInfo.InvariantCulture).Replace('.', ',') + "°";
+            }
+            return null;
+        }
+
+        private string? GetMEPSystemString(Element elem, XElement? rawEl)
+        {
+            Parameter? p = elem.get_Parameter(BuiltInParameter.RBS_SYSTEM_NAME_PARAM) ??
+                           elem.get_Parameter(BuiltInParameter.RBS_DUCT_SYSTEM_TYPE_PARAM) ??
+                           elem.get_Parameter(BuiltInParameter.RBS_PIPING_SYSTEM_TYPE_PARAM) ??
+                           elem.LookupParameter("Имя системы") ??
+                           elem.LookupParameter("Сокращение для системы");
+            if (p != null && p.HasValue)
+            {
+                return p.AsString();
+            }
+            return null;
+        }
+
+        private string? CalculatePipeThickness(Element elem)
+        {
+            Parameter? diamParam = elem.get_Parameter(BuiltInParameter.RBS_PIPE_DIAMETER_PARAM) ?? elem.LookupParameter("Диаметр");
+            if (diamParam != null && diamParam.HasValue)
+            {
+                double diamMm = diamParam.AsDouble() * 304.8;
+                // Standard steel pipe thickness lookup table
+                if (diamMm <= 20) return "2,0";
+                if (diamMm <= 32) return "2,5";
+                if (diamMm <= 50) return "3,0";
+                if (diamMm <= 100) return "3,5";
+                if (diamMm <= 150) return "4,0";
+                return "4,5";
+            }
+            return null;
+        }
+
         private string? CalculateDuctThickness(Element elem, DuctThicknessTable table)
         {
-            // Try to extract Duct dimensions (Diameter or Width/Height)
             double widthMm = 0;
             double heightMm = 0;
             double diameterMm = 0;
@@ -384,7 +590,6 @@ namespace BimboClub.Rules
             Parameter? p = FindParameter(elem, targetParam);
             if (p == null || p.IsReadOnly)
             {
-                // Try setting on Type
                 ElementId typeId = elem.GetTypeId();
                 if (typeId != ElementId.InvalidElementId)
                 {

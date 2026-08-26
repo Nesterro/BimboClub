@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using Autodesk.Revit.DB;
 
 namespace BimboClub.Rules
@@ -79,12 +80,13 @@ namespace BimboClub.Rules
 
     public class RuleFilter : INotifyPropertyChanged
     {
-        private string _filterType = "ByCategories"; // ByCategories, ElementIsElementType, ByParameterValue, ByInsulationParameterValue
+        private string _filterType = "ByCategories"; // ByCategories, ElementIsElementType, ByParameterValue, ByInsulationParameterValue, ByLevel
         private bool _inverted;
         private ObservableCollection<string> _categories = new();
         private ParamIdentifier _paramId = new();
         private FilterMatchType _matchType = FilterMatchType.Equals;
         private string _value = string.Empty;
+        public XElement? RawElement { get; set; }
 
         public string FilterType
         {
@@ -138,7 +140,20 @@ namespace BimboClub.Rules
                 if (FilterType == "ByParameterValue" || FilterType == "ByInsulationParameterValue")
                 {
                     string prefix = FilterType == "ByInsulationParameterValue" ? "[Изоляция] " : "";
-                    return $"{prefix}{ParamId.Name} {MatchType} '{Value}'";
+                    string op = MatchType switch
+                    {
+                        FilterMatchType.Equals => "=",
+                        FilterMatchType.NotEquals => "≠",
+                        FilterMatchType.Contains => "содержит",
+                        FilterMatchType.NotContains => "не содержит",
+                        FilterMatchType.StartsWith => "начинается с",
+                        FilterMatchType.GreaterThan => ">",
+                        FilterMatchType.LessThan => "<",
+                        FilterMatchType.IsEmpty => "пусто",
+                        FilterMatchType.IsNotEmpty => "не пусто",
+                        _ => MatchType.ToString()
+                    };
+                    return $"{prefix}{ParamId.Name} {op} '{Value}'";
                 }
                 return FilterType;
             }
@@ -185,13 +200,15 @@ namespace BimboClub.Rules
 
     public class RuleFragment : INotifyPropertyChanged
     {
-        private string _fragmentType = "StaticText"; // StaticText, Parameter, DuctThickness, Level
+        private string _fragmentType = "Const"; // Const, ParameterValue, StringOperation, Calculator, DuctThickness, PipeThickness, FloorLevelName, MEPSize, FittingAngle, MEPsystem01
         private string _staticText = string.Empty;
+        private string _description = string.Empty;
         private ParamIdentifier _paramId = new();
         private ParamGettingMode _paramMode = ParamGettingMode.Self;
         private bool _convertToMillimeters = true;
         private int? _roundDecimal;
         private DuctThicknessTable? _ductThicknessData;
+        public XElement? RawElement { get; set; }
 
         public string FragmentType
         {
@@ -203,6 +220,12 @@ namespace BimboClub.Rules
         {
             get => _staticText;
             set { _staticText = value; OnPropertyChanged(); OnPropertyChanged(nameof(DisplayName)); }
+        }
+
+        public string Description
+        {
+            get => _description;
+            set { _description = value; OnPropertyChanged(); OnPropertyChanged(nameof(DisplayName)); }
         }
 
         public ParamIdentifier ParamId
@@ -239,14 +262,29 @@ namespace BimboClub.Rules
         {
             get
             {
-                if (FragmentType == "StaticText")
+                if (!string.IsNullOrEmpty(Description)) return Description;
+
+                if (FragmentType == "Const" || FragmentType == "String" || FragmentType == "Symbol")
                     return $"Текст: \"{StaticText}\"";
-                if (FragmentType == "Parameter")
+                if (FragmentType == "ParameterValue" || FragmentType == "Parameter" || FragmentType == "Param")
                     return $"Параметр [{ParamMode}]: {ParamId.Name}";
+                if (FragmentType == "StringOperation")
+                    return $"Операция над строкой: {ParamId.Name}";
+                if (FragmentType == "Calculator")
+                    return "Математический расчет";
                 if (FragmentType == "DuctThickness")
-                    return "Толщина стенок воздуховода (по таблице)";
-                if (FragmentType == "Level")
-                    return "Имя уровня / этажа";
+                    return "Толщина стенок воздуховода (по размерам)";
+                if (FragmentType == "PipeThickness")
+                    return "Толщина стенок трубы (по диаметру)";
+                if (FragmentType == "FloorLevelName" || FragmentType == "Level")
+                    return "Имя этажа / уровня";
+                if (FragmentType == "MEPSize")
+                    return "Размер MEP элемента";
+                if (FragmentType == "FittingAngle")
+                    return "Угол фитинга";
+                if (FragmentType == "MEPsystem01" || FragmentType == "MEPsystem02")
+                    return "Параметр системы MEP";
+
                 return FragmentType;
             }
         }
@@ -262,6 +300,7 @@ namespace BimboClub.Rules
         private bool _isEnabled = true;
         private string _name = "Новое правило";
         private string _comment = string.Empty;
+        private string _formulaDescription = string.Empty;
         private ParamIdentifier _targetParam = new();
         private ObservableCollection<RuleFragment> _fragments = new();
         private ObservableCollection<RuleFilter> _filters = new();
@@ -290,6 +329,12 @@ namespace BimboClub.Rules
             set { _comment = value; OnPropertyChanged(); }
         }
 
+        public string FormulaDescription
+        {
+            get => _formulaDescription;
+            set { _formulaDescription = value; OnPropertyChanged(); }
+        }
+
         public ParamIdentifier TargetParam
         {
             get => _targetParam;
@@ -316,6 +361,7 @@ namespace BimboClub.Rules
     public class RuleSet : INotifyPropertyChanged
     {
         private string _comment = string.Empty;
+        private string _filePath = string.Empty;
         private RuleScope _scope = RuleScope.EntireDocument;
         private ObservableCollection<RuleItem> _rules = new();
 
@@ -323,6 +369,12 @@ namespace BimboClub.Rules
         {
             get => _comment;
             set { _comment = value; OnPropertyChanged(); }
+        }
+
+        public string FilePath
+        {
+            get => _filePath;
+            set { _filePath = value; OnPropertyChanged(); }
         }
 
         public RuleScope Scope
