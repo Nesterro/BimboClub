@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.2.2",
+    "latestVersion":  "2.2.3",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Modernize ParamRules UI styling with Segoe UI theme",
-                      "Updated buttons, zebra DataGridView, ToolStrip menus and form controls",
-                      "Instant cache-busting in BimboClubManager for immediate update detection"
+                      "Restored missing icons in ParamRules forms (Edit, Delete, Add Rule, Run, Move Fragment, Settings)",
+                      "Fixed DataGridView action button cells rendering with clean background without brown boxes",
+                      "Crisp vector icons generated for all rule editor toolbars and calculators"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.2/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.2/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.3/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.3/bimboclub_net8.zip"
                  }
 }

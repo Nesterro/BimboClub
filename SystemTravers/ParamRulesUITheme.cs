@@ -122,8 +122,20 @@ namespace SAV.ParamRules
 		public static void StyleButton(Button btn)
 		{
 			btn.Font = HeaderFont;
-			btn.FlatStyle = FlatStyle.Flat;
 			btn.Cursor = Cursors.Hand;
+
+			// Если кнопка только с иконкой (или фоновым изображением)
+			if (btn.BackgroundImage != null || btn.Image != null || string.IsNullOrWhiteSpace(btn.Text))
+			{
+				btn.FlatStyle = FlatStyle.Flat;
+				btn.FlatAppearance.BorderSize = 0;
+				btn.BackColor = Color.Transparent;
+				btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(226, 232, 240);
+				btn.FlatAppearance.MouseDownBackColor = Color.FromArgb(203, 213, 225);
+				return;
+			}
+
+			btn.FlatStyle = FlatStyle.Flat;
 			btn.FlatAppearance.BorderSize = 1;
 
 			string txt = (btn.Text ?? "").ToLower();
@@ -171,6 +183,36 @@ namespace SAV.ParamRules
 			dgv.RowHeadersVisible = false;
 			dgv.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 			dgv.MultiSelect = true;
+
+			// Очистка коричневого цвета в колонках-кнопках
+			foreach (DataGridViewColumn col in dgv.Columns)
+			{
+				if (col is DataGridViewImageColumn imgCol)
+				{
+					imgCol.DefaultCellStyle.BackColor = CardBg;
+					imgCol.DefaultCellStyle.SelectionBackColor = TableSelected;
+					imgCol.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+					imgCol.DefaultCellStyle.NullValue = null;
+				}
+			}
+
+			dgv.CellFormatting += (s, e) =>
+			{
+				if (e.RowIndex >= 0 && e.ColumnIndex >= 0 && e.ColumnIndex < dgv.Columns.Count)
+				{
+					if (dgv.Columns[e.ColumnIndex] is DataGridViewImageColumn)
+					{
+						if (dgv.Rows[e.RowIndex].Selected)
+						{
+							e.CellStyle.SelectionBackColor = TableSelected;
+						}
+						else
+						{
+							e.CellStyle.BackColor = (e.RowIndex % 2 == 1) ? TableAltRow : CardBg;
+						}
+					}
+				}
+			};
 
 			// Заголовки колонок
 			dgv.ColumnHeadersHeight = 32;
