@@ -1,12 +1,12 @@
 ﻿{
-    "latestVersion":  "2.2.1",
+    "latestVersion":  "2.2.2",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Fixed NullReferenceException in ActionParam XML deserializer during rule file loading",
-                      "Ensured Fragments list and ActionType are properly initialized upon XML load"
+                      "Modernize ParamRules UI styling with Segoe UI theme",
+                      "Updated buttons, zebra DataGridView, ToolStrip menus and form controls"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.1/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.1/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.2/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.2/bimboclub_net8.zip"
                  }
 }
