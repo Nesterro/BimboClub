@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.1.9",
+    "latestVersion":  "2.2.0",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Integrated original LTools CmdRuler engine directly and independently into BimboClub",
-                      "Removed experimental Rules WPF folder",
-                      "Fixed XML default settings fallback in CmdRuler Engine"
+                      "Fixed MissingManifestResourceException in LTools Rule Editor forms",
+                      "Added dedicated standalone large Rule Editor button to BimboClub ribbon panel",
+                      "Integrated all original LTools forms safely into BimboClub assembly"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.9/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.9/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.0/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.0/bimboclub_net8.zip"
                  }
 }

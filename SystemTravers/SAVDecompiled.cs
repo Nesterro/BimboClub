@@ -25271,7 +25271,6 @@ namespace SAV.ParamRules
 		{
 			this.components = new Container();
 			DataGridViewCellStyle dataGridViewCellStyle = new DataGridViewCellStyle();
-			ComponentResourceManager componentResourceManager = new ComponentResourceManager(typeof(FrmRuleEditor2));
 			DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
 			DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
 			this.btnSave = new Button();
@@ -25455,7 +25454,7 @@ namespace SAV.ParamRules
 			this.colFilterDescription.Name = "colFilterDescription";
 			dataGridViewCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle.BackColor = System.Drawing.Color.FromArgb(180, 103, 103);
-			dataGridViewCellStyle.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle1.NullValue");
+			dataGridViewCellStyle.NullValue = null;
 			dataGridViewCellStyle.SelectionBackColor = System.Drawing.Color.FromArgb(180, 103, 103);
 			this.colFilterEditKeys.DefaultCellStyle = dataGridViewCellStyle;
 			this.colFilterEditKeys.HeaderText = "";
@@ -25466,7 +25465,7 @@ namespace SAV.ParamRules
 			this.colFilterEditKeys.Width = 22;
 			dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(180, 103, 103);
-			dataGridViewCellStyle2.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle2.NullValue");
+			dataGridViewCellStyle2.NullValue = null;
 			dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(180, 103, 103);
 			this.colFilterDeleteKeys.DefaultCellStyle = dataGridViewCellStyle2;
 			this.colFilterDeleteKeys.HeaderText = "";
@@ -28605,7 +28604,6 @@ namespace SAV.ParamRules
 		{
 			this.components = new Container();
 			DataGridViewCellStyle dataGridViewCellStyle = new DataGridViewCellStyle();
-			ComponentResourceManager componentResourceManager = new ComponentResourceManager(typeof(FrmRuleEditor1));
 			DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
 			DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
 			DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
@@ -28875,7 +28873,7 @@ namespace SAV.ParamRules
 			this.colFragmentDescription.Name = "colFragmentDescription";
 			dataGridViewCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle.BackColor = System.Drawing.Color.FromArgb(123, 124, 118);
-			dataGridViewCellStyle.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle1.NullValue");
+			dataGridViewCellStyle.NullValue = null;
 			dataGridViewCellStyle.SelectionBackColor = System.Drawing.Color.FromArgb(123, 124, 118);
 			this.colFragmentEditKeys.DefaultCellStyle = dataGridViewCellStyle;
 			this.colFragmentEditKeys.HeaderText = "";
@@ -28886,7 +28884,7 @@ namespace SAV.ParamRules
 			this.colFragmentEditKeys.Width = 22;
 			dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(123, 124, 118);
-			dataGridViewCellStyle2.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle2.NullValue");
+			dataGridViewCellStyle2.NullValue = null;
 			dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(123, 124, 118);
 			this.colFragmentDeleteKeys.DefaultCellStyle = dataGridViewCellStyle2;
 			this.colFragmentDeleteKeys.HeaderText = "";
@@ -29000,7 +28998,7 @@ namespace SAV.ParamRules
 			this.colFilterDescription.Name = "colFilterDescription";
 			dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(180, 103, 103);
-			dataGridViewCellStyle3.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle3.NullValue");
+			dataGridViewCellStyle3.NullValue = null;
 			dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(180, 103, 103);
 			this.colFilterEditKeys.DefaultCellStyle = dataGridViewCellStyle3;
 			this.colFilterEditKeys.HeaderText = "";
@@ -29011,7 +29009,7 @@ namespace SAV.ParamRules
 			this.colFilterEditKeys.Width = 22;
 			dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(180, 103, 103);
-			dataGridViewCellStyle4.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle4.NullValue");
+			dataGridViewCellStyle4.NullValue = null;
 			dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(180, 103, 103);
 			this.colFilterDeleteKeys.DefaultCellStyle = dataGridViewCellStyle4;
 			this.colFilterDeleteKeys.HeaderText = "";
@@ -29511,7 +29509,6 @@ namespace SAV.ParamRules
 			this.components = new Container();
 			DataGridViewCellStyle dataGridViewCellStyle = new DataGridViewCellStyle();
 			DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-			ComponentResourceManager componentResourceManager = new ComponentResourceManager(typeof(FrmRuler));
 			DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
 			DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
 			this.dgv = new DataGridView();
@@ -29618,7 +29615,7 @@ namespace SAV.ParamRules
 			this.colFilters.ReadOnly = true;
 			dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(180, 103, 103);
-			dataGridViewCellStyle2.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle1.NullValue");
+			dataGridViewCellStyle2.NullValue = null;
 			dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(180, 103, 103);
 			this.colEditKeys.DefaultCellStyle = dataGridViewCellStyle2;
 			this.colEditKeys.HeaderText = "";
@@ -29629,7 +29626,7 @@ namespace SAV.ParamRules
 			this.colEditKeys.Width = 22;
 			dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(180, 103, 103);
-			dataGridViewCellStyle3.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle2.NullValue");
+			dataGridViewCellStyle3.NullValue = null;
 			dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(180, 103, 103);
 			this.colDeleteKeys.DefaultCellStyle = dataGridViewCellStyle3;
 			this.colDeleteKeys.HeaderText = "";
@@ -29640,7 +29637,7 @@ namespace SAV.ParamRules
 			this.colDeleteKeys.Width = 22;
 			dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
 			dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(180, 103, 103);
-			dataGridViewCellStyle4.NullValue = componentResourceManager.GetObject("dataGridViewCellStyle3.NullValue");
+			dataGridViewCellStyle4.NullValue = null;
 			dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(180, 103, 103);
 			this.colApply.DefaultCellStyle = dataGridViewCellStyle4;
 			this.colApply.HeaderText = "";
@@ -29796,7 +29793,6 @@ namespace SAV.ParamRules
 				this.toolStripSeparator3,
 				this.tsmiExit
 			});
-			this.tsddbFile.Image = (Image)componentResourceManager.GetObject("tsddbFile.Image");
 			this.tsddbFile.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.tsddbFile.Name = "tsddbFile";
 			this.tsddbFile.Size = new Size(59, 28);
@@ -29829,7 +29825,6 @@ namespace SAV.ParamRules
 				this.toolStripSeparator1,
 				this.tsmiSelectAll
 			});
-			this.tsddbEdit.Image = (Image)componentResourceManager.GetObject("tsddbEdit.Image");
 			this.tsddbEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.tsddbEdit.Name = "tsddbEdit";
 			this.tsddbEdit.Size = new Size(74, 28);
@@ -33986,7 +33981,6 @@ namespace SAV.ParamRules.Fragments
 		{
 			this.components = new Container();
 			DataGridViewCellStyle dataGridViewCellStyle = new DataGridViewCellStyle();
-			ComponentResourceManager componentResourceManager = new ComponentResourceManager(typeof(FrmDuctThickness));
 			DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
 			this.btnOk = new Button();
 			this.btnCancel = new Button();
@@ -34076,7 +34070,7 @@ namespace SAV.ParamRules.Fragments
 			this.txtRect.Name = "txtRect";
 			this.txtRect.Size = new Size(399, 22);
 			this.txtRect.TabIndex = 20;
-			this.tip.SetToolTip(this.txtRect, componentResourceManager.GetString("txtRect.ToolTip"));
+			this.tip.SetToolTip(this.txtRect, "Введите значение габарита");
 			this.txtRect.KeyDown += new KeyEventHandler(this.txtRect_KeyDown);
 			this.txtRect.MouseLeave += new EventHandler(this.txtRect_MouseLeave);
 			this.txtRect.Validated += new EventHandler(this.txtRect_Validated);
@@ -34087,7 +34081,7 @@ namespace SAV.ParamRules.Fragments
 			this.txtRound.Name = "txtRound";
 			this.txtRound.Size = new Size(399, 22);
 			this.txtRound.TabIndex = 25;
-			this.tip.SetToolTip(this.txtRound, componentResourceManager.GetString("txtRound.ToolTip"));
+			this.tip.SetToolTip(this.txtRound, "Введите значение диаметра");
 			this.txtRound.KeyDown += new KeyEventHandler(this.txtRound_KeyDown);
 			this.txtRound.MouseLeave += new EventHandler(this.txtRound_MouseLeave);
 			this.txtRound.Validated += new EventHandler(this.txtRound_Validated);

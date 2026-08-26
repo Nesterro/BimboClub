@@ -433,6 +433,19 @@ namespace BimboClub
 			}
 			catch (Exception ex) { Logger.LogError("Ошибка добавления Расстановка хомутов", ex); }
 
+			// 2. Отдельная крупная кнопка "Редактор правил" (LTools Ruler)
+			try
+			{
+				PushButtonData pushButtonDataParamRulesMain = new PushButtonData("cmdParamRulesMain", "Редактор\nправил", text4, "BimboClub.ParamRulesCommand")
+				{
+					ToolTip = "Оригинальный полнофункциональный Редактор правил заполнения параметров элементов (LTools Ruler).",
+					LargeImage = bitmapSourceParam,
+					Image = bitmapSourceParam16
+				};
+				ribbonPanel.AddItem(pushButtonDataParamRulesMain);
+			}
+			catch (Exception ex) { Logger.LogError("Ошибка добавления Редактор правил", ex); }
+
 			// --- Pulldown: Параметры & Теплопотери ---
 			try
 			{
