@@ -19179,6 +19179,7 @@ namespace SAV.Filters
 			this._parentXpath = parentXpath;
 			this._errP = new ErrorProvider();
 			this.InitializeComponent();
+			SAV.ParamRules.ParamRulesUITheme.ApplyTheme(this);
 			this.Text = formTitle;
 			this.dgvValues.Visible = false;
 			this.txtValue.Visible = false;
@@ -22909,6 +22910,7 @@ namespace SAV.Filters
 		{
 			this.OnlyTypes = onlyTypes;
 			this.InitializeComponent();
+			SAV.ParamRules.ParamRulesUITheme.ApplyTheme(this);
 			this._state = new FormExt_State(this, parentXpath, 444, 412);
 			this._state.ConfigRead();
 			this.rdoTypes.Checked = this.OnlyTypes;
@@ -23049,6 +23051,7 @@ namespace SAV.Filters
 			this._parentXpath = parentXpath;
 			this._errP = new ErrorProvider();
 			this.InitializeComponent();
+			SAV.ParamRules.ParamRulesUITheme.ApplyTheme(this);
 			this.Text = formTitle;
 			this.dgvValues.Visible = false;
 			this.txtValue.Visible = false;
@@ -24384,6 +24387,7 @@ namespace SAV.ParamRules
 		{
 			this._engine = engine;
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			this.Text = title;
 			this._resultHandler = new ResultHandler(this.chkConvertTo, this.cmbDUT, this.chkRoundTo, this.cmbRoundDecimal, this.lblRoundTo, this._engine.AllUnits);
 			this._state = new FormExt_State(this, this._engine.PluginXPath, 579, 414);
@@ -25151,6 +25155,7 @@ namespace SAV.ParamRules
 		{
 			this._engine = engine;
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			string[] array = Matching.StringMatchTypes.Values.ToArray<string>();
 			System.Windows.Forms.ComboBox.ObjectCollection arg_3B_0 = this.cmbMatchType.Items;
 			object[] items = array;
@@ -26796,6 +26801,7 @@ namespace SAV.ParamRules
 		{
 			this._engine = engine;
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			this._state = new FormExt_State(this, this._engine.PluginXPath, 444, 412);
 			this._state.ConfigRead();
 			this.chkShowFiltersResult.Checked = this._engine.InterOpt.ShowFiltersResult;
@@ -26888,6 +26894,7 @@ namespace SAV.ParamRules
 			this.Literal = literal;
 			this._errP = new ErrorProvider();
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			this.Text = title;
 			this._state = new FormExt_State(this, pluginXPath, 444, 412);
 			this._state.ConfigRead();
@@ -27204,6 +27211,7 @@ namespace SAV.ParamRules
 				this.ParamData = new ParamData();
 			}
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			this.Text = title;
 			this._resultHandler = new ResultHandler(this.chkConvertTo, this.cmbDUT, this.chkRoundTo, this.cmbRoundDecimal, this.lblRoundTo, this._engine.AllUnits);
 			this._state = new FormExt_State(this, this._engine.PluginXPath, 579, 208);
@@ -28411,6 +28419,7 @@ namespace SAV.ParamRules
 		{
 			this._engine = engine;
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			bool flag = xeRule == null;
 			if (flag)
 			{
@@ -29124,6 +29133,7 @@ namespace SAV.ParamRules
 			this._isLoaded = false;
 			this._engine = engine;
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			this._colCheckbox = new CheckboxColumn(this.dgv, this.spl.Panel1, 0, null, false, 8);
 			this._fileInterface = new FileInterface(this, "Редактор набора правил", this._engine.FileService, new ReloadHandler(this.Reload), this.tsmiNew, this.tsmiOpen, this.tsmiSave, this.tsmiSaveAs, this.tsmiExit);
 			this._bufferControls = new DgvBufferControls(this.dgv, "cmsRules", new BufferDelegate(this.CutAction), new BufferDelegate(this.CopyAction), new BufferDelegate(this.PasteAction), new BufferDelegate(this.DeleteAction), this.tsmiCut, this.tsmiCopy, this.tsmiPaste, this.tsmiDelete, this.tsmiSelectAll);
@@ -31961,6 +31971,7 @@ namespace SAV.ParamRules.Fragments
 			
 			this._engine = engine;
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			this._operType = new EnumRadioButtonSet<StringOperationType>(StringOperationType.Substring);
 			this._operType.Add(StringOperationType.Substring, this.rdoSubstring);
 			this._operType.Add(StringOperationType.LeftN, this.rdoLeftN);
@@ -33781,6 +33792,7 @@ namespace SAV.ParamRules.Fragments
 		public FrmDuctThickness(string pluginXPath, XElement xeFragment = null)
 		{
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			this._rectSizes = new FrmDuctThickness.SizeSet();
 			this._roundSizes = new FrmDuctThickness.SizeSet();
 			this._state = new FormExt_State(this, pluginXPath ?? "", 320, 391);
@@ -35626,6 +35638,7 @@ namespace SAV.ParamRules.Fragments
 		{
 			this._engine = engine;
 			this.InitializeComponent();
+			ParamRulesUITheme.ApplyTheme(this);
 			this.Text = title;
 			this.ResultHandler = new ResultHandler(this.chkConvertTo, this.cmbDUT, this.chkRoundTo, this.cmbRoundDecimal, this.lblRoundTo, this._engine.AllUnits);
 			this._curOperation = Operation.unknown;
@@ -44633,6 +44646,7 @@ namespace SAV.Forms
 			this._parameters = parameters;
 			this._needToSort = needToSort;
 			this.InitializeComponent();
+			SAV.ParamRules.ParamRulesUITheme.ApplyTheme(this);
 			this._state = new FormExt_State(this, parentXpath, 390, 370);
 			this._state.Add(this.dgv, "200;125;200");
 			this._state.ConfigRead();
@@ -45264,6 +45278,7 @@ namespace SAV.Forms
 		{
 			this._format = format;
 			this.InitializeComponent();
+			SAV.ParamRules.ParamRulesUITheme.ApplyTheme(this);
 			this.Text = caption;
 			this.label1.Text = ((format == null) ? caption : string.Format(format, 0));
 			this.progressBar1.Minimum = 0;
