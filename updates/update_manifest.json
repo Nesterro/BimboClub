@@ -1,12 +1,12 @@
 ﻿{
-    "latestVersion":  "2.1.3",
-    "releaseDate":  "2026-08-19",
+    "latestVersion":  "2.1.4",
+    "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Fixed missing BimboClub_def.xml error in Rule Editor by automatically initializing valid default settings XML file",
-                      "Fixed dark foreground contrast on RadioButtons and Labels in HeatLoss window"
+                      "New signature pink BC logo on delicate soft background for BimboClub Manager",
+                      "Fixed BimboClub Manager UI layout: resolved Update button overlap on Revit version labels, adjusted column spacing and scrollbar padding"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.3/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.3/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.4/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.4/bimboclub_net8.zip"
                  }
 }

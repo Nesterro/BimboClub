@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="BimboClub Tools — Менеджер обновлений" 
         Icon="icon_manager.png"
-        Height="650" Width="1000"
+        Height="680" Width="1060"
         Style="{StaticResource ModernWindowStyle}"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
@@ -18,7 +18,7 @@
     </Window.DataContext>
 
     <Window.Resources>
-        <!-- Boolean to Visibility Converter (Simple Trigger version is used in content, but we define static brushes if needed) -->
+        <!-- Boolean to Visibility Converter -->
     </Window.Resources>
 
     <Border CornerRadius="12" Background="{StaticResource BackgroundBrush}" ClipToBounds="True">
@@ -40,8 +40,8 @@
 
                     <!-- Application Title & Icon -->
                     <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" Margin="16,0,0,0">
-                        <!-- Custom Icon -->
-                        <Image Source="icon_manager.png" Width="22" Height="22" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <!-- BC Pink Logo Icon -->
+                        <Image Source="icon_manager.png" Width="24" Height="24" Margin="0,0,10,0" VerticalAlignment="Center" />
                         <TextBlock Text="BimboClub Tools" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
                         <Border Margin="8,0,0,0" Padding="6,2" CornerRadius="4" Background="#1D153E" VerticalAlignment="Center">
                             <TextBlock Text="Менеджер обновлений" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
@@ -171,8 +171,8 @@
                         </Grid.Style>
                         
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3.5*" />
-                            <ColumnDefinition Width="2.5*" />
+                            <ColumnDefinition Width="1.35*" />
+                            <ColumnDefinition Width="1*" />
                         </Grid.ColumnDefinitions>
 
                         <!-- Left Column: Revit Version Status Cards -->
@@ -184,7 +184,7 @@
 
                             <TextBlock Text="Установленные версии Revit" Style="{StaticResource HeadingStyle}" Margin="0,0,0,16" Grid.Row="0" />
 
-                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,6,0">
                                 <ItemsControl ItemsSource="{Binding RevitVersions}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type models:RevitVersionInfo}">
@@ -197,7 +197,7 @@
                                                     </Grid.ColumnDefinitions>
 
                                                     <!-- Revit Icon Badge -->
-                                                    <Border Grid.Column="0" Width="44" Height="44" CornerRadius="8" Margin="0,0,16,0">
+                                                    <Border Grid.Column="0" Width="44" Height="44" CornerRadius="8" Margin="0,0,14,0">
                                                         <Border.Style>
                                                             <Style TargetType="Border">
                                                                 <Setter Property="Background" Value="#251E3D" />
@@ -234,8 +234,8 @@
                                                     </Border>
 
                                                     <!-- Details -->
-                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" FontSize="14">
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
+                                                        <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" FontSize="14" TextTrimming="CharacterEllipsis">
                                                             <TextBlock.Style>
                                                                     <Style TargetType="TextBlock">
                                                                         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -249,7 +249,7 @@
                                                         </TextBlock>
                                                         
                                                         <!-- Status badge -->
-                                                        <TextBlock Text="{Binding StatusDescription}" FontSize="12" Margin="0,2,0,0">
+                                                        <TextBlock Text="{Binding StatusDescription}" FontSize="12" Margin="0,2,0,0" TextTrimming="CharacterEllipsis">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
                                                                     <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
@@ -276,7 +276,7 @@
                                                         <Button Content="Установить" 
                                                                 Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                 CommandParameter="{Binding}" 
-                                                                Height="32" FontSize="12">
+                                                                Height="32" FontSize="12" Padding="12,0">
                                                             <Button.Style>
                                                                 <Style TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -296,9 +296,10 @@
                                                         <!-- Update Button -->
                                                         <Button Content="Обновить" 
                                                                 Background="{StaticResource WarningGradientBrush}"
+                                                                Foreground="#121020" FontWeight="Bold"
                                                                 Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                 CommandParameter="{Binding}" 
-                                                                Height="32" FontSize="12" Margin="0,0,8,0">
+                                                                Height="32" FontSize="12" Padding="12,0" Margin="0,0,6,0">
                                                             <Button.Style>
                                                                 <Style TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -319,7 +320,7 @@
                                                         <Button Content="Удалить" 
                                                                 Command="{Binding DataContext.UninstallCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                 CommandParameter="{Binding}" 
-                                                                Height="32" FontSize="12">
+                                                                Height="32" FontSize="12" Padding="12,0">
                                                             <Button.Style>
                                                                 <Style TargetType="Button" BasedOn="{StaticResource DangerButtonStyle}">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -379,36 +380,39 @@
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
 
-                                    <!-- Version block -->
-                                    <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                                        <TextBlock Text="ПОСЛЕДНЯЯ ДОСТУПНАЯ ВЕРСИЯ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" />
-                                        <TextBlock Text="{Binding LatestVersion}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" Margin="0,4,0,0" />
+                                    <!-- Latest version header -->
+                                    <StackPanel Grid.Row="0">
+                                        <TextBlock Text="ПОСЛЕДНЯЯ ДОСТУПНАЯ ВЕРСИЯ" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <TextBlock Text="{Binding LatestReleaseVersion, FallbackValue='Загрузка...'}" 
+                                                   FontSize="32" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}" Margin="0,4,0,16" />
+                                        <Separator Background="{StaticResource BorderBrush}" Margin="0,0,0,16" />
                                     </StackPanel>
 
-                                    <!-- Changelog scroll -->
+                                    <!-- Changelog section -->
                                     <Grid Grid.Row="1">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="*" />
                                         </Grid.RowDefinitions>
-                                        <TextBlock Text="СПИСОК ИЗМЕНЕНИЙ" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,8" Grid.Row="0" />
+
+                                        <TextBlock Text="СПИСОК ИЗМЕНЕНИЙ" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,8" Grid.Row="0" />
+                                        
                                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                                            <TextBlock Text="{Binding Changelog}" 
-                                                       TextWrapping="Wrap" 
-                                                       FontSize="12" 
-                                                       Foreground="{StaticResource TextSecondaryBrush}" 
-                                                       LineHeight="18" />
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding LatestReleaseName}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding LatestReleaseBody}" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" FontSize="12" LineHeight="18" />
+                                            </StackPanel>
                                         </ScrollViewer>
                                     </Grid>
                                 </Grid>
                             </Border>
 
+                            <!-- Check for Updates Action Button -->
                             <Button Content="Проверить обновления" 
+                                    Command="{Binding CheckForUpdatesCommand}"
                                     Style="{StaticResource ModernButtonStyle}" 
-                                    Command="{Binding CheckUpdatesCommand}"
-                                    Grid.Row="2" 
-                                    Height="40" 
-                                    Margin="0,16,0,0" />
+                                    Height="44" FontSize="14"
+                                    Grid.Row="2" Margin="0,16,0,0" />
                         </Grid>
                     </Grid>
 
@@ -425,37 +429,32 @@
                             </Style>
                         </Grid.Style>
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
+                        <StackPanel MaxWidth="600" HorizontalAlignment="Left">
+                            <TextBlock Text="Настройки обновлений" Style="{StaticResource HeadingStyle}" Margin="0,0,0,8" />
+                            <TextBlock Text="Параметры источника релизов и автопроверки" Style="{StaticResource SubheadingStyle}" Margin="0,0,0,24" />
 
-                        <TextBlock Text="Настройки менеджера" Style="{StaticResource HeadingStyle}" Margin="0,0,0,24" Grid.Row="0" />
+                            <Border Style="{StaticResource CardStyle}">
+                                <StackPanel>
+                                    <TextBlock Text="РЕПОЗИТОРИЙ GITHUB" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,12" />
+                                    
+                                    <TextBlock Text="Репозиторий плагинов BimboClub:" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
+                                    <TextBox Text="{Binding GitHubRepo, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,16" />
 
-                        <StackPanel Grid.Row="1">
-                            <!-- Update path option -->
-                            <TextBlock Text="ИСТОЧНИК ОБНОВЛЕНИЙ" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,8" />
-                            <TextBox Style="{StaticResource ModernTextBoxStyle}" Text="{Binding UpdateSource, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,4" />
-                            <TextBlock Text="URL адрес сервера или путь к локальной папке, где размещается update_manifest.json и zip-архивы." 
-                                       FontSize="11" Foreground="#5C566E" Margin="0,0,0,24" />
+                                    <CheckBox Content="Автоматически проверять обновления при запуске" 
+                                              IsChecked="{Binding AutoCheckUpdates}" 
+                                              Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,8" />
+                                    
+                                    <CheckBox Content="Включить предварительные сборки (Pre-release)" 
+                                              IsChecked="{Binding IncludePreReleases}" 
+                                              Style="{StaticResource ModernCheckBoxStyle}" />
+                                </StackPanel>
+                            </Border>
 
-                            <!-- Auto close option -->
-                            <CheckBox Style="{StaticResource ModernCheckBoxStyle}" IsChecked="{Binding AutoCloseRevit}" Margin="0,0,0,6">
-                                <TextBlock Text="Автоматически закрывать Revit при установке" FontSize="13" Foreground="{StaticResource TextPrimaryBrush}" />
-                            </CheckBox>
-                            <TextBlock Text="Позволяет менеджеру автоматически закрывать все открытые процессы Revit.exe перед обновлением плагина, чтобы избежать блокировки DLL." 
-                                       FontSize="11" Foreground="#5C566E" Margin="26,0,0,0" />
+                            <Button Content="Сохранить настройки" 
+                                    Command="{Binding SaveSettingsCommand}"
+                                    Style="{StaticResource ModernButtonStyle}" 
+                                    HorizontalAlignment="Left" Width="200" Margin="0,16,0,0" />
                         </StackPanel>
-
-                        <!-- Save button -->
-                        <Button Content="Сохранить настройки" 
-                                Style="{StaticResource ModernButtonStyle}" 
-                                Command="{Binding SaveSettingsCommand}"
-                                Grid.Row="2" 
-                                Height="40" 
-                                Width="200" 
-                                HorizontalAlignment="Right" />
                     </Grid>
 
                     <!-- TAB 3: ABOUT -->
@@ -471,106 +470,44 @@
                             </Style>
                         </Grid.Style>
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                        <StackPanel MaxWidth="600" HorizontalAlignment="Left">
+                            <Border Width="80" Height="80" CornerRadius="18" HorizontalAlignment="Left" Margin="0,0,0,16">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#FFF0F5" Offset="0"/>
+                                        <GradientStop Color="#F8C8D8" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Grid>
+                                    <TextBlock Text="BC" FontSize="36" FontWeight="Bold" Foreground="#D81B60" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI Black"/>
+                                </Grid>
+                            </Border>
 
-                        <Border Style="{StaticResource CardStyle}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="550" Padding="32">
-                            <StackPanel HorizontalAlignment="Center">
-                                <!-- Big stylized logo -->
-                                <Border Width="80" Height="80" CornerRadius="40" Background="{StaticResource AccentGradientBrush}" HorizontalAlignment="Center" Margin="0,0,0,24">
-                                    <TextBlock Text="B" FontWeight="Bold" FontSize="44" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,4" />
-                                </Border>
+                            <TextBlock Text="BimboClub Tools Client" Style="{StaticResource HeadingStyle}" Margin="0,0,0,4" />
+                            <TextBlock Text="Универсальный менеджер установки и обновления плагинов Revit" Style="{StaticResource SubheadingStyle}" Margin="0,0,0,24" />
 
-                                <TextBlock Text="BimboClub Tools" FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" />
-                                <TextBlock Text="Версия 1.0.0" FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,4,0,16" />
-
-                                <TextBlock Text="Интеллектуальные плагины для автоматизации MEP проектирования в Autodesk Revit." 
-                                           FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextAlignment="Center" Width="400" LineHeight="20" HorizontalAlignment="Center" Margin="0,0,0,24" />
-
-                                <Border BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="0,16,0,0">
-                                    <StackPanel>
-                                        <TextBlock Text="Разработчик: BimboClub Dev Team" FontSize="11" Foreground="#5C566E" HorizontalAlignment="Center" Margin="0,0,0,4" />
-                                        <TextBlock Text="Поддерживаемые версии Revit: 2021 – 2026" FontSize="11" Foreground="#5C566E" HorizontalAlignment="Center" />
-                                    </StackPanel>
-                                </Border>
-                            </StackPanel>
-                        </Border>
+                            <Border Style="{StaticResource CardStyle}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,12">
+                                        <TextBlock Text="Версия клиента:" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <TextBlock Text="1.0.0 (Release)" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="Bold" HorizontalAlignment="Right" />
+                                    </Grid>
+                                    <Separator Background="{StaticResource BorderBrush}" Margin="0,0,0,12" />
+                                    <Grid Margin="0,0,0,12">
+                                        <TextBlock Text="Разработчик:" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <TextBlock Text="BimboClub Team" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="Bold" HorizontalAlignment="Right" />
+                                    </Grid>
+                                    <Separator Background="{StaticResource BorderBrush}" Margin="0,0,0,12" />
+                                    <Grid>
+                                        <TextBlock Text="Платформа:" Foreground="{StaticResource TextSecondaryBrush}" />
+                                        <TextBlock Text=".NET 8.0 WPF (Standalone)" Foreground="{StaticResource TextPrimaryBrush}" FontWeight="Bold" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
                     </Grid>
+                    
                 </Grid>
-            </Grid>
-
-            <!-- Dialog Overlay: Revit Warning -->
-            <Grid Grid.RowSpan="2" Background="#D5000000" Visibility="Collapsed">
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ShowRevitWarning}" Value="True">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-
-                <Border Style="{StaticResource CardStyle}" Width="450" Height="220" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="24" Background="#181330">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-
-                        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,16">
-                            <TextBlock Text="⚠" FontSize="22" Foreground="{StaticResource WarningBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                            <TextBlock Text="Обнаружен работающий Revit" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                        </StackPanel>
-
-                        <TextBlock Text="Приложение Autodesk Revit сейчас запущено на вашем компьютере. Для предотвращения блокировки и повреждения DLL-файлов плагина необходимо закрыть Revit перед установкой." 
-                                   TextWrapping="Wrap" FontSize="12.5" Foreground="{StaticResource TextSecondaryBrush}" LineHeight="18" Grid.Row="1" />
-
-                        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Right" Margin="0,16,0,0">
-                            <Button Content="Отмена" Style="{StaticResource OutlineButtonStyle}" Command="{Binding CloseWarningCommand}" Margin="0,0,12,0" Width="90" Height="34" />
-                            <Button Content="Закрыть Revit и продолжить" Style="{StaticResource ModernButtonStyle}" Command="{Binding ForceInstallCommand}" Height="34" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <!-- Global Loading overlay -->
-            <Grid Grid.RowSpan="2" Background="#90000000">
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-
-                <Border CornerRadius="12" Background="#C50D0A1C" Width="360" Height="140" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
-                        <TextBlock Text="{Binding ProgressText}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,0,0,16" />
-                        
-                        <!-- Custom styled progress bar -->
-                        <Grid Height="8">
-                            <Border CornerRadius="4" Background="#1D153E" />
-                            <!-- Glow progress bar -->
-                            <ProgressBar Value="{Binding GlobalProgress}" Minimum="0" Maximum="100" BorderThickness="0" Height="8" Background="Transparent" Foreground="{StaticResource AccentGradientBrush}">
-                                <ProgressBar.Template>
-                                    <ControlTemplate TargetType="ProgressBar">
-                                        <Grid x:Name="TemplateRoot">
-                                            <Border CornerRadius="4" Background="{TemplateBinding Background}"/>
-                                            <Border x:Name="PART_Indicator" CornerRadius="4" HorizontalAlignment="Left" Background="{TemplateBinding Foreground}"/>
-                                        </Grid>
-                                    </ControlTemplate>
-                                </ProgressBar.Template>
-                            </ProgressBar>
-                        </Grid>
-                    </StackPanel>
-                </Border>
             </Grid>
         </Grid>
     </Border>
