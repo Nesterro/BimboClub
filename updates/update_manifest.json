@@ -3,7 +3,8 @@
     "releaseDate":  "2026-08-26",
     "changelog":  [
                       "Modernize ParamRules UI styling with Segoe UI theme",
-                      "Updated buttons, zebra DataGridView, ToolStrip menus and form controls"
+                      "Updated buttons, zebra DataGridView, ToolStrip menus and form controls",
+                      "Instant cache-busting in BimboClubManager for immediate update detection"
                   ],
     "packages":  {
                      "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.2/bimboclub_net48.zip",

@@ -53,7 +53,18 @@ namespace BimboClubManager.Services
                 if (sourcePath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || 
                     sourcePath.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
                 {
-                    jsonContent = await _httpClient.GetStringAsync(sourcePath);
+                    string url = sourcePath;
+                    url += (url.Contains("?") ? "&" : "?") + $"_nocache={DateTime.UtcNow.Ticks}";
+                    using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                    request.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
+                    {
+                        NoCache = true,
+                        NoStore = true,
+                        MustRevalidate = true
+                    };
+                    using var response = await _httpClient.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+                    jsonContent = await response.Content.ReadAsStringAsync();
                 }
                 else
                 {
