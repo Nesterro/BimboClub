@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.1.5",
+    "latestVersion":  "2.1.6",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Fixed CheckForUpdatesCommand button binding and manifest properties in BimboClub Manager",
-                      "Added automatic update check on BimboClub Manager launch",
-                      "Updated BC pink badge logo with vibrant pink border and soft gentle background"
+                      "Rewrote Rule Editor from scratch with clean independent WPF architecture",
+                      "Removed legacy LTools folder and dependencies",
+                      "Added full XML rule import/export compatibility and dark modern UI"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.5/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.5/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.6/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.6/bimboclub_net8.zip"
                  }
 }

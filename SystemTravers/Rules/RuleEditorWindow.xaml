@@ -1,0 +1,308 @@
+<Window x:Class="BimboClub.Rules.RuleEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="BimboClub — Редактор правил" 
+        Height="720" Width="1140"
+        WindowStartupLocation="CenterScreen"
+        Background="#161426" Foreground="#FFFFFF"
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="BgBrush" Color="#161426" />
+        <SolidColorBrush x:Key="CardBgBrush" Color="#221F38" />
+        <SolidColorBrush x:Key="BorderBrush" Color="#363254" />
+        <SolidColorBrush x:Key="AccentGold" Color="#FFD700" />
+        <SolidColorBrush x:Key="AccentPink" Color="#FF4081" />
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#A59EC0" />
+
+        <Style x:Key="ModernBtn" TargetType="Button">
+            <Setter Property="Background" Value="#2E2A4A" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#453E6B" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="GoldBtn" TargetType="Button" BasedOn="{StaticResource ModernBtn}">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#FFD700" Offset="0"/>
+                        <GradientStop Color="#FFA500" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="#1A1428" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#1B172E" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#3F3863" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="#1B172E" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#3F3863" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="6,4" />
+        </Style>
+
+        <Style TargetType="RadioButton">
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <!-- Header -->
+            <RowDefinition Height="Auto" />
+            <!-- Main Content Area -->
+            <RowDefinition Height="*" />
+            <!-- Footer Actions -->
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal" Grid.Column="0">
+                <Border Width="38" Height="38" CornerRadius="9" Margin="0,0,12,0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#FFF0F5" Offset="0"/>
+                            <GradientStop Color="#F8C8D8" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.BorderBrush>
+                        <SolidColorBrush Color="#FF4081"/>
+                    </Border.BorderBrush>
+                    <Border.BorderThickness>1.5</Border.BorderThickness>
+                    <TextBlock Text="BC" FontSize="18" FontWeight="Bold" Foreground="#D81B60" HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Segoe UI Black"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="BimboClub Tools" FontWeight="Bold" FontSize="16" Foreground="{StaticResource AccentGold}" />
+                        <TextBlock Text=" — Редактор правил" FontWeight="Bold" FontSize="16" Foreground="#FFFFFF" />
+                    </StackPanel>
+                    <TextBlock Text="Универсальная обработка параметров и пакетное автозаполнение по условиям" FontSize="12" Foreground="{StaticResource TextSecondary}" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Quick Template Buttons -->
+            <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
+                <Button Content="📁 Открыть XML..." Click="BtnOpenXml_Click" Style="{StaticResource ModernBtn}" Margin="0,0,8,0" />
+                <Button Content="💾 Сохранить XML..." Click="BtnSaveXml_Click" Style="{StaticResource ModernBtn}" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Main Body -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <!-- Rules List Column -->
+                <ColumnDefinition Width="380" />
+                <ColumnDefinition Width="14" />
+                <!-- Rule Inspector Column -->
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT: Rules List -->
+            <Border Grid.Column="0" Background="{StaticResource CardBgBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <TextBlock Text="СПИСОК ПРАВИЛ" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                        <TextBlock x:Name="TxtRulesCount" Text="0 правил" FontSize="11" Foreground="{StaticResource AccentGold}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Rules ListBox -->
+                    <ListBox x:Name="LstRules" Grid.Row="1" Background="Transparent" BorderThickness="0" SelectionChanged="LstRules_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#1C1830" BorderBrush="#342E54" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,3">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <CheckBox IsChecked="{Binding IsEnabled}" VerticalAlignment="Center" Margin="0,0,8,0" />
+
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" Foreground="#FFFFFF" TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                                                <Border Background="#2C234E" CornerRadius="4" Padding="6,2" Margin="0,0,6,0">
+                                                    <TextBlock Text="{Binding TargetParam.Name, FallbackValue='Цель'}" FontSize="10" Foreground="{StaticResource AccentGold}" />
+                                                </Border>
+                                                <TextBlock Text="{Binding Filters.Count, StringFormat='Фильтров: {0}'}" FontSize="10" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <!-- Rule Management Buttons -->
+                    <UniformGrid Grid.Row="2" Columns="4" Margin="0,10,0,0">
+                        <Button Content="＋ Доб." Click="BtnAddRule_Click" Style="{StaticResource ModernBtn}" Margin="0,0,4,0" ToolTip="Добавить новое правило" />
+                        <Button Content="📋 Дублир." Click="BtnDuplicateRule_Click" Style="{StaticResource ModernBtn}" Margin="2,0,4,0" ToolTip="Дублировать выбранное правило" />
+                        <Button Content="▲" Click="BtnMoveUp_Click" Style="{StaticResource ModernBtn}" Margin="2,0,4,0" ToolTip="Переместить вверх" />
+                        <Button Content="▼" Click="BtnMoveDown_Click" Style="{StaticResource ModernBtn}" Margin="2,0,0,0" ToolTip="Переместить вниз" />
+                    </UniformGrid>
+                </Grid>
+            </Border>
+
+            <!-- RIGHT: Rule Inspector -->
+            <Border Grid.Column="2" Background="{StaticResource CardBgBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="16">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="PnlRuleDetails">
+                        
+                        <!-- Rule Name & Target Param -->
+                        <TextBlock Text="ПАРАМЕТРЫ ПРАВИЛА" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,10" />
+                        
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.2*" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Наименование правила:" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,4" />
+                                <TextBox x:Name="TxtRuleName" TextChanged="TxtRuleName_TextChanged" Height="30" />
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Целевой параметр для записи:" FontSize="12" Foreground="{StaticResource AccentGold}" FontWeight="SemiBold" Margin="0,0,0,4" />
+                                <TextBox x:Name="TxtTargetParam" TextChanged="TxtTargetParam_TextChanged" Height="30" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Separator Background="{StaticResource BorderBrush}" Margin="0,8,0,16" />
+
+                        <!-- Section: Filters -->
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="ФИЛЬТРЫ ЭЛЕМЕНТОВ (КОГДА ПРИМЕНЯТЬ)" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="+ Категория" Click="BtnAddCategoryFilter_Click" Style="{StaticResource ModernBtn}" Height="26" Padding="8,0" Margin="0,0,6,0" FontSize="11" />
+                                <Button Content="+ Условие параметра" Click="BtnAddParamFilter_Click" Style="{StaticResource ModernBtn}" Height="26" Padding="8,0" FontSize="11" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Filters List -->
+                        <ItemsControl x:Name="IcFilters" Margin="0,0,0,16">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#1C1830" BorderBrush="#342E54" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#FFFFFF" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="1" Content="✕" Click="BtnDeleteFilter_Click" Tag="{Binding}" Background="Transparent" Foreground="#FF6B8B" BorderThickness="0" FontWeight="Bold" Margin="8,0,0,0" Cursor="Hand" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Separator Background="{StaticResource BorderBrush}" Margin="0,8,0,16" />
+
+                        <!-- Section: Value Fragments / Formula -->
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="ФОРМИРОВАНИЕ ЗНАЧЕНИЯ (ЧТО ЗАПИСЫВАТЬ)" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="+ Текст" Click="BtnAddStaticText_Click" Style="{StaticResource ModernBtn}" Height="26" Padding="8,0" Margin="0,0,6,0" FontSize="11" />
+                                <Button Content="+ Параметр" Click="BtnAddParamFragment_Click" Style="{StaticResource ModernBtn}" Height="26" Padding="8,0" Margin="0,0,6,0" FontSize="11" />
+                                <Button Content="+ Толщина стенки" Click="BtnAddDuctThickness_Click" Style="{StaticResource ModernBtn}" Height="26" Padding="8,0" Margin="0,0,6,0" FontSize="11" />
+                                <Button Content="+ Этаж/Уровень" Click="BtnAddLevelFragment_Click" Style="{StaticResource ModernBtn}" Height="26" Padding="8,0" FontSize="11" />
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Fragments List -->
+                        <ItemsControl x:Name="IcFragments" Margin="0,0,0,16">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#1C1830" BorderBrush="#342E54" BorderThickness="1" CornerRadius="6" Padding="8" Margin="0,2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#FFFFFF" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                            <Button Grid.Column="1" Content="✕" Click="BtnDeleteFragment_Click" Tag="{Binding}" Background="Transparent" Foreground="#FF6B8B" BorderThickness="0" FontWeight="Bold" Margin="8,0,0,0" Cursor="Hand" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Footer Actions -->
+        <Border Grid.Row="2" Background="{StaticResource CardBgBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!-- Scope Selectors -->
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <!-- Action Execute Button -->
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="Область обработки:" Foreground="{StaticResource TextSecondary}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,14,0" />
+                    <RadioButton x:Name="RdoAllDoc" Content="Во всем проекте" IsChecked="True" Margin="0,0,14,0" />
+                    <RadioButton x:Name="RdoActiveView" Content="На активном виде" Margin="0,0,14,0" />
+                    <RadioButton x:Name="RdoSelection" Content="Только выбранные" />
+                </StackPanel>
+
+                <!-- Progress Bar -->
+                <ProgressBar x:Name="PrgBar" Grid.Column="1" Height="8" Margin="20,0" Visibility="Hidden" Background="#1C1830" Foreground="{StaticResource AccentGold}" />
+
+                <Button Grid.Column="2" Content="⚡ ВЫПОЛНИТЬ ПРАВИЛА" Click="BtnExecute_Click" Style="{StaticResource GoldBtn}" Height="38" Padding="20,0" FontSize="13" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
