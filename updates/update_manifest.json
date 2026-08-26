@@ -1,12 +1,13 @@
 ﻿{
-    "latestVersion":  "2.1.4",
+    "latestVersion":  "2.1.5",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "New signature pink BC logo on delicate soft background for BimboClub Manager",
-                      "Fixed BimboClub Manager UI layout: resolved Update button overlap on Revit version labels, adjusted column spacing and scrollbar padding"
+                      "Fixed CheckForUpdatesCommand button binding and manifest properties in BimboClub Manager",
+                      "Added automatic update check on BimboClub Manager launch",
+                      "Updated BC pink badge logo with vibrant pink border and soft gentle background"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.4/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.4/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.5/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.5/bimboclub_net8.zip"
                  }
 }
