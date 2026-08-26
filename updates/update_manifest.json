@@ -1,13 +1,12 @@
 ﻿{
-    "latestVersion":  "2.2.0",
+    "latestVersion":  "2.2.1",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Fixed MissingManifestResourceException in LTools Rule Editor forms",
-                      "Added dedicated standalone large Rule Editor button to BimboClub ribbon panel",
-                      "Integrated all original LTools forms safely into BimboClub assembly"
+                      "Fixed NullReferenceException in ActionParam XML deserializer during rule file loading",
+                      "Ensured Fragments list and ActionType are properly initialized upon XML load"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.1/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.1/bimboclub_net8.zip"
                  }
 }

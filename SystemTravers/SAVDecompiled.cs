@@ -27821,10 +27821,12 @@ namespace SAV.ParamRules
 		public ActionParam()
 		{
 			this.Fragments = new List<IFragment>();
-			
 			this.Type = ActionType.SetParamValue;
 		}
-		public ActionParam(XElement xe, ModelData md) : base(xe) {
+		public ActionParam(XElement xe, ModelData md) : base(xe)
+		{
+			this.Fragments = new List<IFragment>();
+			this.Type = ActionType.SetParamValue;
 			bool flag = base.ErrReport != "";
 			if (!flag)
 			{
