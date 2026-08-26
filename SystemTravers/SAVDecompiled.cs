@@ -30710,31 +30710,19 @@ namespace SAV.ParamRules
 					}
 				}
 				XElement elementOrDefElement2 = xmlFile.GetElementOrDefElement(this.PluginXPath + "/applyOptions", out text2, "");
-				bool flag3 = !string.IsNullOrEmpty(text2);
-				if (flag3)
+				if (elementOrDefElement2 == null)
 				{
-					this.ErrReport = text2;
+					elementOrDefElement2 = new XElement("applyOptions", new XAttribute("inFullDoc", "true"));
 				}
-				else
+				this.ApplyOpt = new ApplyOptions(this.UIdoc, elementOrDefElement2);
+
+				XElement elementOrDefElement3 = xmlFile.GetElementOrDefElement(this.PluginXPath + "/interOptions", out text2, "");
+				if (elementOrDefElement3 == null)
 				{
-					this.ApplyOpt = new ApplyOptions(this.UIdoc, elementOrDefElement2);
-					bool flag4 = this.ApplyOpt.ErrReport != "";
-					if (flag4)
-					{
-						this.ErrReport = this.ApplyOpt.ErrReport;
-					}
-					else
-					{
-						XElement elementOrDefElement3 = xmlFile.GetElementOrDefElement(this.PluginXPath + "/interOptions", out text2, "");
-						this.InterOpt = new InterOptions(elementOrDefElement3);
-						bool flag5 = this.InterOpt.ErrReport != "";
-						if (flag5)
-						{
-							this.ErrReport = this.InterOpt.ErrReport;
-							Log.Write(this.InterOpt.ErrReport);
-						}
-					}
+					elementOrDefElement3 = new XElement("interOptions", new XAttribute("isAutoSave", "true"));
 				}
+				this.InterOpt = new InterOptions(elementOrDefElement3);
+				this.ErrReport = "";
 			}
 		}
 		public void LoadFromXml(out string errReport)

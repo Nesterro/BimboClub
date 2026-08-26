@@ -2,7 +2,7 @@ using System;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using BimboClub.Rules;
+using SAV.ParamRules;
 
 namespace BimboClub
 {
@@ -14,21 +14,8 @@ namespace BimboClub
         {
             try
             {
-                UIApplication uiapp = commandData.Application;
-                UIDocument uidoc = uiapp.ActiveUIDocument;
-                Document doc = uidoc?.Document;
-
-                if (doc == null)
-                {
-                    TaskDialog.Show("BimboClub", "Откройте проект Revit перед запуском редактора правил.");
-                    return Result.Cancelled;
-                }
-
-                // Run modern native BimboClub Rule Editor Window
-                var window = new RuleEditorWindow(doc, uidoc);
-                window.ShowDialog();
-
-                return Result.Succeeded;
+                var cmd = new CmdRuler();
+                return cmd.Execute(commandData, ref message, elements);
             }
             catch (Exception ex)
             {

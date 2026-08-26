@@ -1,12 +1,13 @@
 ﻿{
-    "latestVersion":  "2.1.8",
+    "latestVersion":  "2.1.9",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Fixed text truncation for update availability in BimboClubManager cards (enabled TextWrapping)",
-                      "Widened version cards and window dimensions to 1140x700 for optimal UI display"
+                      "Integrated original LTools CmdRuler engine directly and independently into BimboClub",
+                      "Removed experimental Rules WPF folder",
+                      "Fixed XML default settings fallback in CmdRuler Engine"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.8/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.8/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.9/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.9/bimboclub_net8.zip"
                  }
 }
