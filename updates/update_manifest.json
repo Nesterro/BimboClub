@@ -1,14 +1,12 @@
 ﻿{
-    "latestVersion":  "2.1.7",
+    "latestVersion":  "2.1.8",
     "releaseDate":  "2026-08-26",
     "changelog":  [
-                      "Full support for all LTools XML fragment types (StringOperation, Calculator, MEPSize, DuctThickness, PipeThickness, FittingAngle, FloorLevelName)",
-                      "Replaced blocking TaskDialog on XML open with instant search and status bar",
-                      "Added rule filtering search box and formula descriptions display",
-                      "Fully independent clean WPF Rule Editor engine in BimboClub"
+                      "Fixed text truncation for update availability in BimboClubManager cards (enabled TextWrapping)",
+                      "Widened version cards and window dimensions to 1140x700 for optimal UI display"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.7/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.7/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.8/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.1.8/bimboclub_net8.zip"
                  }
 }

@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="BimboClub Tools — Менеджер обновлений" 
         Icon="icon_manager.png"
-        Height="680" Width="1060"
+        Height="700" Width="1140"
         Style="{StaticResource ModernWindowStyle}"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
@@ -171,7 +171,7 @@
                         </Grid.Style>
                         
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.35*" />
+                            <ColumnDefinition Width="1.55*" />
                             <ColumnDefinition Width="1*" />
                         </Grid.ColumnDefinitions>
 
@@ -235,7 +235,7 @@
 
                                                     <!-- Details -->
                                                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,12,0">
-                                                        <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" FontSize="14" TextTrimming="CharacterEllipsis">
+                                                        <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" FontSize="14" TextWrapping="Wrap">
                                                             <TextBlock.Style>
                                                                     <Style TargetType="TextBlock">
                                                                         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
@@ -249,7 +249,7 @@
                                                         </TextBlock>
                                                         
                                                         <!-- Status badge -->
-                                                        <TextBlock Text="{Binding StatusDescription}" FontSize="12" Margin="0,2,0,0" TextTrimming="CharacterEllipsis">
+                                                        <TextBlock Text="{Binding StatusDescription}" FontSize="12" Margin="0,3,0,0" TextWrapping="Wrap" LineHeight="16">
                                                             <TextBlock.Style>
                                                                 <Style TargetType="TextBlock">
                                                                     <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}" />
