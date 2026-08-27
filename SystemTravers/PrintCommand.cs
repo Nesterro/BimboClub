@@ -382,7 +382,16 @@ namespace BimboClub
             var beforeFiles = Directory.GetFiles(folderPath, "*.pdf");
 
             IList<ElementId> viewIds = new List<ElementId> { view.Id };
-            doc.Export(folderPath, viewIds, options);
+            using (Transaction trans = new Transaction(doc, "BimboClub PDF Export"))
+            {
+                trans.Start();
+                QuoteSanitizer.SanitizeDocument(doc, viewIds, out _, out _);
+                doc.Regenerate();
+
+                doc.Export(folderPath, viewIds, options);
+
+                trans.RollBack();
+            }
 
             var afterFiles = Directory.GetFiles(folderPath, "*.pdf");
             var newFiles = afterFiles.Except(beforeFiles).ToList();
@@ -410,7 +419,16 @@ namespace BimboClub
             options.PaperFormat = ExportPaperFormat.Default;
 
             IList<ElementId> viewIds = sheets.Select(s => s.Id).ToList();
-            doc.Export(folderPath, viewIds, options);
+            using (Transaction trans = new Transaction(doc, "BimboClub PDF Combined Export"))
+            {
+                trans.Start();
+                QuoteSanitizer.SanitizeDocument(doc, viewIds, out _, out _);
+                doc.Regenerate();
+
+                doc.Export(folderPath, viewIds, options);
+
+                trans.RollBack();
+            }
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]

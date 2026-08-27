@@ -118,6 +118,47 @@ namespace BimboClub
             return style;
         }
 
+        public static Style CreateDarkComboBoxItemStyle(SolidColorBrush popupBg, SolidColorBrush accentColor)
+        {
+            Style itemStyle = new Style(typeof(ComboBoxItem));
+            itemStyle.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, popupBg));
+            itemStyle.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
+            itemStyle.Setters.Add(new Setter(ComboBoxItem.PaddingProperty, new Thickness(8, 6, 8, 6)));
+            itemStyle.Setters.Add(new Setter(ComboBoxItem.HorizontalContentAlignmentProperty, HorizontalAlignment.Left));
+            itemStyle.Setters.Add(new Setter(ComboBoxItem.VerticalContentAlignmentProperty, VerticalAlignment.Center));
+            itemStyle.Setters.Add(new Setter(ComboBoxItem.CursorProperty, Cursors.Hand));
+
+            ControlTemplate itemTemplate = new ControlTemplate(typeof(ComboBoxItem));
+            FrameworkElementFactory itemBorder = new FrameworkElementFactory(typeof(Border));
+            itemBorder.Name = "Bd";
+            itemBorder.SetValue(Border.BackgroundProperty, new Binding("Background") { RelativeSource = RelativeSource.TemplatedParent });
+            itemBorder.SetValue(Border.BorderBrushProperty, new Binding("BorderBrush") { RelativeSource = RelativeSource.TemplatedParent });
+            itemBorder.SetValue(Border.BorderThicknessProperty, new Thickness(0));
+            itemBorder.SetValue(Border.CornerRadiusProperty, new CornerRadius(3));
+            itemBorder.SetValue(Border.MarginProperty, new Thickness(2, 1, 2, 1));
+            itemBorder.SetValue(Border.PaddingProperty, new Binding("Padding") { RelativeSource = RelativeSource.TemplatedParent });
+
+            FrameworkElementFactory itemContent = new FrameworkElementFactory(typeof(ContentPresenter));
+            itemContent.SetValue(ContentPresenter.VerticalAlignmentProperty, VerticalAlignment.Center);
+            itemContent.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Left);
+            
+            itemBorder.AppendChild(itemContent);
+            itemTemplate.VisualTree = itemBorder;
+
+            Trigger isSelectedTrigger = new Trigger { Property = ComboBoxItem.IsSelectedProperty, Value = true };
+            isSelectedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, accentColor ?? new SolidColorBrush(Color.FromRgb(79, 70, 229)), "Bd"));
+            isSelectedTrigger.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
+            itemTemplate.Triggers.Add(isSelectedTrigger);
+
+            Trigger isHighlightedTrigger = new Trigger { Property = ComboBoxItem.IsHighlightedProperty, Value = true };
+            isHighlightedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(56, 56, 75)), "Bd"));
+            isHighlightedTrigger.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, new SolidColorBrush(Color.FromRgb(255, 215, 0))));
+            itemTemplate.Triggers.Add(isHighlightedTrigger);
+
+            itemStyle.Setters.Add(new Setter(ComboBoxItem.TemplateProperty, itemTemplate));
+            return itemStyle;
+        }
+
         public static Style CreateDarkComboBoxStyle(SolidColorBrush bg, SolidColorBrush popupBg, SolidColorBrush borderBrush, SolidColorBrush accentRed)
         {
             Style cbStyle = new Style(typeof(ComboBox));
@@ -126,6 +167,7 @@ namespace BimboClub
             cbStyle.Setters.Add(new Setter(ComboBox.BorderBrushProperty, borderBrush));
             cbStyle.Setters.Add(new Setter(ComboBox.BorderThicknessProperty, new Thickness(1)));
             cbStyle.Setters.Add(new Setter(ComboBox.PaddingProperty, new Thickness(8, 4, 8, 4)));
+            cbStyle.Setters.Add(new Setter(ComboBox.ItemContainerStyleProperty, CreateDarkComboBoxItemStyle(popupBg, accentRed)));
 
             // ToggleButton Template
             ControlTemplate toggleTemplate = new ControlTemplate(typeof(ToggleButton));
@@ -136,12 +178,12 @@ namespace BimboClub
             toggleBorder.SetValue(Border.BackgroundProperty, new Binding("Background") { RelativeSource = RelativeSource.TemplatedParent });
             toggleBorder.SetValue(Border.BorderBrushProperty, new Binding("BorderBrush") { RelativeSource = RelativeSource.TemplatedParent });
             toggleBorder.SetValue(Border.BorderThicknessProperty, new Binding("BorderThickness") { RelativeSource = RelativeSource.TemplatedParent });
-            toggleBorder.SetValue(Border.CornerRadiusProperty, new CornerRadius(3));
+            toggleBorder.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
             toggleGrid.AppendChild(toggleBorder);
 
             FrameworkElementFactory arrowPath = new FrameworkElementFactory(typeof(System.Windows.Shapes.Path));
             arrowPath.SetValue(System.Windows.Shapes.Path.DataProperty, Geometry.Parse("M 0 0 L 4 4 L 8 0 Z"));
-            arrowPath.SetValue(System.Windows.Shapes.Path.FillProperty, Brushes.White);
+            arrowPath.SetValue(System.Windows.Shapes.Path.FillProperty, new SolidColorBrush(Color.FromRgb(200, 200, 220)));
             arrowPath.SetValue(System.Windows.Shapes.Path.HorizontalAlignmentProperty, HorizontalAlignment.Right);
             arrowPath.SetValue(System.Windows.Shapes.Path.VerticalAlignmentProperty, VerticalAlignment.Center);
             arrowPath.SetValue(System.Windows.Shapes.Path.MarginProperty, new Thickness(0, 0, 10, 0));
@@ -186,7 +228,7 @@ namespace BimboClub
             popupBorder.SetValue(Border.BackgroundProperty, popupBg);
             popupBorder.SetValue(Border.BorderBrushProperty, borderBrush);
             popupBorder.SetValue(Border.BorderThicknessProperty, new Thickness(1));
-            popupBorder.SetValue(Border.CornerRadiusProperty, new CornerRadius(3));
+            popupBorder.SetValue(Border.CornerRadiusProperty, new CornerRadius(4));
             popupBorder.SetValue(Border.MarginProperty, new Thickness(0, 2, 0, 0));
 
             FrameworkElementFactory scrollViewer = new FrameworkElementFactory(typeof(ScrollViewer));
@@ -213,10 +255,10 @@ namespace BimboClub
         {
             if (cb == null) return;
 
-            SolidColorBrush popupBg = new SolidColorBrush(Color.FromRgb(30, 30, 36));
+            SolidColorBrush popupBg = new SolidColorBrush(Color.FromRgb(30, 30, 40));
             SolidColorBrush accentRed = new SolidColorBrush(Color.FromRgb(179, 14, 45));
-            SolidColorBrush border = borderBrush ?? new SolidColorBrush(Color.FromRgb(60, 60, 70));
-            SolidColorBrush inputBg = bg ?? new SolidColorBrush(Color.FromRgb(38, 38, 44));
+            SolidColorBrush border = borderBrush ?? new SolidColorBrush(Color.FromRgb(60, 60, 75));
+            SolidColorBrush inputBg = bg ?? new SolidColorBrush(Color.FromRgb(38, 38, 48));
 
             cb.Style = CreateDarkComboBoxStyle(inputBg, popupBg, border, accentRed);
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -86,6 +86,7 @@ namespace BimboClub
         public ExportWindow(List<ViewSheet> sheets, List<ViewSheetSet> sheetSets, string defaultFolder)
         {
             InitializeComponent();
+            UiThemeHelper.ApplyDarkTheme(this);
             SetWindowIcon();
 
             AllSheets = sheets.Select(s => new BccExportSheetItem(s)).OrderBy(s => s.Number).ToList();
@@ -303,6 +304,7 @@ namespace BimboClub
         public string Number { get; }
         public string Name { get; }
         public ViewSheet Sheet { get; }
+        public string DisplayName => string.IsNullOrEmpty(Name) ? Number : $"{Number} - {Name}";
 
         public BccExportSheetItem(ViewSheet sheet)
         {

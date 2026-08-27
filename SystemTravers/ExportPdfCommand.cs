@@ -132,7 +132,7 @@ namespace BimboClub
 
                             if (window.FixQuotes)
                             {
-                                FixQuotesInDocument(doc, selectedSheetIds);
+                                QuoteSanitizer.SanitizeDocument(doc, selectedSheetIds, out _, out _);
                                 doc.Regenerate();
                             }
 
@@ -169,94 +169,36 @@ namespace BimboClub
 
                         bool isPdf24 = window.SelectedPrinterName.IndexOf("PDF24", StringComparison.OrdinalIgnoreCase) >= 0;
 
-                        if (window.CombineSheets)
+                        Dictionary<ElementId, string> origNotes = null;
+                        Dictionary<ElementId, Dictionary<string, string>> origParams = null;
+
+                        if (window.FixQuotes)
                         {
-                            progress.UpdateProgress("Печать объединенного PDF файла...", 0, true);
-
-                            string fileName = SanitizeFileName(window.CombinedFileName);
-                            string filePath = Path.Combine(folderPath, fileName + ".pdf");
-
-                            if (File.Exists(filePath))
-                            {
-                                try { File.Delete(filePath); } catch { }
-                            }
-
-                            // Setup print settings inside transaction
-                            using (Transaction trans = new Transaction(doc, "BimboClub Print Configuration"))
+                            using (Transaction trans = new Transaction(doc, "BimboClub Sanitize Quotes"))
                             {
                                 trans.Start();
-
-                                printManager.PrintRange = PrintRange.Select;
-
-                                ViewSheetSetting viewSheetSetting = printManager.ViewSheetSetting;
-                                ViewSet views = new ViewSet();
-                                foreach (var id in selectedSheetIds)
-                                {
-                                    ViewSheet sheet = doc.GetElement(id) as ViewSheet;
-                                    if (sheet != null) views.Insert(sheet);
-                                }
-                                viewSheetSetting.CurrentViewSheetSet.Views = views;
-                                
-                                try
-                                {
-                                    viewSheetSetting.Save();
-                                }
-                                catch
-                                {
-                                    try { viewSheetSetting.SaveAs("BimboClub_Temp_Set"); } catch { }
-                                }
-
-                                PrintParameters printParams = printManager.PrintSetup.CurrentPrintSetting.PrintParameters;
-                                ConfigurePrintParameters(printParams, window, printManager);
-
-                                printManager.PrintToFile = true;
-                                printManager.CombinedFile = true;
-                                printManager.PrintToFileName = filePath;
-                                printManager.Apply();
-
+                                QuoteSanitizer.SanitizeDocument(doc, selectedSheetIds, out origNotes, out origParams);
+                                doc.Regenerate();
                                 trans.Commit();
                             }
-
-                            if (isPdf24)
-                            {
-                                ConfigurePdf24SilentPrint(window.SelectedPrinterName, folderPath, fileName);
-                            }
-
-                            // Submit print job (outside transaction)
-                            printManager.SubmitPrint();
-
-                            if (isPdf24)
-                            {
-                                int elapsedMs = 0;
-                                while (!File.Exists(filePath) && elapsedMs < 15000)
-                                {
-                                    System.Threading.Thread.Sleep(200);
-                                    elapsedMs += 200;
-                                }
-                            }
                         }
-                        else
+
+                        try
                         {
-                            // Print sheet-by-sheet
-                            int total = selectedSheetIds.Count;
-                            for (int i = 0; i < total; i++)
+                            if (window.CombineSheets)
                             {
-                                var sheetId = selectedSheetIds[i];
-                                ViewSheet sheet = doc.GetElement(sheetId) as ViewSheet;
-                                if (sheet == null) continue;
+                                progress.UpdateProgress("Печать объединенного PDF файла...", 0, true);
 
-                                double pct = ((double)(i + 1) / total) * 100;
-                                progress.UpdateProgress($"Печать листа {i + 1} из {total}: {sheet.SheetNumber} - {sheet.Name}...", pct);
-
-                                string sheetFileName = SanitizeFileName($"{sheet.SheetNumber} - {sheet.Name}");
-                                string filePath = Path.Combine(folderPath, sheetFileName + ".pdf");
+                                string fileName = SanitizeFileName(window.CombinedFileName);
+                                string filePath = Path.Combine(folderPath, fileName + ".pdf");
 
                                 if (File.Exists(filePath))
                                 {
                                     try { File.Delete(filePath); } catch { }
                                 }
 
-                                using (Transaction trans = new Transaction(doc, "BimboClub Print Single Sheet"))
+                                // Setup print settings inside transaction
+                                using (Transaction trans = new Transaction(doc, "BimboClub Print Configuration"))
                                 {
                                     trans.Start();
 
@@ -264,7 +206,11 @@ namespace BimboClub
 
                                     ViewSheetSetting viewSheetSetting = printManager.ViewSheetSetting;
                                     ViewSet views = new ViewSet();
-                                    views.Insert(sheet);
+                                    foreach (var id in selectedSheetIds)
+                                    {
+                                        ViewSheet sheet = doc.GetElement(id) as ViewSheet;
+                                        if (sheet != null) views.Insert(sheet);
+                                    }
                                     viewSheetSetting.CurrentViewSheetSet.Views = views;
                                     
                                     try
@@ -289,19 +235,103 @@ namespace BimboClub
 
                                 if (isPdf24)
                                 {
-                                    ConfigurePdf24SilentPrint(window.SelectedPrinterName, folderPath, sheetFileName);
+                                    ConfigurePdf24SilentPrint(window.SelectedPrinterName, folderPath, fileName);
                                 }
 
+                                // Submit print job (outside transaction)
                                 printManager.SubmitPrint();
 
                                 if (isPdf24)
                                 {
                                     int elapsedMs = 0;
-                                    while (!File.Exists(filePath) && elapsedMs < 10000)
+                                    while (!File.Exists(filePath) && elapsedMs < 15000)
                                     {
-                                        System.Threading.Thread.Sleep(100);
-                                        elapsedMs += 100;
+                                        System.Threading.Thread.Sleep(200);
+                                        elapsedMs += 200;
                                     }
+                                }
+                            }
+                            else
+                            {
+                                // Print sheet-by-sheet
+                                int total = selectedSheetIds.Count;
+                                for (int i = 0; i < total; i++)
+                                {
+                                    var sheetId = selectedSheetIds[i];
+                                    ViewSheet sheet = doc.GetElement(sheetId) as ViewSheet;
+                                    if (sheet == null) continue;
+
+                                    double pct = ((double)(i + 1) / total) * 100;
+                                    progress.UpdateProgress($"Печать листа {i + 1} из {total}: {sheet.SheetNumber} - {sheet.Name}...", pct);
+
+                                    string sheetFileName = SanitizeFileName($"{sheet.SheetNumber} - {sheet.Name}");
+                                    string filePath = Path.Combine(folderPath, sheetFileName + ".pdf");
+
+                                    if (File.Exists(filePath))
+                                    {
+                                        try { File.Delete(filePath); } catch { }
+                                    }
+
+                                    using (Transaction trans = new Transaction(doc, "BimboClub Print Single Sheet"))
+                                    {
+                                        trans.Start();
+
+                                        printManager.PrintRange = PrintRange.Select;
+
+                                        ViewSheetSetting viewSheetSetting = printManager.ViewSheetSetting;
+                                        ViewSet views = new ViewSet();
+                                        views.Insert(sheet);
+                                        viewSheetSetting.CurrentViewSheetSet.Views = views;
+                                        
+                                        try
+                                        {
+                                            viewSheetSetting.Save();
+                                        }
+                                        catch
+                                        {
+                                            try { viewSheetSetting.SaveAs("BimboClub_Temp_Set"); } catch { }
+                                        }
+
+                                        PrintParameters printParams = printManager.PrintSetup.CurrentPrintSetting.PrintParameters;
+                                        ConfigurePrintParameters(printParams, window, printManager);
+
+                                        printManager.PrintToFile = true;
+                                        printManager.CombinedFile = true;
+                                        printManager.PrintToFileName = filePath;
+                                        printManager.Apply();
+
+                                        trans.Commit();
+                                    }
+
+                                    if (isPdf24)
+                                    {
+                                        ConfigurePdf24SilentPrint(window.SelectedPrinterName, folderPath, sheetFileName);
+                                    }
+
+                                    printManager.SubmitPrint();
+
+                                    if (isPdf24)
+                                    {
+                                        int elapsedMs = 0;
+                                        while (!File.Exists(filePath) && elapsedMs < 10000)
+                                        {
+                                            System.Threading.Thread.Sleep(100);
+                                            elapsedMs += 100;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            if (window.FixQuotes && (origNotes?.Count > 0 || origParams?.Count > 0))
+                            {
+                                using (Transaction transRestore = new Transaction(doc, "BimboClub Restore Quotes"))
+                                {
+                                    transRestore.Start();
+                                    QuoteSanitizer.RestoreDocument(doc, origNotes, origParams);
+                                    doc.Regenerate();
+                                    transRestore.Commit();
                                 }
                             }
                         }
