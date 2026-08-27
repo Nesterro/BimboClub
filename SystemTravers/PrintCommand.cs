@@ -220,7 +220,7 @@ namespace BimboClub
                                 fileName = MakeValidFileName(fileName) + ".pdf";
 
                                 List<View> viewsToExport = toExport.Select(item => item.RawSheetObject as View).Where(v => v != null).ToList();
-                                NativePdfExporter.ExportPDFCombined(doc, viewsToExport, folderPath, fileName);
+                                NativePdfExporter.ExportPDFCombined(doc, viewsToExport, folderPath, fileName, window.FixQuotes);
                                 exportedPdfs = viewsToExport.Count;
                             }
                             catch (Exception ex)
@@ -252,7 +252,7 @@ namespace BimboClub
 
                                     fileName = MakeValidFileName(fileName) + ".pdf";
 
-                                    NativePdfExporter.ExportPDF(doc, view, folderPath, fileName);
+                                    NativePdfExporter.ExportPDF(doc, view, folderPath, fileName, window.FixQuotes);
                                     exportedPdfs++;
                                 }
                                 catch (Exception ex)
@@ -373,7 +373,7 @@ namespace BimboClub
     public static class NativePdfExporter
     {
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public static void ExportPDF(Document doc, View view, string folderPath, string targetFileName)
+        public static void ExportPDF(Document doc, View view, string folderPath, string targetFileName, bool fixQuotes = true)
         {
             PDFExportOptions options = new PDFExportOptions();
             options.Combine = false;
@@ -385,12 +385,22 @@ namespace BimboClub
             using (Transaction trans = new Transaction(doc, "BimboClub PDF Export"))
             {
                 trans.Start();
-                QuoteSanitizer.SanitizeDocument(doc, viewIds, out _, out _);
-                doc.Regenerate();
+                if (fixQuotes)
+                {
+                    QuoteSanitizer.SanitizeDocument(doc, viewIds, out _, out _);
+                    doc.Regenerate();
+                }
 
                 doc.Export(folderPath, viewIds, options);
 
-                trans.RollBack();
+                if (fixQuotes)
+                {
+                    trans.RollBack();
+                }
+                else
+                {
+                    trans.Commit();
+                }
             }
 
             var afterFiles = Directory.GetFiles(folderPath, "*.pdf");
@@ -411,7 +421,7 @@ namespace BimboClub
         }
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public static void ExportPDFCombined(Document doc, List<View> sheets, string folderPath, string targetFileName)
+        public static void ExportPDFCombined(Document doc, List<View> sheets, string folderPath, string targetFileName, bool fixQuotes = true)
         {
             PDFExportOptions options = new PDFExportOptions();
             options.Combine = true;
@@ -422,12 +432,22 @@ namespace BimboClub
             using (Transaction trans = new Transaction(doc, "BimboClub PDF Combined Export"))
             {
                 trans.Start();
-                QuoteSanitizer.SanitizeDocument(doc, viewIds, out _, out _);
-                doc.Regenerate();
+                if (fixQuotes)
+                {
+                    QuoteSanitizer.SanitizeDocument(doc, viewIds, out _, out _);
+                    doc.Regenerate();
+                }
 
                 doc.Export(folderPath, viewIds, options);
 
-                trans.RollBack();
+                if (fixQuotes)
+                {
+                    trans.RollBack();
+                }
+                else
+                {
+                    trans.Commit();
+                }
             }
         }
 

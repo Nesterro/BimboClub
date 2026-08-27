@@ -110,14 +110,9 @@ namespace BimboClub
 				ToolTip = "Утилита для копирования параметров инженерных систем (воздуховоды и трубопроводы)."
 			};
 
-			PushButtonData pushButtonDataPrint = new PushButtonData("cmdPrintMaster", "Экспорт чертежей", text4, "BimboClub.PrintCommand")
+			PushButtonData pushButtonDataPrint = new PushButtonData("cmdPrintMaster", "Печать чертежей", text4, "BimboClub.PrintCommand")
 			{
-				ToolTip = "Пакетный экспорт листов в PDF, DWG и IFC с автоопределением форматов рамок и умным именованием."
-			};
-
-			PushButtonData pushButtonDataExportPdfBcc = new PushButtonData("cmdExportPdfBcc", "Экспорт PDF", text4, "BimboClub.ExportPdfCommand")
-			{
-				ToolTip = "Пакетный экспорт выбранных листов проекта в PDF формат."
+				ToolTip = "Пакетный экспорт листов в PDF и DWG с автоопределением форматов рамок, умным именованием и исправлением кавычек ГОСТ."
 			};
 
 			PushButtonData pushButtonDataSchedulePackBcc = new PushButtonData("cmdSchedulePackBcc", "Пакет спецификаций", text4, "BimboClub.SchedulePackCommand")
@@ -264,13 +259,11 @@ namespace BimboClub
 			if (bitmapSourcePrint != null)
 			{
 				pushButtonDataPrint.LargeImage = bitmapSourcePrint;
-				pushButtonDataExportPdfBcc.LargeImage = bitmapSourcePrint;
 				pushButtonDataSchedulePackBcc.LargeImage = bitmapSourcePrint;
 			}
 			if (bitmapSourcePrint16 != null)
 			{
 				pushButtonDataPrint.Image = bitmapSourcePrint16;
-				pushButtonDataExportPdfBcc.Image = bitmapSourcePrint16;
 				pushButtonDataSchedulePackBcc.Image = bitmapSourcePrint16;
 			}
 
@@ -473,9 +466,8 @@ namespace BimboClub
 				{
 					pd.LargeImage = bitmapSourceExcel;
 					pd.Image = bitmapSourceExcel16;
-					pd.AddPushButton(pushButtonDataExportPdfBcc);
-					pd.AddPushButton(pushButtonDataSchedulePackBcc);
 					pd.AddPushButton(pushButtonDataPrint);
+					pd.AddPushButton(pushButtonDataSchedulePackBcc);
 					pd.AddPushButton(pushButtonDataJson);
 					pd.AddPushButton(pushButtonDataExcelExp);
 					pd.AddPushButton(pushButtonDataExcelImp);

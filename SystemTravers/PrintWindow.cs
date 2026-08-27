@@ -52,6 +52,7 @@ namespace BimboClub
         private ComboBox _cbTypeFilter;
         private ComboBox _cbSheetSets;
         private CheckBox _chkCombine;
+        private CheckBox _chkFixQuotes;
         private CheckBox _chkExportPdf;
         private CheckBox _chkExportDwg;
         private TextBox _txtNamingPattern;
@@ -66,6 +67,7 @@ namespace BimboClub
         public string OutputFolderPath => _txtFolderPath.Text;
         public List<SheetItem> SelectedSheets => _allSheets.Where(s => s.IsChecked).ToList();
         public bool CombineToSinglePdf => _chkCombine.IsChecked == true;
+        public bool FixQuotes => _chkFixQuotes?.IsChecked == true;
         public bool ExportPdf => _chkExportPdf.IsChecked == true;
         public bool ExportDwg => _chkExportDwg.IsChecked == true;
         public string SelectedDwgSetup => _cbDwgSetups?.SelectedItem?.ToString();
@@ -147,6 +149,7 @@ namespace BimboClub
             FontSize = 13;
             MinHeight = 650;
             MinWidth = 500;
+            UiThemeHelper.ApplyDarkTheme(this);
 
             // Цветовая палитра
             SolidColorBrush panelBg = new SolidColorBrush(Color.FromRgb(32, 32, 38)); // #202026
@@ -187,7 +190,7 @@ namespace BimboClub
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(40) });    // Поиск
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Список листов
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(35) });    // Групповой выбор
-            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(280) });   // Настройки (увеличено для новых опций)
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(315) });   // Настройки
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(65) });    // Кнопки действий
             Content = mainGrid;
 
@@ -309,22 +312,23 @@ namespace BimboClub
                 BorderBrush = borderBrush,
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(5),
-                Padding = new Thickness(15),
+                Padding = new Thickness(15, 10, 15, 10),
                 Margin = new Thickness(15, 5, 15, 10)
             };
             Grid.SetRow(settingsBorder, 4);
             mainGrid.Children.Add(settingsBorder);
 
             Grid settingsGrid = new Grid();
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(28) }); // Заголовок
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(32) }); // Выбор набора
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(32) }); // Форматы экспорта (PDF, DWG)
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(32) }); // Настройка экспорта DWG
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(28) }); // Объединение PDF
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(32) }); // Шаблон имени
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(42) }); // Превью имени
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(32) }); // Папка
-            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(20) }); // Теги описание
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(26) }); // Заголовок
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Выбор набора
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Форматы экспорта (PDF, DWG)
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Настройка экспорта DWG
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(26) }); // Объединение PDF
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(26) }); // Исправление кавычек
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Шаблон имени
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(38) }); // Превью имени
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(30) }); // Папка
+            settingsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(18) }); // Теги описание
             settingsBorder.Child = settingsGrid;
 
             TextBlock lblSettingsTitle = new TextBlock
@@ -353,7 +357,7 @@ namespace BimboClub
             setGrid.Children.Add(_cbSheetSets);
 
             // 5.1.5 Форматы экспорта (PDF, DWG)
-            Grid formatGrid = new Grid { Margin = new Thickness(0, 3, 0, 3) };
+            Grid formatGrid = new Grid { Margin = new Thickness(0, 2, 0, 2) };
             Grid.SetRow(formatGrid, 2);
             settingsGrid.Children.Add(formatGrid);
             formatGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(145) });
@@ -377,7 +381,7 @@ namespace BimboClub
             formatGrid.Children.Add(_chkExportDwg);
 
             // 5.1.8 Настройка экспорта DWG (Ряд 3)
-            Grid dwgGrid = new Grid { Margin = new Thickness(0, 3, 0, 3) };
+            Grid dwgGrid = new Grid { Margin = new Thickness(0, 2, 0, 2) };
             Grid.SetRow(dwgGrid, 3);
             settingsGrid.Children.Add(dwgGrid);
             dwgGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(145) });
@@ -398,16 +402,28 @@ namespace BimboClub
                 Style = checkBoxStyle,
                 Content = "Объединить все выбранные листы в один общий PDF файл",
                 FontWeight = FontWeights.SemiBold,
-                Margin = new Thickness(0, 3, 0, 0)
+                Margin = new Thickness(0, 2, 0, 0)
             };
             _chkCombine.Checked += (s, e) => { UpdateNamingPreview(); };
             _chkCombine.Unchecked += (s, e) => { UpdateNamingPreview(); };
             Grid.SetRow(_chkCombine, 4);
             settingsGrid.Children.Add(_chkCombine);
 
-            // 5.3 Шаблон имени (Ряд 5)
+            // 5.2.5 Исправление кавычек ГОСТ (Ряд 5)
+            _chkFixQuotes = new CheckBox
+            {
+                Style = checkBoxStyle,
+                Content = "Исправлять кавычки-ёлочки « » (ГОСТ без дробей 1/4 и 1/2)",
+                FontWeight = FontWeights.SemiBold,
+                IsChecked = true,
+                Margin = new Thickness(0, 2, 0, 0)
+            };
+            Grid.SetRow(_chkFixQuotes, 5);
+            settingsGrid.Children.Add(_chkFixQuotes);
+
+            // 5.3 Шаблон имени (Ряд 6)
             Grid patternGrid = new Grid();
-            Grid.SetRow(patternGrid, 5);
+            Grid.SetRow(patternGrid, 6);
             settingsGrid.Children.Add(patternGrid);
             patternGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(145) });
             patternGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -426,17 +442,17 @@ namespace BimboClub
             Grid.SetColumn(_txtNamingPattern, 1);
             patternGrid.Children.Add(_txtNamingPattern);
 
-            // 5.4 Превью (Ряд 6)
+            // 5.4 Превью (Ряд 7)
             Border previewBorder = new Border
             {
                 Background = controlBg,
                 BorderBrush = borderBrush,
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(3),
-                Padding = new Thickness(8, 3, 8, 3),
-                Margin = new Thickness(0, 3, 0, 3)
+                Padding = new Thickness(8, 2, 8, 2),
+                Margin = new Thickness(0, 2, 0, 2)
             };
-            Grid.SetRow(previewBorder, 6);
+            Grid.SetRow(previewBorder, 7);
             settingsGrid.Children.Add(previewBorder);
 
             _txtNamingPreview = new TextBlock
@@ -449,9 +465,9 @@ namespace BimboClub
             };
             previewBorder.Child = _txtNamingPreview;
 
-            // 5.5 Папка сохранения (Ряд 7)
+            // 5.5 Папка сохранения (Ряд 8)
             Grid folderGrid = new Grid();
-            Grid.SetRow(folderGrid, 7);
+            Grid.SetRow(folderGrid, 8);
             settingsGrid.Children.Add(folderGrid);
             folderGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(145) });
             folderGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -478,7 +494,7 @@ namespace BimboClub
             Grid.SetColumn(btnBrowse, 2);
             folderGrid.Children.Add(btnBrowse);
 
-            // 5.6 Теги описание (Ряд 8)
+            // 5.6 Теги описание (Ряд 9)
             TextBlock lblTagsDesc = new TextBlock
             {
                 Text = "Доступные теги: {ProjectNumber} (Шифр), {Section} (Раздел), {SheetNumber} (Номер), {SheetName} (Имя листов)",
@@ -487,7 +503,7 @@ namespace BimboClub
                 FontStyle = FontStyles.Italic,
                 VerticalAlignment = VerticalAlignment.Center
             };
-            Grid.SetRow(lblTagsDesc, 8);
+            Grid.SetRow(lblTagsDesc, 9);
             settingsGrid.Children.Add(lblTagsDesc);
 
             // 6. Подвал
