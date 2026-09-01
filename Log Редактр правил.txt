@@ -1,0 +1,2623 @@
+«Подробная информация об использовании оперативной 
+(JIT) отладки вместо данного диалогового 
+окна содержится в конце этого сообщения.
+
+************** Текст исключения **************
+System.ArgumentNullException: Значение не может быть неопределенным.
+Имя параметра: source
+   в System.Linq.Enumerable.Any[TSource](IEnumerable`1 source)
+   в SAV.ParamRules.Engine.GetStartList()
+   в SAV.ParamRules.FrmRuleEditor1..ctor(Engine engine, XElement xeRule)
+   в SAV.ParamRules.FrmRuler.dgv_CellClick(Object sender, DataGridViewCellEventArgs e)
+   в System.Windows.Forms.DataGridView.OnCellClick(DataGridViewCellEventArgs e)
+   в System.Windows.Forms.DataGridView.OnMouseClick(MouseEventArgs e)
+   в System.Windows.Forms.Control.WmMouseUp(Message& m, MouseButtons button, Int32 clicks)
+   в System.Windows.Forms.Control.WndProc(Message& m)
+   в System.Windows.Forms.NativeWindow.Callback(IntPtr hWnd, Int32 msg, IntPtr wparam, IntPtr lparam)
+
+
+************** Загруженные сборки **************
+mscorlib
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9337.0 built by: NET481REL1LAST_25H2_C
+    CodeBase: file:///C:/Windows/Microsoft.NET/Framework64/v4.0.30319/mscorlib.dll
+----------------------------------------
+UIFrameworkInterop
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/UIFrameworkInterop.DLL
+----------------------------------------
+System
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System/v4.0_4.0.0.0__b77a5c561934e089/System.dll
+----------------------------------------
+UIFramework
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/UIFramework.DLL
+----------------------------------------
+UIFrameworkServices
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/UIFrameworkServices.DLL
+----------------------------------------
+CefSharp.Wpf
+    Версия сборки: 105.3.390.0
+    Версия Win32: 105.3.390.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/CefSharp/CefSharp.Wpf.DLL
+----------------------------------------
+CefSharp.Core
+    Версия сборки: 105.3.390.0
+    Версия Win32: 105.3.390.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/CefSharp/CefSharp.Core.DLL
+----------------------------------------
+CefSharp
+    Версия сборки: 105.3.390.0
+    Версия Win32: 105.3.390.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/CefSharp/CefSharp.DLL
+----------------------------------------
+CefSharp.Core.Runtime
+    Версия сборки: 105.3.390.0
+    Версия Win32: 105.3.390
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/CefSharp/CefSharp.Core.Runtime.DLL
+----------------------------------------
+System.Core
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Core/v4.0_4.0.0.0__b77a5c561934e089/System.Core.dll
+----------------------------------------
+Autodesk.UI.Windows.WebOnDesktop
+    Версия сборки: 3.2.0.0
+    Версия Win32: 3.2.35
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.UI.Windows.WebOnDesktop.DLL
+----------------------------------------
+PresentationFramework
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework/v4.0_4.0.0.0__31bf3856ad364e35/PresentationFramework.dll
+----------------------------------------
+WindowsBase
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/WindowsBase/v4.0_4.0.0.0__31bf3856ad364e35/WindowsBase.dll
+----------------------------------------
+PresentationCore
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_64/PresentationCore/v4.0_4.0.0.0__31bf3856ad364e35/PresentationCore.dll
+----------------------------------------
+System.Xaml
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xaml/v4.0_4.0.0.0__b77a5c561934e089/System.Xaml.dll
+----------------------------------------
+Autodesk.UI.Themes
+    Версия сборки: 3.2.0.0
+    Версия Win32: 3.2.21
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.UI.Themes.DLL
+----------------------------------------
+System.Configuration
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Configuration/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Configuration.dll
+----------------------------------------
+System.Xml
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Xceed.Wpf.AvalonDock
+    Версия сборки: 2.1.0.0
+    Версия Win32: 2.1.5
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Xceed.Wpf.AvalonDock.DLL
+----------------------------------------
+UIFrameworkRes
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/UIFrameworkRes.DLL
+----------------------------------------
+UIFrameworkRes.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/ru-RU/UIFrameworkRes.resources.DLL
+----------------------------------------
+AdWindows
+    Версия сборки: 5.0.3.1
+    Версия Win32: 5.0.3.1
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AdWindows.DLL
+----------------------------------------
+AdWindows.resources
+    Версия сборки: 5.0.2.2
+    Версия Win32: 5.0.3.1
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/ru-RU/AdWindows.resources.DLL
+----------------------------------------
+WindowsFormsIntegration
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/WindowsFormsIntegration/v4.0_4.0.0.0__31bf3856ad364e35/WindowsFormsIntegration.dll
+----------------------------------------
+mscorlib.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0 built by: NET481REL1
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/mscorlib.resources/v4.0_4.0.0.0_ru_b77a5c561934e089/mscorlib.resources.dll
+----------------------------------------
+PresentationFramework.Aero2
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework.Aero2/v4.0_4.0.0.0__31bf3856ad364e35/PresentationFramework.Aero2.dll
+----------------------------------------
+System.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0 built by: NET481REL1
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.resources/v4.0_4.0.0.0_ru_b77a5c561934e089/System.resources.dll
+----------------------------------------
+System.Drawing
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Drawing/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Drawing.dll
+----------------------------------------
+DBManagedServices
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/DBManagedServices.DLL
+----------------------------------------
+AdApplicationFrame
+    Версия сборки: 0.0.0.0
+    Версия Win32: 5.0.3.1
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AdApplicationFrame.DLL
+----------------------------------------
+AddInManagerUI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddInManagerUI.DLL
+----------------------------------------
+System.Windows.Forms
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9325.0 built by: NET481REL1LAST_25H2_C
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Windows.Forms/v4.0_4.0.0.0__b77a5c561934e089/System.Windows.Forms.dll
+----------------------------------------
+PresentationFramework.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework.resources/v4.0_4.0.0.0_ru_31bf3856ad364e35/PresentationFramework.resources.dll
+----------------------------------------
+PresentationFramework-SystemXml
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework-SystemXml/v4.0_4.0.0.0__b77a5c561934e089/PresentationFramework-SystemXml.dll
+----------------------------------------
+PresentationCore.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0 built by: NET481REL1
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationCore.resources/v4.0_4.0.0.0_ru_31bf3856ad364e35/PresentationCore.resources.dll
+----------------------------------------
+System.Windows.Controls.Ribbon
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Windows.Controls.Ribbon/v4.0_4.0.0.0__b77a5c561934e089/System.Windows.Controls.Ribbon.dll
+----------------------------------------
+SSONET
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/SSONET.DLL
+----------------------------------------
+RevitAPIFoundation
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPIFoundation.DLL
+----------------------------------------
+UtilityAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/UtilityAPI.DLL
+----------------------------------------
+RevitAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPI.DLL
+----------------------------------------
+GeomUtilAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/GeomUtilAPI.DLL
+----------------------------------------
+EssentialsDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/EssentialsDBAPI.DLL
+----------------------------------------
+RevitDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitDBAPI.DLL
+----------------------------------------
+RevitDBCoreAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitDBCoreAPI.DLL
+----------------------------------------
+GraphicsAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/GraphicsAPI.DLL
+----------------------------------------
+RoomAreaPlanDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RoomAreaPlanDBAPI.DLL
+----------------------------------------
+HostObjDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/HostObjDBAPI.DLL
+----------------------------------------
+FamilyDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/FamilyDBAPI.DLL
+----------------------------------------
+ArrayElemsDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/ArrayElemsDBAPI.DLL
+----------------------------------------
+StructuralDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/StructuralDBAPI.DLL
+----------------------------------------
+SculptingDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/SculptingDBAPI.DLL
+----------------------------------------
+ElementGroupDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/ElementGroupDBAPI.DLL
+----------------------------------------
+CurtainGridFamilyDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/CurtainGridFamilyDBAPI.DLL
+----------------------------------------
+SiteDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/SiteDBAPI.DLL
+----------------------------------------
+DetailDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/DetailDBAPI.DLL
+----------------------------------------
+BuildingSystemsDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/BuildingSystemsDBAPI.DLL
+----------------------------------------
+EnergyAnalysisDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/EnergyAnalysisDBAPI.DLL
+----------------------------------------
+ATFRevitCoreAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/ATFRevitCoreAPI.DLL
+----------------------------------------
+IntfATFAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/IntfATFAPI.DLL
+----------------------------------------
+MaterialDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/MaterialDBAPI.DLL
+----------------------------------------
+InfrastructureDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/InfrastructureDBAPI.DLL
+----------------------------------------
+AnalysisAppsDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AnalysisAppsDBAPI.DLL
+----------------------------------------
+StructuralAnalysisDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/StructuralAnalysisDBAPI.DLL
+----------------------------------------
+RebarDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RebarDBAPI.DLL
+----------------------------------------
+AssemblyDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AssemblyDBAPI.DLL
+----------------------------------------
+StairRampDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/StairRampDBAPI.DLL
+----------------------------------------
+APIDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/APIDBAPI.DLL
+----------------------------------------
+DPartDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/DPartDBAPI.DLL
+----------------------------------------
+PersistenceDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/PersistenceDBAPI.DLL
+----------------------------------------
+InterfaceUtilAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/InterfaceUtilAPI.DLL
+----------------------------------------
+InterfaceAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/InterfaceAPI.DLL
+----------------------------------------
+TextEngineAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/TextEngineAPI.DLL
+----------------------------------------
+PointCloudAccessAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/PointCloudAccessAPI.DLL
+----------------------------------------
+NumberingDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/NumberingDBAPI.DLL
+----------------------------------------
+MassingDBAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/MassingDBAPI.DLL
+----------------------------------------
+PresentationFramework.Aero
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework.Aero/v4.0_4.0.0.0__31bf3856ad364e35/PresentationFramework.Aero.dll
+----------------------------------------
+PresentationFramework.Luna
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework.Luna/v4.0_4.0.0.0__31bf3856ad364e35/PresentationFramework.Luna.dll
+----------------------------------------
+Microsoft.Expression.Interactions
+    Версия сборки: 4.5.0.0
+    Версия Win32: 3.0.40218.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Microsoft.Expression.Interactions.DLL
+----------------------------------------
+UIAutomationTypes
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/UIAutomationTypes/v4.0_4.0.0.0__31bf3856ad364e35/UIAutomationTypes.dll
+----------------------------------------
+UIAutomationProvider
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/UIAutomationProvider/v4.0_4.0.0.0__31bf3856ad364e35/UIAutomationProvider.dll
+----------------------------------------
+PresentationFramework-SystemCore
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework-SystemCore/v4.0_4.0.0.0__b77a5c561934e089/PresentationFramework-SystemCore.dll
+----------------------------------------
+APIInterop
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/APIInterop.DLL
+----------------------------------------
+RevitAddInUtility
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAddInUtility.DLL
+----------------------------------------
+System.Xml.Linq
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml.Linq/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.Linq.dll
+----------------------------------------
+PackageContentsParser
+    Версия сборки: 1.0.0.0
+    Версия Win32: 1.0.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/PackageContentsParser.DLL
+----------------------------------------
+RevitAPIIFC
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPIIFC.DLL
+----------------------------------------
+IntfIFCAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/IntfIFCAPI.DLL
+----------------------------------------
+AddInManager
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddInManager.DLL
+----------------------------------------
+Autodesk.ATFTranslationServer.DBApplication
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ATFTranslationServer/Autodesk.ATFTranslationServer.DBApplication.dll
+----------------------------------------
+Autodesk.BendingDetails.DB
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/BendingDetails/Autodesk.BendingDetails.DB.dll
+----------------------------------------
+Autodesk.CivilAlignments.DBApplication
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/CivilAlignments/Autodesk.CivilAlignments.DBApplication.dll
+----------------------------------------
+Autodesk.CoordinationModelDB
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/CoordinationModel/Autodesk.CoordinationModelDB.dll
+----------------------------------------
+Autodesk.Entitlement.Utilities
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ModelBrowser/Autodesk.Entitlement.Utilities.dll
+----------------------------------------
+Autodesk.FreeFormRebar.DB
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/FreeFormRebar/Autodesk.FreeFormRebar.DB.dll
+----------------------------------------
+Autodesk.LightboxDB
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Lightbox/Autodesk.LightboxDB.dll
+----------------------------------------
+Autodesk.LinkTopography.Parser
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SiteLinker/Autodesk.LinkTopography.Parser.dll
+----------------------------------------
+Autodesk.ParametersService.DB
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ParametersServiceDB/Autodesk.ParametersService.DB.dll
+----------------------------------------
+Autodesk.Reinforcement.Utilities
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ReinforcementUtilities/Autodesk.Reinforcement.Utilities.dll
+----------------------------------------
+Autodesk.ResultsBuilder.DBApplication
+    Версия сборки: 2024.0.0.0
+    Версия Win32: 2024.0.0.5138
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ResultsManagerExplorer/Autodesk.ResultsBuilder.DBApplication.dll
+----------------------------------------
+Autodesk.RouteAnalysis.DBApplication
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/RouteAnalysis/Autodesk.RouteAnalysis.DBApplication.dll
+----------------------------------------
+Autodesk.SteelConnectionsDB
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/Autodesk.SteelConnectionsDB.dll
+----------------------------------------
+Autodesk.StructuralRibbon.Application
+    Версия сборки: 2024.0.0.0
+    Версия Win32: 2024.0.0.5138
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ResultsManagerExplorer/Autodesk.StructuralRibbon.Application.dll
+----------------------------------------
+ConnectedDesktopDB
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ConnectedDesktop/ConnectedDesktopDB.dll
+----------------------------------------
+KeynoteDBServer
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Keynote/KeynoteDBServer.dll
+----------------------------------------
+Autodesk.MEP.SegmentCalculation.DBApplication
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/MEPCalculation/Autodesk.MEP.SegmentCalculation.DBApplication.dll
+----------------------------------------
+Autodesk.MEP.FittingCalculation.DBApplication
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/MEPCalculation/Autodesk.MEP.FittingCalculation.DBApplication.dll
+----------------------------------------
+CollaborateDB
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Cloud%20Models%20for%20Revit%202024/CollaborateDB.dll
+----------------------------------------
+Autodesk.BendingDetails.DB.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/BendingDetails/ru-RU/Autodesk.BendingDetails.DB.resources.DLL
+----------------------------------------
+Autodesk.CivilAlignments.DBApplication.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/CivilAlignments/ru-RU/Autodesk.CivilAlignments.DBApplication.resources.DLL
+----------------------------------------
+RevitAPIExtData
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPIExtData.DLL
+----------------------------------------
+Autodesk.CoordinationModel.NavisworksApplication
+    Версия сборки: 0.0.0.0
+    Версия Win32: 
+5InternalName
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/CoordinationModel/Autodesk.CoordinationModel.NavisworksApplication.DLL
+----------------------------------------
+Autodesk.CoordinationModelDB.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/CoordinationModel/ru-RU/Autodesk.CoordinationModelDB.resources.DLL
+----------------------------------------
+Autodesk.FreeFormRebar.DB.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/FreeFormRebar/ru-RU/Autodesk.FreeFormRebar.DB.resources.DLL
+----------------------------------------
+LightboxCore
+    Версия сборки: 2.0.13.0
+    Версия Win32: 2.0.13.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Lightbox/LightboxCore.DLL
+----------------------------------------
+LightboxCoreImpl
+    Версия сборки: 2.0.13.0
+    Версия Win32: 2.0.13.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Lightbox/LightboxCoreImpl.DLL
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Autodesk.LightboxDB.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Lightbox/ru-RU/Autodesk.LightboxDB.resources.DLL
+----------------------------------------
+Autodesk.LinkTopography.Parser.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SiteLinker/ru-RU/Autodesk.LinkTopography.Parser.resources.DLL
+----------------------------------------
+Simulex.Net
+    Версия сборки: 2.2.0.5
+    Версия Win32: 2.2.0.5
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/RouteAnalysis/Simulex.Net.DLL
+----------------------------------------
+Autodesk.RouteAnalysis.DBApplication.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/RouteAnalysis/ru-RU/Autodesk.RouteAnalysis.DBApplication.resources.DLL
+----------------------------------------
+RevitAPISteel
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPISteel.DLL
+----------------------------------------
+ASSettings
+    Версия сборки: 1.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASSettings.DLL
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+StructuralAnalysisResults
+    Версия сборки: 2.5.0.15253
+    Версия Win32: 2.5.0.15253
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Addins/DynamoForRevit/Revit/nodes/steel-pkg/bin/StructuralAnalysisResults.dll
+----------------------------------------
+ConnectedDesktopDB.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ConnectedDesktop/ru-RU/ConnectedDesktopDB.resources.DLL
+----------------------------------------
+Autodesk.DesktopConnector.API
+    Версия сборки: 7.4.0.296
+    Версия Win32: 7.4.0.296
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ConnectedDesktop/Autodesk.DesktopConnector.API.DLL
+----------------------------------------
+System.Runtime.Caching
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Runtime.Caching/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Runtime.Caching.dll
+----------------------------------------
+System.Runtime.Serialization
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Runtime.Serialization/v4.0_4.0.0.0__b77a5c561934e089/System.Runtime.Serialization.dll
+----------------------------------------
+System.ServiceModel
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.ServiceModel/v4.0_4.0.0.0__b77a5c561934e089/System.ServiceModel.dll
+----------------------------------------
+SMDiagnostics
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/SMDiagnostics/v4.0_4.0.0.0__b77a5c561934e089/SMDiagnostics.dll
+----------------------------------------
+System.ServiceModel.Internals
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.ServiceModel.Internals/v4.0_4.0.0.0__31bf3856ad364e35/System.ServiceModel.Internals.dll
+----------------------------------------
+System.IdentityModel
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.IdentityModel/v4.0_4.0.0.0__b77a5c561934e089/System.IdentityModel.dll
+----------------------------------------
+System.ServiceModel.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0 built by: NET481REL1
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.ServiceModel.resources/v4.0_4.0.0.0_ru_b77a5c561934e089/System.ServiceModel.resources.dll
+----------------------------------------
+Autodesk.MEP.SegmentCalculation.DBApplication.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/MEPCalculation/ru-RU/Autodesk.MEP.SegmentCalculation.DBApplication.resources.DLL
+----------------------------------------
+Autodesk.MEP.FittingCalculation.DBApplication.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/MEPCalculation/ru-RU/Autodesk.MEP.FittingCalculation.DBApplication.resources.DLL
+----------------------------------------
+Autodesk.Bcg.Net
+    Версия сборки: 8.1.3.0
+    Версия Win32: 8.1.3.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.Bcg.Net.DLL
+----------------------------------------
+Microsoft.Practices.Unity
+    Версия сборки: 3.5.0.0
+    Версия Win32: 3.5.1404.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Microsoft.Practices.Unity.DLL
+----------------------------------------
+System.Runtime
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Runtime/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Runtime.dll
+----------------------------------------
+RSCloudClient
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RSCloudClient.DLL
+----------------------------------------
+Autodesk.RevitServer.Management.Client
+    Версия сборки: 8.1.1.0
+    Версия Win32: 8.1.1.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.RevitServer.Management.Client.DLL
+----------------------------------------
+Autodesk.Bcg
+    Версия сборки: 3.27.1.0
+    Версия Win32: 3.27.1.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.Bcg.DLL
+----------------------------------------
+CollaborateCommon
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Cloud%20Models%20for%20Revit%202024/CollaborateCommon.DLL
+----------------------------------------
+System.Net.Http
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9337.0 built by: NET481REL1LAST_25H2_C
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Net.Http/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Net.Http.dll
+----------------------------------------
+Autodesk.Bcg.Http
+    Версия сборки: 4.1.0.0
+    Версия Win32: 4.1.0.51
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.Bcg.Http.DLL
+----------------------------------------
+System.Threading
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Threading/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Threading.dll
+----------------------------------------
+System.Collections
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Collections/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Collections.dll
+----------------------------------------
+System.Reflection
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Reflection/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Reflection.dll
+----------------------------------------
+System.Linq
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Linq/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Linq.dll
+----------------------------------------
+System.Globalization
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Globalization/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Globalization.dll
+----------------------------------------
+System.Resources.ResourceManager
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Resources.ResourceManager/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Resources.ResourceManager.dll
+----------------------------------------
+System.Runtime.Extensions
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Runtime.Extensions/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Runtime.Extensions.dll
+----------------------------------------
+System.Linq.Expressions
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Linq.Expressions/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Linq.Expressions.dll
+----------------------------------------
+System.Reflection.Extensions
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Reflection.Extensions/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Reflection.Extensions.dll
+----------------------------------------
+Anonymously Hosted DynamicMethods Assembly
+    Версия сборки: 0.0.0.0
+    Версия Win32: 4.8.9337.0 built by: NET481REL1LAST_25H2_C
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_64/mscorlib/v4.0_4.0.0.0__b77a5c561934e089/mscorlib.dll
+----------------------------------------
+Microsoft.Practices.Unity.Configuration
+    Версия сборки: 3.5.0.0
+    Версия Win32: 3.5.1404.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Microsoft.Practices.Unity.Configuration.DLL
+----------------------------------------
+RSCloudClientRevitService
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RSCloudClientRevitService.DLL
+----------------------------------------
+System.Net.Http.WebRequest
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9337.0 built by: NET481REL1LAST_25H2_C
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Net.Http.WebRequest/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Net.Http.WebRequest.dll
+----------------------------------------
+System.Net.Http.Formatting
+    Версия сборки: 5.2.9.0
+    Версия Win32: 5.2.61129.10
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/System.Net.Http.Formatting.DLL
+----------------------------------------
+AddInJournaling
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddInJournaling.DLL
+----------------------------------------
+AddInJournalEngine
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddInJournalEngine.DLL
+----------------------------------------
+AddInJournalClient
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddInJournalClient.DLL
+----------------------------------------
+FabricationPartBrowser
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Addins/FabricationPartBrowser/FabricationPartBrowser.dll
+----------------------------------------
+Autodesk.UI.Windows
+    Версия сборки: 3.2.0.0
+    Версия Win32: 3.2.21
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.UI.Windows.DLL
+----------------------------------------
+RevitAPIUI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPIUI.DLL
+----------------------------------------
+UserInterfaceUtility
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/UserInterfaceUtility.DLL
+----------------------------------------
+Autodesk.RevitApplicationHome.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Addins/ModelBrowser/Autodesk.RevitApplicationHome.Application.dll
+----------------------------------------
+CEFRevitUtils
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/CEFRevitUtils.DLL
+----------------------------------------
+CefSharp.Wpf.HwndHost
+    Версия сборки: 105.3.390.0
+    Версия Win32: 105.3.390.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/CefSharp/CefSharp.Wpf.HwndHost.DLL
+----------------------------------------
+APIUIAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/APIUIAPI.DLL
+----------------------------------------
+RevitMFCAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitMFCAPI.DLL
+----------------------------------------
+DesktopMFCAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/DesktopMFCAPI.DLL
+----------------------------------------
+RevitUIAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitUIAPI.DLL
+----------------------------------------
+BuildingSystemsUIAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/BuildingSystemsUIAPI.DLL
+----------------------------------------
+EssentialsUIAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/EssentialsUIAPI.DLL
+----------------------------------------
+DetailUIAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/DetailUIAPI.DLL
+----------------------------------------
+Autodesk.BendingDetails.UI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/BendingDetails/Autodesk.BendingDetails.UI.dll
+----------------------------------------
+Autodesk.BendingDetails.UI.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/BendingDetails/ru-RU/Autodesk.BendingDetails.UI.resources.DLL
+----------------------------------------
+Autodesk.CivilAlignments.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/CivilAlignments/Autodesk.CivilAlignments.Application.dll
+----------------------------------------
+Autodesk.CoordinationModelUI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/CoordinationModel/Autodesk.CoordinationModelUI.dll
+----------------------------------------
+Autodesk.IFC.Export.UI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/IFCExporterUI/Autodesk.IFC.Export.UI.dll
+----------------------------------------
+Autodesk.LightboxUI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Lightbox/Autodesk.LightboxUI.dll
+----------------------------------------
+Autodesk.LinkTopography.Commands.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SiteLinker/Autodesk.LinkTopography.Commands.Application.dll
+----------------------------------------
+Autodesk.LoadAutodeskFamily.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/LoadAutodeskFamily/Autodesk.LoadAutodeskFamily.Application.dll
+----------------------------------------
+Autodesk.Revit.Config.Client
+    Версия сборки: 3.4.0.0
+    Версия Win32: 3.4.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.Revit.Config.Client.DLL
+----------------------------------------
+Autodesk.MemberForces.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/MemberForces/Autodesk.MemberForces.Application.dll
+----------------------------------------
+Autodesk.PnIDModeler.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/PnIDModeler/Autodesk.PnIDModeler.Application.dll
+----------------------------------------
+Autodesk.PnIDModeler.Client
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/PnIDModeler/Autodesk.PnIDModeler.Client.DLL
+----------------------------------------
+Autodesk.PnIDModeler.Application.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/PnIDModeler/ru-RU/Autodesk.PnIDModeler.Application.resources.DLL
+----------------------------------------
+Autodesk.PnIDModeler.Client.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/PnIDModeler/ru-RU/Autodesk.PnIDModeler.Client.resources.DLL
+----------------------------------------
+Polly
+    Версия сборки: 7.0.0.0
+    Версия Win32: 7.2.1.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Polly.DLL
+----------------------------------------
+Autodesk.Precast.Application
+    Версия сборки: 1.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.Application.dll
+----------------------------------------
+Autodesk.Precast.UI
+    Версия сборки: 19.0.1.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.UI.DLL
+----------------------------------------
+Autodesk.Precast.RevitBase
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.RevitBase.DLL
+----------------------------------------
+Autodesk.Precast.Base
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.Base.DLL
+----------------------------------------
+Autodesk.Precast.Localization
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.Localization.DLL
+----------------------------------------
+Autodesk.Precast.Localization.resources
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2319.768
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/ru-RU/Autodesk.Precast.Localization.resources.DLL
+----------------------------------------
+Autodesk.Precast.API
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.API.DLL
+----------------------------------------
+Autodesk.Precast.CNC
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.CNC.DLL
+----------------------------------------
+Autodesk.Precast.CNCExport
+    Версия сборки: 1.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.CNCExport.DLL
+----------------------------------------
+Autodesk.Precast.Commands
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.Commands.DLL
+----------------------------------------
+Autodesk.Precast.Geometry
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.Geometry.DLL
+----------------------------------------
+Newtonsoft.Json
+    Версия сборки: 13.0.0.0
+    Версия Win32: 13.0.1.25517
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Newtonsoft.Json.DLL
+----------------------------------------
+Autodesk.Precast.RevitGeometry
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.RevitGeometry.DLL
+----------------------------------------
+Autodesk.Precast.RevitUI
+    Версия сборки: 1.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.RevitUI.DLL
+----------------------------------------
+Autodesk.Precast.ShopDrawings
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.ShopDrawings.DLL
+----------------------------------------
+Autodesk.Precast.Slab
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.Slab.DLL
+----------------------------------------
+System.Numerics
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Numerics/v4.0_4.0.0.0__b77a5c561934e089/System.Numerics.dll
+----------------------------------------
+Autodesk.Precast.Wall
+    Версия сборки: 20.0.0.0
+    Версия Win32: 24.0.2351.769
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Precast/Autodesk.Precast.Wall.DLL
+----------------------------------------
+Autodesk.Revit.ProjectBrowser.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ProjectBrowser/Autodesk.Revit.ProjectBrowser.Application.dll
+----------------------------------------
+System.Data
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_64/System.Data/v4.0_4.0.0.0__b77a5c561934e089/System.Data.dll
+----------------------------------------
+Autodesk.ReinforcementNumbering.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ReinforcementNumbering/Autodesk.ReinforcementNumbering.Application.dll
+----------------------------------------
+Autodesk.ResultsExplorer.Application
+    Версия сборки: 2024.0.0.0
+    Версия Win32: 2024.0.0.5138
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ResultsManagerExplorer/Autodesk.ResultsExplorer.Application.dll
+----------------------------------------
+Autodesk.ResultsExplorer.Application.resources
+    Версия сборки: 2021.0.0.0
+    Версия Win32: 2021.0.0.2
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ResultsManagerExplorer/ru-RU/Autodesk.ResultsExplorer.Application.resources.DLL
+----------------------------------------
+Autodesk.StructuralRibbon.Application.resources
+    Версия сборки: 2021.0.0.0
+    Версия Win32: 2021.0.0.2
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ResultsManagerExplorer/ru-RU/Autodesk.StructuralRibbon.Application.resources.DLL
+----------------------------------------
+Microsoft.CSharp
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Microsoft.CSharp/v4.0_4.0.0.0__b03f5f7f11d50a3a/Microsoft.CSharp.dll
+----------------------------------------
+Autodesk.RevisionsOnSheetUI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/RevisionsOnSheetUI/Autodesk.RevisionsOnSheetUI.dll
+----------------------------------------
+Autodesk.Revit.CloudRendering.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Addins/RaasForRevit/Autodesk.Revit.CloudRendering.Application.DLL
+----------------------------------------
+Autodesk.Revit.CloudRendering.Application.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Addins/RaasForRevit/ru-RU/Autodesk.Revit.CloudRendering.Application.resources.DLL
+----------------------------------------
+Autodesk.Revit.SharedViews.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SharedViews/Autodesk.Revit.SharedViews.Application.dll
+----------------------------------------
+Autodesk.Revit.SharedViews.Application.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SharedViews/ru-RU/Autodesk.Revit.SharedViews.Application.resources.DLL
+----------------------------------------
+Autodesk.RouteAnalysis.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/RouteAnalysis/Autodesk.RouteAnalysis.Application.dll
+----------------------------------------
+Autodesk.SectionProperties.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SectionProperties/Autodesk.SectionProperties.Application.dll
+----------------------------------------
+Autodesk.SpaceNaming.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SpaceNaming/Autodesk.SpaceNaming.Application.dll
+----------------------------------------
+Autodesk.SteelConnectionsUI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/Autodesk.SteelConnectionsUI.dll
+----------------------------------------
+DotNetRoots
+    Версия сборки: 1.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/DotNetRoots.DLL
+----------------------------------------
+Autodesk.REX.Framework
+    Версия сборки: 2024.0.0.0
+    Версия Win32: 2024.0.0.5143
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Autodesk.REX.Framework/v4.0_2024.0.0.0__51e16e3b26b42eda/Autodesk.REX.Framework.dll
+----------------------------------------
+Autodesk.TwinmotionForRevit
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/TwinmotionForRevit/Autodesk.TwinmotionForRevit.dll
+----------------------------------------
+Autodesk.DatasmithRevitExporter
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/TwinmotionForRevit/Autodesk.DatasmithRevitExporter.DLL
+----------------------------------------
+Autodesk.UnifiedParameters.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/UnifiedParameters/Autodesk.UnifiedParameters.Application.dll
+----------------------------------------
+Autodesk.ViewSheetSetUI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ViewSheetSet/Autodesk.ViewSheetSetUI.dll
+----------------------------------------
+AutoLoader
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/AutoLoader/AutoLoader.dll
+----------------------------------------
+ConnectedDesktopUI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ConnectedDesktop/ConnectedDesktopUI.dll
+----------------------------------------
+DynamoRevitVersionSelector
+    Версия сборки: 2.18.1.8943
+    Версия Win32: 2.18.1.8943
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoForRevit/Revit/DynamoRevitVersionSelector.dll
+----------------------------------------
+DynamoInstallDetective
+    Версия сборки: 2.18.1.5096
+    Версия Win32: 2.18.1.5096
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoForRevit/DynamoInstallDetective.dll
+----------------------------------------
+DynamoRevitDS
+    Версия сборки: 2.18.1.8943
+    Версия Win32: 2.18.1.8943
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoForRevit/Revit/DynamoRevitDS.dll
+----------------------------------------
+RevitServices
+    Версия сборки: 2.18.1.8943
+    Версия Win32: 2.18.1.8943
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoForRevit/Revit/RevitServices.DLL
+----------------------------------------
+Autodesk.DynamoPlayerForRevit.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoPlayerForRevit/Autodesk.DynamoPlayerForRevit.Application.dll
+----------------------------------------
+DynamoPlayer
+    Версия сборки: 3.1.4.0
+    Версия Win32: 3.1.4.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoPlayerForRevit/DynamoPlayer.DLL
+----------------------------------------
+Autodesk.DynamoPlayerForRevit.Application.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoPlayerForRevit/ru-RU/Autodesk.DynamoPlayerForRevit.Application.resources.DLL
+----------------------------------------
+Autodesk.EnergyAnalysis.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/EnergyAnalysis/Autodesk.EnergyAnalysis.Application.dll
+----------------------------------------
+FabricationPartBrowser.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Addins/FabricationPartBrowser/ru-RU/FabricationPartBrowser.resources.DLL
+----------------------------------------
+Autodesk.MEP.FittingCalculationUI.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/MEPCalculation/Autodesk.MEP.FittingCalculationUI.Application.dll
+----------------------------------------
+Autodesk.MEP.FittingCalculationUI.Application.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/MEPCalculation/ru-RU/Autodesk.MEP.FittingCalculationUI.Application.resources.DLL
+----------------------------------------
+Autodesk.GenerativeDesignForRevit.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/GenerativeDesignForRevit/Autodesk.GenerativeDesignForRevit.Application.dll
+----------------------------------------
+DynamoPlayerExtension
+    Версия сборки: 3.1.4.0
+    Версия Win32: 3.1.4.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoPlayerForRevit/DynamoPlayerExtension.DLL
+----------------------------------------
+DynamoCore
+    Версия сборки: 2.18.1.5096
+    Версия Win32: 2.18.1.5096
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoForRevit/DynamoCore.dll
+----------------------------------------
+DynamoCoreWpf
+    Версия сборки: 2.18.1.5096
+    Версия Win32: 2.18.1.5096
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoForRevit/DynamoCoreWpf.dll
+----------------------------------------
+Microsoft.Practices.Prism
+    Версия сборки: 4.1.0.0
+    Версия Win32: 4.1.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoForRevit/Microsoft.Practices.Prism.DLL
+----------------------------------------
+vtortola.WebSockets.Rfc6455
+    Версия сборки: 2.2.4.0
+    Версия Win32: 2.2.4.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoPlayerForRevit/vtortola.WebSockets.Rfc6455.DLL
+----------------------------------------
+vtortola.WebSockets
+    Версия сборки: 2.2.4.0
+    Версия Win32: 2.2.4.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoPlayerForRevit/vtortola.WebSockets.DLL
+----------------------------------------
+System.Threading.Tasks.Dataflow
+    Версия сборки: 4.5.24.0
+    Версия Win32: 4.5.24.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/DynamoPlayerForRevit/System.Threading.Tasks.Dataflow.DLL
+----------------------------------------
+System.Threading.Tasks
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Threading.Tasks/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Threading.Tasks.dll
+----------------------------------------
+System.Diagnostics.Tracing
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Diagnostics.Tracing/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Diagnostics.Tracing.dll
+----------------------------------------
+KeynoteUIServer
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Keynote/KeynoteUIServer.dll
+----------------------------------------
+PointCloudSnappingServer
+    Версия сборки: 1.0.8642.5696
+    Версия Win32: 
+ZInternalName
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/PointCloudSnappingServer/PointCloudSnappingServer.dll
+----------------------------------------
+Autodesk.MEP.PressureLossReport.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/MEPCalculation/Autodesk.MEP.PressureLossReport.Application.dll
+----------------------------------------
+Autodesk.BatchPrint.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.4.427
+    CodeBase: file:///C:/Program%20Files/Autodesk/Batch%20Print%20for%20Revit%202024/Autodesk.BatchPrint.Application.dll
+----------------------------------------
+Autodesk.BatchPrint.Utilities
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.4.427
+    CodeBase: file:///C:/Program%20Files/Autodesk/Batch%20Print%20for%20Revit%202024/Autodesk.BatchPrint.Utilities.DLL
+----------------------------------------
+Collaborate
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Cloud%20Models%20for%20Revit%202024/Collaborate.dll
+----------------------------------------
+CollaborateBrowser
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Cloud%20Models%20for%20Revit%202024/CollaborateBrowser.dll
+----------------------------------------
+SkyscraperClientHost
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Cloud%20Models%20for%20Revit%202024/SkyscraperClientHost.dll
+----------------------------------------
+C4RNET
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/C4RNET.DLL
+----------------------------------------
+eTransmitForRevit
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.4.427
+    CodeBase: file:///C:/Program%20Files/Autodesk/eTransmit%20for%20Revit%202024/eTransmitForRevit.dll
+----------------------------------------
+eTransmitForRevit.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.3.412
+    CodeBase: file:///C:/Program%20Files/Autodesk/eTransmit%20for%20Revit%202024/ru-RU/eTransmitForRevit.resources.DLL
+----------------------------------------
+Autodesk.WorksharingMonitor.Application
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.4.427
+    CodeBase: file:///C:/Program%20Files/Autodesk/Worksharing%20Monitor%20for%20Revit%202024/Autodesk.WorksharingMonitor.Application.dll
+----------------------------------------
+Autodesk.WorksharingMonitor.Utilities
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.4.427
+    CodeBase: file:///C:/Program%20Files/Autodesk/Worksharing%20Monitor%20for%20Revit%202024/Autodesk.WorksharingMonitor.Utilities.dll
+----------------------------------------
+BimboClub
+    Версия сборки: 2.2.4.0
+    Версия Win32: 2.2.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/BimboClub.dll
+----------------------------------------
+DiRoots.One
+    Версия сборки: 1.5.3.0
+    Версия Win32: 1.5.3.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DiRoots.One1.5.3.0/DiRoots.One.dll
+----------------------------------------
+DiRoots.One.Commons
+    Версия сборки: 1.5.3.0
+    Версия Win32: 1.5.3.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DiRoots.One1.5.3.0/DiRoots.One.Commons.DLL
+----------------------------------------
+DiRoots.One.LanDict
+    Версия сборки: 1.5.3.0
+    Версия Win32: 1.5.3.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DiRoots.One1.5.3.0/DiRoots.One.LanDict.DLL
+----------------------------------------
+DiRoots.One.NLog
+    Версия сборки: 5.0.0.0
+    Версия Win32: 5.0.0.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DiRoots.One1.5.3.0/DiRoots.One.NLog.DLL
+----------------------------------------
+DiRoots.One.UIBehaviours
+    Версия сборки: 1.5.3.0
+    Версия Win32: 1.5.3.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DiRoots.One1.5.3.0/DiRoots.One.UIBehaviours.dll
+----------------------------------------
+DiRoots.ProSheets
+    Версия сборки: 1.3.3.0
+    Версия Win32: 1.3.3.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DiRoots.ProSheets1.3.3.0/diroots.prosheets.dll
+----------------------------------------
+DiRoots.One.CommonsPS
+    Версия сборки: 1.3.3.0
+    Версия Win32: 1.3.3.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DiRoots.ProSheets1.3.3.0/DiRoots.One.CommonsPS.DLL
+----------------------------------------
+DiRoots.TrackerPS
+    Версия сборки: 1.3.3.0
+    Версия Win32: 1.3.3.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DiRoots.ProSheets1.3.3.0/DiRoots.TrackerPS.DLL
+----------------------------------------
+DuctSystemParamCopy
+    Версия сборки: 0.0.0.0
+    Версия Win32: 0.0.0.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/DuctSystemParamCopy/DuctSystemParamCopy.dll
+----------------------------------------
+ExportViewSelectorAddin
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/ExportViewSelectorAddin/ExportViewSelectorAddin.dll
+----------------------------------------
+LTools
+    Версия сборки: 2025.0.3.379
+    Версия Win32: 2025.0.3.379
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/LTools/LTools.dll
+----------------------------------------
+ModPlus_Revit_2024
+    Версия сборки: 11.0.0.0
+    Версия Win32: 38.2.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus_Revit_2024.dll
+----------------------------------------
+ModPlusStyle
+    Версия сборки: 1.0.0.0
+    Версия Win32: 15.0.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlusStyle.DLL
+----------------------------------------
+ModPlusAPI
+    Версия сборки: 1.0.0.0
+    Версия Win32: 41.1.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlusAPI.DLL
+----------------------------------------
+ModPlusService.Dto
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlusService.Dto.DLL
+----------------------------------------
+ModPlus.GongSolutions.Wpf.DragDrop
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.GongSolutions.Wpf.DragDrop.dll
+----------------------------------------
+NCalc
+    Версия сборки: 1.3.8.0
+    Версия Win32: 1.3.8.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/NCalc.dll
+----------------------------------------
+ModPlus.Languages
+    Версия сборки: 1.0.0.0
+    Версия Win32: 1.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.Languages.dll
+----------------------------------------
+ModPlus.SimpleInjector
+    Версия сборки: 5.0.0.0
+    Версия Win32: 5.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.SimpleInjector.dll
+----------------------------------------
+ModPlus.Newtonsoft.Json
+    Версия сборки: 11.0.0.0
+    Версия Win32: 11.0.1
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.Newtonsoft.Json.dll
+----------------------------------------
+ModPlus.SharpRaven
+    Версия сборки: 0.0.0.0
+    Версия Win32: 0.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.SharpRaven.dll
+----------------------------------------
+ModPlus.CSharpFunctionalExtensions
+    Версия сборки: 1.0.0.0
+    Версия Win32: 2.28.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.CSharpFunctionalExtensions.dll
+----------------------------------------
+ModPlus.ICSharpCode.AvalonEdit
+    Версия сборки: 6.1.0.0
+    Версия Win32: 6.1.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.ICSharpCode.AvalonEdit.dll
+----------------------------------------
+ModPlus.Xaml.Behaviors.Wpf
+    Версия сборки: 1.1.39.0
+    Версия Win32: 1.1.39.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.Xaml.Behaviors.Wpf.dll
+----------------------------------------
+ModPlus.BigDataExcelExporter
+    Версия сборки: 2.0.3.0
+    Версия Win32: 2.0.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.BigDataExcelExporter.dll
+----------------------------------------
+ModPlus.iTextSharp
+    Версия сборки: 5.5.13.3
+    Версия Win32: 5.5.13.3
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.iTextSharp.dll
+----------------------------------------
+ModPlus.FreeImageNET
+    Версия сборки: 3.17.0.5
+    Версия Win32: 3.17.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.FreeImageNET.dll
+----------------------------------------
+ModPlus.BouncyCastle
+    Версия сборки: 1.8.9.0
+    Версия Win32: 1.8.20343.1
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.BouncyCastle.dll
+----------------------------------------
+ModPlus.Excel
+    Версия сборки: 0.105.1.0
+    Версия Win32: 0.105.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Extensions/ModPlus.Excel.dll
+----------------------------------------
+mprAlignViews_2024
+    Версия сборки: 2.0.0.0
+    Версия Win32: 2.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprAlignViews/mprAlignViews_2024.dll
+----------------------------------------
+mprApartmentBuildingLayout_2024
+    Версия сборки: 4.1.15.0
+    Версия Win32: 4.1.15.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprApartmentBuildingLayout/mprApartmentBuildingLayout_2024.dll
+----------------------------------------
+mprApartmentViews_2024
+    Версия сборки: 1.0.0.0
+    Версия Win32: 1.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprApartmentViews/mprApartmentViews_2024.dll
+----------------------------------------
+mprBaseLevel_2024
+    Версия сборки: 1.13.8.0
+    Версия Win32: 1.13.8.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprBaseLevel/mprBaseLevel_2024.dll
+----------------------------------------
+mprBeamsReinforcement_2024
+    Версия сборки: 2.3.14.0
+    Версия Win32: 2.3.14.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprBeamsReinforcement/mprBeamsReinforcement_2024.dll
+----------------------------------------
+mprBreakLayers_2024
+    Версия сборки: 1.5.8.0
+    Версия Win32: 1.5.8.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprBreakLayers/mprBreakLayers_2024.dll
+----------------------------------------
+mprCADmanager_2024
+    Версия сборки: 2.3.4.0
+    Версия Win32: 2.3.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCADmanager/mprCADmanager_2024.dll
+----------------------------------------
+mprCleaner_2024
+    Версия сборки: 2.31.2.0
+    Версия Win32: 2.31.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCleaner/mprCleaner_2024.dll
+----------------------------------------
+mprColorizer_2024
+    Версия сборки: 3.8.1.0
+    Версия Win32: 3.8.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprColorizer/mprColorizer_2024.dll
+----------------------------------------
+mprColumnsReinforcement_2024
+    Версия сборки: 4.5.17.0
+    Версия Win32: 4.5.17.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprColumnsReinforcement/mprColumnsReinforcement_2024.dll
+----------------------------------------
+mprCommands_2024
+    Версия сборки: 1.21.2.0
+    Версия Win32: 1.21.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCommands/mprCommands_2024.dll
+----------------------------------------
+mprContextFilter_2024
+    Версия сборки: 2.7.4.0
+    Версия Win32: 2.7.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprContextFilter/mprContextFilter_2024.dll
+----------------------------------------
+mprCopyAlongCurve_2024
+    Версия сборки: 1.2.2.0
+    Версия Win32: 1.2.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCopyAlongCurve/mprCopyAlongCurve_2024.dll
+----------------------------------------
+mprCopyCropBox_2024
+    Версия сборки: 1.8.15.0
+    Версия Win32: 1.8.15.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCopyCropBox/mprCopyCropBox_2024.dll
+----------------------------------------
+mprCopyElementsToOpenDocuments_2024
+    Версия сборки: 3.4.4.0
+    Версия Win32: 3.4.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCopyElementsToOpenDocuments/mprCopyElementsToOpenDocuments_2024.dll
+----------------------------------------
+mprCopyParameterValues_2024
+    Версия сборки: 1.15.7.0
+    Версия Win32: 1.15.7.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCopyParameterValues/mprCopyParameterValues_2024.dll
+----------------------------------------
+mprCopySheetsToOpenDocuments_2024
+    Версия сборки: 1.13.3.0
+    Версия Win32: 1.13.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCopySheetsToOpenDocuments/mprCopySheetsToOpenDocuments_2024.dll
+----------------------------------------
+mprCopyViewTemplateFilters_2024
+    Версия сборки: 2.7.3.0
+    Версия Win32: 2.7.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprCopyViewTemplateFilters/mprCopyViewTemplateFilters_2024.dll
+----------------------------------------
+mprDimBias_2024
+    Версия сборки: 6.3.8.0
+    Версия Win32: 6.3.8.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprDimBias/mprDimBias_2024.dll
+----------------------------------------
+mprDimByLine_2024
+    Версия сборки: 3.3.9.0
+    Версия Win32: 3.3.9.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprDimByLine/mprDimByLine_2024.dll
+----------------------------------------
+mprElevations_2024
+    Версия сборки: 1.6.7.0
+    Версия Win32: 1.6.7.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprElevations/mprElevations_2024.dll
+----------------------------------------
+mprEqualCurtainWalls_2024
+    Версия сборки: 1.0.5.0
+    Версия Win32: 1.0.5.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprEqualCurtainWalls/mprEqualCurtainWalls_2024.dll
+----------------------------------------
+mprExcelImport_2024
+    Версия сборки: 2.2.5.0
+    Версия Win32: 2.2.5.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprExcelImport/mprExcelImport_2024.dll
+----------------------------------------
+netstandard
+    Версия сборки: 2.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/netstandard/v4.0_2.0.0.0__cc7b13ffcd2ddd51/netstandard.dll
+----------------------------------------
+mprExportToExcel_2024
+    Версия сборки: 2.2.3.0
+    Версия Win32: 2.2.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprExportToExcel/mprExportToExcel_2024.dll
+----------------------------------------
+mprExteriorPlanDimensions_2024
+    Версия сборки: 2.0.0.0
+    Версия Win32: 2.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprExteriorPlanDimensions/mprExteriorPlanDimensions_2024.dll
+----------------------------------------
+mprFamilyDuplicateFixer_2024
+    Версия сборки: 1.5.1.0
+    Версия Win32: 1.5.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprFamilyDuplicateFixer/mprFamilyDuplicateFixer_2024.dll
+----------------------------------------
+mprFastViewCut_2024
+    Версия сборки: 2.0.7.0
+    Версия Win32: 2.0.7.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprFastViewCut/mprFastViewCut_2024.dll
+----------------------------------------
+mprFavoriteViews_2024
+    Версия сборки: 1.6.4.0
+    Версия Win32: 1.6.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprFavoriteViews/mprFavoriteViews_2024.dll
+----------------------------------------
+mprFilterSelection_2024
+    Версия сборки: 1.6.0.0
+    Версия Win32: 1.6.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprFilterSelection/mprFilterSelection_2024.dll
+----------------------------------------
+mprFindAndReplace_2024
+    Версия сборки: 2.17.4.0
+    Версия Win32: 2.17.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprFindAndReplace/mprFindAndReplace_2024.dll
+----------------------------------------
+mprFlipped_2024
+    Версия сборки: 1.1.1.0
+    Версия Win32: 1.1.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprFlipped/mprFlipped_2024.dll
+----------------------------------------
+mprFloorByRoom_2024
+    Версия сборки: 1.9.12.0
+    Версия Win32: 1.9.12.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprFloorByRoom/mprFloorByRoom_2024.dll
+----------------------------------------
+mprFontReplacer_2024
+    Версия сборки: 2.6.3.0
+    Версия Win32: 2.6.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprFontReplacer/mprFontReplacer_2024.dll
+----------------------------------------
+mprHeightSplitter_2024
+    Версия сборки: 1.6.4.0
+    Версия Win32: 1.6.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprHeightSplitter/mprHeightSplitter_2024.dll
+----------------------------------------
+mprInteriorPlanDimensions_2024
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprInteriorPlanDimensions/mprInteriorPlanDimensions_2024.dll
+----------------------------------------
+mprJoin_2024
+    Версия сборки: 1.16.11.0
+    Версия Win32: 1.16.11.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprJoin/mprJoin_2024.dll
+----------------------------------------
+mprLinksManager_2024
+    Версия сборки: 1.2.5.0
+    Версия Win32: 1.2.5.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprLinksManager/mprLinksManager_2024.dll
+----------------------------------------
+mprMaterialManager_2024
+    Версия сборки: 1.2.3.0
+    Версия Win32: 1.2.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprMaterialManager/mprMaterialManager_2024.dll
+----------------------------------------
+mprMEPAlign_2024
+    Версия сборки: 3.2.3.0
+    Версия Win32: 3.2.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprMEPAlign/mprMEPAlign_2024.dll
+----------------------------------------
+mprMEPConnect_2024
+    Версия сборки: 1.6.6.0
+    Версия Win32: 1.6.6.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprMEPConnect/mprMEPConnect_2024.dll
+----------------------------------------
+mprMEPCopy_2024
+    Версия сборки: 2.1.5.0
+    Версия Win32: 2.1.5.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprMEPCopy/mprMEPCopy_2024.dll
+----------------------------------------
+mprMepElementsBender_2024
+    Версия сборки: 3.0.2.0
+    Версия Win32: 3.0.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprMepElementsBender/mprMepElementsBender_2024.dll
+----------------------------------------
+mprMEPRotate_2024
+    Версия сборки: 2.3.4.0
+    Версия Win32: 2.3.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprMEPRotate/mprMEPRotate_2024.dll
+----------------------------------------
+mprMEPSplit_2024
+    Версия сборки: 1.1.3.0
+    Версия Win32: 1.1.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprMEPSplit/mprMEPSplit_2024.dll
+----------------------------------------
+mprMergeDims_2024
+    Версия сборки: 1.6.2.0
+    Версия Win32: 1.6.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprMergeDims/mprMergeDims_2024.dll
+----------------------------------------
+mprModelCompare_2024
+    Версия сборки: 1.0.0.0
+    Версия Win32: 1.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprModelCompare/mprModelCompare_2024.dll
+----------------------------------------
+mprNestedFamilyParamsTransfer_2024
+    Версия сборки: 1.1.5.0
+    Версия Win32: 1.1.5.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprNestedFamilyParamsTransfer/mprNestedFamilyParamsTransfer_2024.dll
+----------------------------------------
+mprNotes_2024
+    Версия сборки: 1.7.10.0
+    Версия Win32: 1.7.10.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprNotes/mprNotes_2024.dll
+----------------------------------------
+mprNumbering_2024
+    Версия сборки: 6.4.9.0
+    Версия Win32: 6.4.9.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprNumbering/mprNumbering_2024.dll
+----------------------------------------
+mprOverrideGraphicManager_2024
+    Версия сборки: 1.1.4.0
+    Версия Win32: 1.1.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprOverrideGraphicManager/mprOverrideGraphicManager_2024.dll
+----------------------------------------
+mprParameters_2024
+    Версия сборки: 2.13.4.0
+    Версия Win32: 2.13.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprParameters/mprParameters_2024.dll
+----------------------------------------
+mprParametrization_2024
+    Версия сборки: 4.1.33.0
+    Версия Win32: 4.1.33.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprParametrization/mprParametrization_2024.dll
+----------------------------------------
+mprPatterns_2024
+    Версия сборки: 1.8.0.0
+    Версия Win32: 1.8.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprPatterns/mprPatterns_2024.dll
+----------------------------------------
+mprPhases_2024
+    Версия сборки: 1.0.2.0
+    Версия Win32: 1.0.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprPhases/mprPhases_2024.dll
+----------------------------------------
+mprPlateWeight_2024
+    Версия сборки: 1.1.4.0
+    Версия Win32: 1.1.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprPlateWeight/mprPlateWeight_2024.dll
+----------------------------------------
+mprRebarSolidAndVisible_2024
+    Версия сборки: 3.5.2.0
+    Версия Win32: 3.5.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprRebarSolidAndVisible/mprRebarSolidAndVisible_2024.dll
+----------------------------------------
+mprRebarTools_2024
+    Версия сборки: 2.4.5.0
+    Версия Win32: 2.4.5.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprRebarTools/mprRebarTools_2024.dll
+----------------------------------------
+mprRenameInFamily_2024
+    Версия сборки: 1.4.0.0
+    Версия Win32: 1.4.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprRenameInFamily/mprRenameInFamily_2024.dll
+----------------------------------------
+mprRoomColorVolume_2024
+    Версия сборки: 1.5.1.0
+    Версия Win32: 1.5.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprRoomColorVolume/mprRoomColorVolume_2024.dll
+----------------------------------------
+mprRoomFinishing_2024
+    Версия сборки: 3.1.13.0
+    Версия Win32: 3.1.13.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprRoomFinishing/mprRoomFinishing_2024.dll
+----------------------------------------
+mprScheduleLookup_2024
+    Версия сборки: 1.4.8.0
+    Версия Win32: 1.4.8.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprScheduleLookup/mprScheduleLookup_2024.dll
+----------------------------------------
+mprSectionAnnotation_2024
+    Версия сборки: 2.0.1.0
+    Версия Win32: 2.0.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprSectionAnnotation/mprSectionAnnotation_2024.dll
+----------------------------------------
+mprSheetCopy_2024
+    Версия сборки: 4.10.5.0
+    Версия Win32: 4.10.5.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprSheetCopy/mprSheetCopy_2024.dll
+----------------------------------------
+mprSheetExport_2024
+    Версия сборки: 5.11.4.0
+    Версия Win32: 5.11.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprSheetExport/mprSheetExport_2024.dll
+----------------------------------------
+mprSheetRenumber_2024
+    Версия сборки: 3.2.10.0
+    Версия Win32: 3.2.10.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprSheetRenumber/mprSheetRenumber_2024.dll
+----------------------------------------
+mprSlabsReinforcement_2024
+    Версия сборки: 3.4.18.0
+    Версия Win32: 3.4.18.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprSlabsReinforcement/mprSlabsReinforcement_2024.dll
+----------------------------------------
+mprSplitDimChain_2024
+    Версия сборки: 1.3.8.0
+    Версия Win32: 1.3.8.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprSplitDimChain/mprSplitDimChain_2024.dll
+----------------------------------------
+mprSplitRebar_2024
+    Версия сборки: 2.3.6.0
+    Версия Win32: 2.3.6.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprSplitRebar/mprSplitRebar_2024.dll
+----------------------------------------
+mprStairArrows_2024
+    Версия сборки: 1.0.0.0
+    Версия Win32: 1.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprStairArrows/mprStairArrows_2024.dll
+----------------------------------------
+mprStructureToParameter_2024
+    Версия сборки: 3.0.3.0
+    Версия Win32: 3.0.3.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprStructureToParameter/mprStructureToParameter_2024.dll
+----------------------------------------
+mprSumParameters_2024
+    Версия сборки: 1.3.4.0
+    Версия Win32: 1.3.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprSumParameters/mprSumParameters_2024.dll
+----------------------------------------
+mprTagless_2024
+    Версия сборки: 1.7.9.0
+    Версия Win32: 1.7.9.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprTagless/mprTagless_2024.dll
+----------------------------------------
+mprTools_2024
+    Версия сборки: 2.27.8.0
+    Версия Win32: 2.27.8.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprTools/mprTools_2024.dll
+----------------------------------------
+mprToposolidFloorConverter_2024
+    Версия сборки: 1.0.1.0
+    Версия Win32: 1.0.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprToposolidFloorConverter/mprToposolidFloorConverter_2024.dll
+----------------------------------------
+mprTypeManager_2024
+    Версия сборки: 1.10.16.0
+    Версия Win32: 1.10.16.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprTypeManager/mprTypeManager_2024.dll
+----------------------------------------
+mprViewColorOn3D_2024
+    Версия сборки: 1.1.14.0
+    Версия Win32: 1.1.14.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprViewColorOn3D/mprViewColorOn3D_2024.dll
+----------------------------------------
+mprViewCopy_2024
+    Версия сборки: 2.6.4.0
+    Версия Win32: 2.6.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprViewCopy/mprViewCopy_2024.dll
+----------------------------------------
+mprViewIn3D_2024
+    Версия сборки: 2.3.1.0
+    Версия Win32: 2.3.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprViewIn3D/mprViewIn3D_2024.dll
+----------------------------------------
+mprViewRange_2024
+    Версия сборки: 1.1.1.0
+    Версия Win32: 1.1.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprViewRange/mprViewRange_2024.dll
+----------------------------------------
+mprViewSync_2024
+    Версия сборки: 1.5.11.0
+    Версия Win32: 1.5.11.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprViewSync/mprViewSync_2024.dll
+----------------------------------------
+mprVisibility_2024
+    Версия сборки: 1.1.4.0
+    Версия Win32: 1.1.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprVisibility/mprVisibility_2024.dll
+----------------------------------------
+mprWallsReinforcement_2024
+    Версия сборки: 6.1.17.0
+    Версия Win32: 6.1.17.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprWallsReinforcement/mprWallsReinforcement_2024.dll
+----------------------------------------
+mprWallSweep_2024
+    Версия сборки: 2.12.2.0
+    Версия Win32: 2.12.2.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprWallSweep/mprWallSweep_2024.dll
+----------------------------------------
+mprWarningViewer_2024
+    Версия сборки: 1.2.7.0
+    Версия Win32: 1.2.7.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprWarningViewer/mprWarningViewer_2024.dll
+----------------------------------------
+mprWorksets_2024
+    Версия сборки: 3.4.6.0
+    Версия Win32: 3.4.6.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprWorksets/mprWorksets_2024.dll
+----------------------------------------
+mprWorldOrientation_2024
+    Версия сборки: 2.2.4.0
+    Версия Win32: 2.2.4.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/ModPlus/Functions/Revit/mprWorldOrientation/mprWorldOrientation_2024.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+nwexportrevit
+    Версия сборки: 1.0.9041.809
+    Версия Win32: 21.3.3.0
+    CodeBase: file:///C:/ProgramData/Autodesk/Revit/Addins/2024/revit_exporter.Addin.bundle/nwexportrevit/nwexportrevit.dll
+----------------------------------------
+RevitPythonShell
+    Версия сборки: 2024.0.0.0
+    Версия Win32: 2024.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/RevitPythonShell.dll
+----------------------------------------
+CommandLoaderAssembly.dll
+    Версия сборки: 1.0.0.0
+    Версия Win32: 2024.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/RevitPythonShell.dll
+----------------------------------------
+RpsRuntime
+    Версия сборки: 2024.0.0.0
+    Версия Win32: 2024.0.0.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/RpsRuntime.DLL
+----------------------------------------
+Microsoft.Scripting
+    Версия сборки: 1.3.4.0
+    Версия Win32: 1.3.4.1000
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/Microsoft.Scripting.DLL
+----------------------------------------
+IronPython
+    Версия сборки: 3.4.1.0
+    Версия Win32: 3.4.1.1000
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/IronPython.DLL
+----------------------------------------
+Microsoft.Dynamic
+    Версия сборки: 1.3.4.0
+    Версия Win32: 1.3.4.1000
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/Microsoft.Dynamic.DLL
+----------------------------------------
+IronPython.Modules
+    Версия сборки: 3.4.1.0
+    Версия Win32: 3.4.1.1000
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/IronPython.Modules.DLL
+----------------------------------------
+System.Memory
+    Версия сборки: 4.0.1.2
+    Версия Win32: 4.6.31308.01
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/System.Memory.DLL
+----------------------------------------
+System.Runtime.CompilerServices.Unsafe
+    Версия сборки: 4.0.4.1
+    Версия Win32: 4.6.28619.01
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/System.Runtime.CompilerServices.Unsafe.DLL
+----------------------------------------
+Snippets.scripting
+    Версия сборки: 0.0.0.0
+    Версия Win32: 1.3.4.1000
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/RevitPythonShell/Microsoft.Dynamic.dll
+----------------------------------------
+System.Dynamic
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Dynamic/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Dynamic.dll
+----------------------------------------
+Microsoft.CSharp.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Microsoft.CSharp.resources/v4.0_4.0.0.0_ru_b03f5f7f11d50a3a/Microsoft.CSharp.resources.dll
+----------------------------------------
+V2Tools_R24
+    Версия сборки: 13.19.9167.37712
+    Версия Win32: 13.19.9167.37712
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/V2Architects/V2Tools/V2Tools_R24.dll
+----------------------------------------
+MdXaml
+    Версия сборки: 1.18.1.0
+    Версия Win32: 1.18.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/V2Architects/V2Tools/MdXaml.dll
+----------------------------------------
+MdXaml.Plugins
+    Версия сборки: 1.18.1.0
+    Версия Win32: 1.18.1.0
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/V2Architects/V2Tools/MdXaml.Plugins.dll
+----------------------------------------
+System.Resources.Extensions
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.700.19.46214
+    CodeBase: file:///C:/Users/nesterov/AppData/Roaming/Autodesk/Revit/Addins/2024/V2Architects/V2Tools/System.Resources.Extensions.dll
+----------------------------------------
+System.DirectoryServices
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.DirectoryServices/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.DirectoryServices.dll
+----------------------------------------
+System.Management
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Management/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Management.dll
+----------------------------------------
+System.Memory
+    Версия сборки: 4.0.1.1
+    Версия Win32: 4.6.28619.01
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/System.Memory.DLL
+----------------------------------------
+System.Numerics.Vectors
+    Версия сборки: 4.1.4.0
+    Версия Win32: 4.6.26515.06
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/System.Numerics.Vectors.DLL
+----------------------------------------
+RevitAPIUIMacrosInterop
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPIUIMacrosInterop.DLL
+----------------------------------------
+SDACommon
+    Версия сборки: 2014.4.2.26
+    Версия Win32: 2014.4.2.26
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/SDACommon.DLL
+----------------------------------------
+RevitAPIMacrosInterop
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPIMacrosInterop.DLL
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Autodesk.IFC.Export.UI.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/IFCExporterUI/ru-RU/Autodesk.IFC.Export.UI.resources.DLL
+----------------------------------------
+Autodesk.RevisionsOnSheetUI.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/RevisionsOnSheetUI/ru-RU/Autodesk.RevisionsOnSheetUI.resources.DLL
+----------------------------------------
+AdpSDKCSharpWrapper
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.4.1.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AdpSDKCSharpWrapper.DLL
+----------------------------------------
+System.Web.Extensions
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Web.Extensions/v4.0_4.0.0.0__31bf3856ad364e35/System.Web.Extensions.dll
+----------------------------------------
+System.Web
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_64/System.Web/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.Web.dll
+----------------------------------------
+Autodesk.RevitApplicationHome.Application.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Addins/ModelBrowser/ru-RU/Autodesk.RevitApplicationHome.Application.resources.DLL
+----------------------------------------
+Autodesk.RevitApplicationHome.Utilities
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Addins/ModelBrowser/Autodesk.RevitApplicationHome.Utilities.DLL
+----------------------------------------
+PresentationFramework-SystemXmlLinq
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework-SystemXmlLinq/v4.0_4.0.0.0__b77a5c561934e089/PresentationFramework-SystemXmlLinq.dll
+----------------------------------------
+RSEnterpriseClientInterop
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RSEnterpriseClientInterop.DLL
+----------------------------------------
+RSEnterpriseClient
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RSEnterpriseClient.DLL
+----------------------------------------
+RS.Enterprise.Common.ClientServer.DataContract
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RS.Enterprise.Common.ClientServer.DataContract.DLL
+----------------------------------------
+Autodesk.C4R.Client
+    Версия сборки: 6.2.0.0
+    Версия Win32: 6.2.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Cloud%20Models%20for%20Revit%202024/Autodesk.C4R.Client.DLL
+----------------------------------------
+Autodesk.Http
+    Версия сборки: 14.4.0.0
+    Версия Win32: 14.4.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.Http.DLL
+----------------------------------------
+System.xml.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0 built by: NET481REL1
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml.resources/v4.0_4.0.0.0_ru_b77a5c561934e089/System.Xml.resources.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+PresentationFramework-SystemData
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9344.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/PresentationFramework-SystemData/v4.0_4.0.0.0__b77a5c561934e089/PresentationFramework-SystemData.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+adui24
+    Версия сборки: 0.0.0.0
+    Версия Win32: 24.3.57.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/adui24.DLL
+----------------------------------------
+AdUiPalettes
+    Версия сборки: 24.3.0.0
+    Версия Win32: 24.3.57.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AdUiPalettes.DLL
+----------------------------------------
+AdUIMgd
+    Версия сборки: 24.3.0.0
+    Версия Win32: 24.3.57.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AdUIMgd.DLL
+----------------------------------------
+Vitro.Client.Shell
+    Версия сборки: 2021.1.0.1156
+    Версия Win32: 2021.1.0.1156
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Vitro.Client.Shell/v4.0_2021.1.0.1156__37c3e1fa0a92b3f6/Vitro.Client.Shell.dll
+----------------------------------------
+LogicNP.EZNamespaceExtensions
+    Версия сборки: 6.0.0.0
+    Версия Win32: 6.0.0.0
+    CodeBase: file:///C:/WINDOWS/assembly/GAC/LogicNP.EZNamespaceExtensions/6.0.0.0__183e52843b1db176/LogicNP.EZNamespaceExtensions.dll
+----------------------------------------
+Vitro.Client.Common.UI
+    Версия сборки: 2021.1.0.1156
+    Версия Win32: 2021.1.0.1156
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Vitro.Client.Common.UI/v4.0_2021.1.0.1156__6de85fb655398711/Vitro.Client.Common.UI.dll
+----------------------------------------
+Spring.Core
+    Версия сборки: 1.3.2.20943
+    Версия Win32: 1.3.2.20943
+    CodeBase: file:///C:/WINDOWS/assembly/GAC_MSIL/Spring.Core/1.3.2.20943__65e474d141e25e07/Spring.Core.dll
+----------------------------------------
+Vitro.Client.Common
+    Версия сборки: 2021.1.0.1156
+    Версия Win32: 2021.1.0.1156
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Vitro.Client.Common/v4.0_2021.1.0.1156__b0679ff1cba4f41b/Vitro.Client.Common.dll
+----------------------------------------
+log4net
+    Версия сборки: 1.2.10.0
+    Версия Win32: 1.2.10.0
+    CodeBase: file:///C:/WINDOWS/assembly/GAC_MSIL/log4net/1.2.10.0__1b44e1d426115821/log4net.dll
+----------------------------------------
+Common.Logging.Log4Net
+    Версия сборки: 1.2.0.2
+    Версия Win32: 1.2.0.2
+    CodeBase: file:///C:/WINDOWS/assembly/GAC_MSIL/Common.Logging.Log4Net/1.2.0.2__af08829b84f0328e/Common.Logging.Log4Net.dll
+----------------------------------------
+Common.Logging
+    Версия сборки: 1.2.0.0
+    Версия Win32: 1.2.0.0
+    CodeBase: file:///C:/WINDOWS/assembly/GAC/Common.Logging/1.2.0.0__af08829b84f0328e/Common.Logging.dll
+----------------------------------------
+Microsoft.SharePoint.Client.Runtime
+    Версия сборки: 15.0.0.0
+    Версия Win32: 15.0.4420.1017
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Microsoft.SharePoint.Client.Runtime/v4.0_15.0.0.0__71e9bce111e9429c/Microsoft.SharePoint.Client.Runtime.dll
+----------------------------------------
+Vitro.Client.Locale
+    Версия сборки: 2021.1.0.1156
+    Версия Win32: 2021.1.0.1156
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Vitro.Client.Locale/v4.0_2021.1.0.1156__9bc770f52fa53ee2/Vitro.Client.Locale.dll
+----------------------------------------
+Microsoft.SharePoint.Client
+    Версия сборки: 15.0.0.0
+    Версия Win32: 15.0.4481.1504
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Microsoft.SharePoint.Client/v4.0_15.0.0.0__71e9bce111e9429c/Microsoft.SharePoint.Client.dll
+----------------------------------------
+Vitro.Client.Word
+    Версия сборки: 2021.1.0.1156
+    Версия Win32: 2021.1.0.1156
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Vitro.Client.Word/v4.0_2021.1.0.1156__37923704681ff360/Vitro.Client.Word.dll
+----------------------------------------
+Vitro.Client.Common.Office
+    Версия сборки: 2021.1.0.1156
+    Версия Win32: 2021.1.0.1156
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Vitro.Client.Common.Office/v4.0_2021.1.0.1156__81fea653bb0ba1fe/Vitro.Client.Common.Office.dll
+----------------------------------------
+Vitro.Client.Excel
+    Версия сборки: 2021.1.0.1156
+    Версия Win32: 2021.1.0.1156
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Vitro.Client.Excel/v4.0_2021.1.0.1156__813fc6f63f9f583a/Vitro.Client.Excel.dll
+----------------------------------------
+TaskDialog
+    Версия сборки: 1.2.0.2
+    Версия Win32: 1.2.0.2
+    CodeBase: file:///C:/WINDOWS/assembly/GAC_MSIL/TaskDialog/1.2.0.2__b629903e843c4cdd/TaskDialog.dll
+----------------------------------------
+Microsoft.Office.Tools.Common
+    Версия сборки: 10.0.0.0
+    Версия Win32: 10.0.60910.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/Microsoft.Office.Tools.Common/v4.0_10.0.0.0__b03f5f7f11d50a3a/Microsoft.Office.Tools.Common.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+TD_SwigCoreMgd
+    Версия сборки: 19.8.0.0
+    Версия Win32: 19.8.0.0
+    CodeBase: file:///C:/Program%20Files/Vitro%20Software/Vitro/Client/Tools/Teigha/x64/TD_SwigCoreMgd.dll
+----------------------------------------
+TG_SwigDbMgd
+    Версия сборки: 19.8.0.0
+    Версия Win32: 19.8.0.0
+    CodeBase: file:///C:/Program%20Files/Vitro%20Software/Vitro/Client/Tools/Teigha/x64/TG_SwigDbMgd.dll
+----------------------------------------
+Vitro.Client.Common.Cad
+    Версия сборки: 2021.1.0.1156
+    Версия Win32: 2021.1.0.1156
+    CodeBase: file:///C:/Program%20Files/Vitro%20Software/Vitro/Client/Tools/Teigha/x64/Vitro.Client.Common.Cad.dll
+----------------------------------------
+RS.Enterprise.Common.ClientServer.Helper
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RS.Enterprise.Common.ClientServer.Helper.DLL
+----------------------------------------
+RSEnterpriseClientRevitService
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RSEnterpriseClientRevitService.DLL
+----------------------------------------
+RS.Enterprise.Common.ClientServer.Proxy
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RS.Enterprise.Common.ClientServer.Proxy.DLL
+----------------------------------------
+RS.Enterprise.Common.ClientServer.ServiceContract.Model
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RS.Enterprise.Common.ClientServer.ServiceContract.Model.DLL
+----------------------------------------
+Autodesk.RevitServer.Social
+    Версия сборки: 1.4.3.0
+    Версия Win32: 1.4.3.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Autodesk.RevitServer.Social.DLL
+----------------------------------------
+Castle.Windsor
+    Версия сборки: 3.2.0.0
+    Версия Win32: 3.2.1.20
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Castle.Windsor.DLL
+----------------------------------------
+Castle.Core
+    Версия сборки: 3.2.0.0
+    Версия Win32: 3.2.1.28
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/Castle.Core.DLL
+----------------------------------------
+RS.Enterprise.Common.ClientServer.ServiceContract.Local
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RS.Enterprise.Common.ClientServer.ServiceContract.Local.DLL
+----------------------------------------
+System.RunTime.Serialization.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0 built by: NET481REL1
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Runtime.Serialization.resources/v4.0_4.0.0.0_ru_b77a5c561934e089/System.Runtime.Serialization.resources.dll
+----------------------------------------
+CollaborateDB.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Cloud%20Models%20for%20Revit%202024/ru-RU/CollaborateDB.resources.DLL
+----------------------------------------
+RS.Enterprise.Common.ClientServer.PermissionSource
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RS.Enterprise.Common.ClientServer.PermissionSource.DLL
+----------------------------------------
+RS.Enterprise.Utility
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.0.0.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RS.Enterprise.Utility.DLL
+----------------------------------------
+ASObjectsMgd
+    Версия сборки: 1.0.8427.26780
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASObjectsMgd.DLL
+----------------------------------------
+Autodesk.SteelConnections.ASRvtFamilyMapping
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/Autodesk.SteelConnections.ASRvtFamilyMapping.DLL
+----------------------------------------
+ASCADLinkMgd
+    Версия сборки: 0.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASCADLinkMgd.DLL
+----------------------------------------
+JointDesignUtils
+    Версия сборки: 1.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/JointDesignUtils.DLL
+----------------------------------------
+ASSettingsMgd
+    Версия сборки: 1.0.8427.26522
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASSettingsMgd.DLL
+----------------------------------------
+AsRealDWGLoaderMgd
+    Версия сборки: 0.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/AsRealDWGLoaderMgd.DLL
+----------------------------------------
+Autodesk.SteelConnections.ASRvtModeler
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/Autodesk.SteelConnections.ASRvtModeler.DLL
+----------------------------------------
+ASModelerMgd
+    Версия сборки: 0.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASModelerMgd.DLL
+----------------------------------------
+ASGeometryMgd
+    Версия сборки: 0.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASGeometryMgd.DLL
+----------------------------------------
+System.IO.Compression
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.IO.Compression/v4.0_4.0.0.0__b77a5c561934e089/System.IO.Compression.dll
+----------------------------------------
+ASRepository
+    Версия сборки: 1.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASRepository.DLL
+----------------------------------------
+System.IO.Compression.FileSystem
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.IO.Compression.FileSystem/v4.0_4.0.0.0__b77a5c561934e089/System.IO.Compression.FileSystem.dll
+----------------------------------------
+SqlLocalDbManMgd
+    Версия сборки: 1.0.8427.26523
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/SqlLocalDbManMgd.DLL
+----------------------------------------
+ASRepositorySQLSrv
+    Версия сборки: 1.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASRepositorySQLSrv.DLL
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+System.Data.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0 built by: NET481REL1
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Data.resources/v4.0_4.0.0.0_ru_b77a5c561934e089/System.Data.resources.dll
+----------------------------------------
+System.Transactions
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_64/System.Transactions/v4.0_4.0.0.0__b77a5c561934e089/System.Transactions.dll
+----------------------------------------
+System.EnterpriseServices
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_64/System.EnterpriseServices/v4.0_4.0.0.0__b03f5f7f11d50a3a/System.EnterpriseServices.dll
+----------------------------------------
+Acdbmgd
+    Версия сборки: 24.3.0.0
+    Версия Win32: 24.3.57.0.0
+    CodeBase: file:///C:/Program%20Files/Common%20Files/Autodesk%20Shared/RealDWG%20Shared%202024/acdbmgd.dll
+----------------------------------------
+ASNetRuntime
+    Версия сборки: 1.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASNetRuntime.DLL
+----------------------------------------
+ASRepositoryProxy
+    Версия сборки: 0.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASRepositoryProxy.dll
+----------------------------------------
+ASDataObjects
+    Версия сборки: 1.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASDataObjects.dll
+----------------------------------------
+EntityFramework
+    Версия сборки: 6.0.0.0
+    Версия Win32: 6.1.40302.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/EntityFramework.DLL
+----------------------------------------
+EntityFramework.SqlServer
+    Версия сборки: 6.0.0.0
+    Версия Win32: 6.1.40302.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/EntityFramework.SqlServer.DLL
+----------------------------------------
+System.ComponentModel.DataAnnotations
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.ComponentModel.DataAnnotations/v4.0_4.0.0.0__31bf3856ad364e35/System.ComponentModel.DataAnnotations.dll
+----------------------------------------
+System.Data.OracleClient
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9221.0 built by: NET481REL1LAST_25H2
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_64/System.Data.OracleClient/v4.0_4.0.0.0__b77a5c561934e089/System.Data.OracleClient.dll
+----------------------------------------
+EntityFrameworkDynamicProxies-ASDataObjects
+    Версия сборки: 1.0.0.0
+    Версия Win32: 6.1.40302.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/EntityFramework.dll
+----------------------------------------
+ASMgdJoints
+    Версия сборки: 1.0.8427.26786
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASMgdJoints.dll
+----------------------------------------
+DotNetRootsMgd
+    Версия сборки: 1.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/DotNetRootsMgd.DLL
+----------------------------------------
+ASProfilesMgd
+    Версия сборки: 0.0.0.0
+    Версия Win32: 28.0.89.0
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/SteelConnections/ASProfilesMgd.DLL
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+RevitAPIBrowserUtils
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RevitAPIBrowserUtils.DLL
+----------------------------------------
+RebarUIStartUpAPI
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.25
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/RebarUIStartUpAPI.DLL
+----------------------------------------
+Autodesk.ResultsManager.Application
+    Версия сборки: 2024.0.0.0
+    Версия Win32: 2024.0.0.5138
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/ResultsManagerExplorer/Autodesk.ResultsManager.Application.DLL
+----------------------------------------
+Microsoft.GeneratedCode
+    Версия сборки: 1.0.0.0
+    Версия Win32: 4.8.9340.0 built by: NET481REL1LAST_25H2_B
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Xml/v4.0_4.0.0.0__b77a5c561934e089/System.Xml.dll
+----------------------------------------
+KeynoteUIServer.resources
+    Версия сборки: 24.0.0.0
+    Версия Win32: 24.1.10.24
+    CodeBase: file:///C:/Program%20Files/Autodesk/Revit%202024/AddIns/Keynote/ru-RU/KeynoteUIServer.resources.DLL
+----------------------------------------
+System.Windows.Forms.resources
+    Версия сборки: 4.0.0.0
+    Версия Win32: 4.8.9032.0 built by: NET481REL1
+    CodeBase: file:///C:/WINDOWS/Microsoft.Net/assembly/GAC_MSIL/System.Windows.Forms.resources/v4.0_4.0.0.0_ru_b77a5c561934e089/System.Windows.Forms.resources.dll
+----------------------------------------
+
+************** Оперативная отладка (JIT) **************
+Для подключения оперативной (JIT) отладки файл .config данного
+приложения или компьютера (machine.config) должен иметь
+значение jitDebugging, установленное в секции system.windows.forms.
+Приложение также должно быть скомпилировано с включенной
+отладкой.
+
+Например:
+
+<configuration>
+    <system.windows.forms jitDebugging="true" />
+</configuration>
+
+При включенной отладке JIT любое необрабатываемое исключение
+пересылается отладчику JIT, зарегистрированному на данном компьютере,
+вместо того чтобы обрабатываться данным диалоговым окном.

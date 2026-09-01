@@ -1,13 +1,12 @@
 ﻿{
-    "latestVersion":  "2.2.5",
-    "releaseDate":  "2026-08-27",
+    "latestVersion":  "2.2.6",
+    "releaseDate":  "2026-09-01",
     "changelog":  [
-                      "Merged PDF export into Print Master and removed duplicate separate PDF export button from ribbon",
-                      "Integrated QuoteSanitizer into Print Master (fixes « » turning into 1/4 and 1/2 fractions)",
-                      "Applied modern dark theme styling across all Print Master controls and dropdowns"
+                      "Fixed ArgumentNullException when editing rules in ParamRules (LTools Ruler)",
+                      "Added null-safe backing field for SelectedElemIds and protected Engine.GetStartList"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.5/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.5/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.6/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.6/bimboclub_net8.zip"
                  }
 }

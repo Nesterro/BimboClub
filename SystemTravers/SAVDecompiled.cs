@@ -21672,10 +21672,21 @@ namespace SAV.Filters
 			get;
 			set;
 		}
+		private List<ElementId> _selectedElemIds = new List<ElementId>();
 		public List<ElementId> SelectedElemIds
 		{
-			get;
-			set;
+			get
+			{
+				if (this._selectedElemIds == null)
+				{
+					this._selectedElemIds = new List<ElementId>();
+				}
+				return this._selectedElemIds;
+			}
+			set
+			{
+				this._selectedElemIds = (value ?? new List<ElementId>());
+			}
 		}
 		public string ErrReport
 		{
@@ -21686,15 +21697,7 @@ namespace SAV.Filters
 		{
 			this.InFullDoc = inFullDoc;
 			this.ActiveView = view;
-			bool flag = selectedElemIds == null;
-			if (flag)
-			{
-				this.SelectedElemIds = new List<ElementId>();
-			}
-			else
-			{
-				this.SelectedElemIds = selectedElemIds;
-			}
+			this.SelectedElemIds = (selectedElemIds ?? new List<ElementId>());
 		}
 		public void Set4OneElement(ElementId id)
 		{
@@ -21707,10 +21710,16 @@ namespace SAV.Filters
 		public ApplyOptions(UIDocument uidoc, XElement xe)
 		{
 			this.ErrReport = "";
+			this.SelectedElemIds = new List<ElementId>();
 			bool flag = xe == null || !xe.HasElements || xe.Name != "applyOptions";
 			if (flag)
 			{
 				this.ErrReport = "не найден узел applyOptions";
+				this.InFullDoc = true;
+				if (uidoc != null)
+				{
+					this.SetSelectingMode(uidoc);
+				}
 			}
 			else
 			{
@@ -21719,26 +21728,42 @@ namespace SAV.Filters
 				if (ok)
 				{
 					this.InFullDoc = (bool)result.Value;
-					this.SetSelectingMode(uidoc);
+					if (uidoc != null)
+					{
+						this.SetSelectingMode(uidoc);
+					}
 				}
 				else
 				{
 					this.ErrReport = result.ErrMsg;
+					this.InFullDoc = true;
+					if (uidoc != null)
+					{
+						this.SetSelectingMode(uidoc);
+					}
 				}
 			}
 		}
 		public ApplyOptions(UIDocument uidoc, System.Windows.Forms.ComboBox cmbDiscip, RadioButton rdoInFullDoc)
 		{
 			this.InFullDoc = rdoInFullDoc.Checked;
-			this.SetSelectingMode(uidoc);
+			this.SelectedElemIds = new List<ElementId>();
+			if (uidoc != null)
+			{
+				this.SetSelectingMode(uidoc);
+			}
 		}
 		public void SetSelectingMode(UIDocument uidoc)
 		{
 			this.ActiveView = null;
 			bool flag = !this.InFullDoc;
-			if (flag)
+			if (flag && uidoc != null)
 			{
-				this.ActiveView = uidoc.ActiveGraphicalView;
+				try
+				{
+					this.ActiveView = uidoc.ActiveGraphicalView;
+				}
+				catch { }
 			}
 			this.SelectedElemIds = new List<ElementId>();
 		}
@@ -30795,16 +30820,29 @@ namespace SAV.ParamRules
 		}
 		public List<Element> GetStartList()
 		{
-			bool flag = this.ApplyOpt.ActiveView != null;
-			FilteredElementCollector filteredElementCollector;
-			if (flag)
+			try
 			{
-				filteredElementCollector = new FilteredElementCollector(this.Model.Doc, this.ApplyOpt.ActiveView.Id);
-			}
-			else
-			{
-				bool flag2 = this.ApplyOpt.SelectedElemIds.Any<ElementId>();
-				if (flag2)
+				if (this.Model == null || this.Model.Doc == null)
+				{
+					return new List<Element>();
+				}
+
+				if (this.ApplyOpt == null)
+				{
+					this.ApplyOpt = new ApplyOptions(true, null, new List<ElementId>());
+				}
+
+				if (this.ApplyOpt.SelectedElemIds == null)
+				{
+					this.ApplyOpt.SelectedElemIds = new List<ElementId>();
+				}
+
+				FilteredElementCollector filteredElementCollector;
+				if (this.ApplyOpt.ActiveView != null && this.ApplyOpt.ActiveView.IsValidObject)
+				{
+					filteredElementCollector = new FilteredElementCollector(this.Model.Doc, this.ApplyOpt.ActiveView.Id);
+				}
+				else if (this.ApplyOpt.SelectedElemIds != null && this.ApplyOpt.SelectedElemIds.Count > 0)
 				{
 					filteredElementCollector = new FilteredElementCollector(this.Model.Doc, this.ApplyOpt.SelectedElemIds);
 				}
@@ -30812,8 +30850,21 @@ namespace SAV.ParamRules
 				{
 					filteredElementCollector = new FilteredElementCollector(this.Model.Doc);
 				}
+
+				return filteredElementCollector.WherePasses(new LogicalOrFilter(new ElementIsElementTypeFilter(false), new ElementIsElementTypeFilter(true))).ToElements().ToList<Element>();
 			}
-			return filteredElementCollector.WherePasses(new LogicalOrFilter(new ElementIsElementTypeFilter(false), new ElementIsElementTypeFilter(true))).ToElements().ToList<Element>();
+			catch
+			{
+				if (this.Model?.Doc != null)
+				{
+					try
+					{
+						return new FilteredElementCollector(this.Model.Doc).WherePasses(new LogicalOrFilter(new ElementIsElementTypeFilter(false), new ElementIsElementTypeFilter(true))).ToElements().ToList<Element>();
+					}
+					catch { }
+				}
+				return new List<Element>();
+			}
 		}
 		public string GetLastFileXPath()
 		{
