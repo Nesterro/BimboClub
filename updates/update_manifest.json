@@ -1,12 +1,13 @@
 ﻿{
-    "latestVersion":  "2.2.6",
+    "latestVersion":  "2.2.7",
     "releaseDate":  "2026-09-01",
     "changelog":  [
-                      "Fixed ArgumentNullException when editing rules in ParamRules (LTools Ruler)",
-                      "Added null-safe backing field for SelectedElemIds and protected Engine.GetStartList"
+                      "Fixed culture formatting bug in ParamRules for floating point constants (e.g. 0.606 getting parsed as 606 due to comma separator)",
+                      "Added universal dot/comma parsing for double/float/decimal/int in XML deserialization",
+                      "Ensured invariant culture XML serialization for FragmentConst"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.6/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.6/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.7/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.7/bimboclub_net8.zip"
                  }
 }

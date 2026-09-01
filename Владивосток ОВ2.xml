@@ -1,0 +1,1431 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rules>
+	<comment></comment>
+	<rule index="1" enable="true">
+		<comment>Толщина стенки воздуховодов ОБВ</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Толщина стенки</name>
+				<guid>381b467b-3518-42bb-b183-35169c9bdfb3</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Толщина стенки'&#xD;&#xA;: [Толщина стенок воздуховода]">
+				<fragment type="DuctThickness">
+					<rectangle>
+						<ductSize>
+							<min mm="0">0</min>
+							<max mm="1250">4.1010498687664043</max>
+							<thickness mm="0.8">0.0026246719160104987</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="1250">4.1010498687664043</min>
+							<max mm="MaxValue">1.7976931348623157E+308</max>
+							<thickness mm="0.9">0.002952755905511811</thickness>
+						</ductSize>
+					</rectangle>
+					<round>
+						<ductSize>
+							<min mm="0">0</min>
+							<max mm="900">2.9527559055118111</max>
+							<thickness mm="0.8">0.0026246719160104987</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="900">2.9527559055118111</min>
+							<max mm="1600">5.2493438320209975</max>
+							<thickness mm="1">0.0032808398950131233</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="1600">5.2493438320209975</min>
+							<max mm="MaxValue">1.7976931348623157E+308</max>
+							<thickness mm="1.2">0.003937007874015748</thickness>
+						</ductSize>
+					</round>
+					<convertToMillimeters>false</convertToMillimeters>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Имя системы</name>
+					<bip>-1140324</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>NotContains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">ДП</value>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Имя системы</name>
+					<bip>-1140324</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>NotContains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">ДВ</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="2" enable="true">
+		<comment>Толщина стенки воздуховодов ДВ</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Толщина стенки</name>
+				<guid>381b467b-3518-42bb-b183-35169c9bdfb3</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Толщина стенки'&#xD;&#xA;: [Толщина стенок воздуховода]">
+				<fragment type="DuctThickness">
+					<rectangle>
+						<ductSize>
+							<min mm="0">0</min>
+							<max mm="500">1.6404199475065617</max>
+							<thickness mm="0.8">0.0026246719160104987</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="500">1.6404199475065617</min>
+							<max mm="MaxValue">1.7976931348623157E+308</max>
+							<thickness mm="1">0.0032808398950131233</thickness>
+						</ductSize>
+					</rectangle>
+					<round>
+						<ductSize>
+							<min mm="0">0</min>
+							<max mm="1250">4.1010498687664043</max>
+							<thickness mm="1">0.0032808398950131233</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="1250">4.1010498687664043</min>
+							<max mm="1600">5.2493438320209975</max>
+							<thickness mm="1.2">0.003937007874015748</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="1600">5.2493438320209975</min>
+							<max mm="MaxValue">1.7976931348623157E+308</max>
+							<thickness mm="1.4">0.0045931758530183726</thickness>
+						</ductSize>
+					</round>
+					<convertToMillimeters>false</convertToMillimeters>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Имя системы</name>
+					<bip>-1140324</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>Contains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">ДВ</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="3" enable="true">
+		<comment>Толщина стенки воздуховодов ДП</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Толщина стенки</name>
+				<guid>381b467b-3518-42bb-b183-35169c9bdfb3</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Толщина стенки'&#xD;&#xA;: [Толщина стенок воздуховода]">
+				<fragment type="DuctThickness">
+					<rectangle>
+						<ductSize>
+							<min mm="0">0</min>
+							<max mm="1000">3.2808398950131235</max>
+							<thickness mm="0.8">0.0026246719160104987</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="1000">3.2808398950131235</min>
+							<max mm="MaxValue">1.7976931348623157E+308</max>
+							<thickness mm="0.9">0.002952755905511811</thickness>
+						</ductSize>
+					</rectangle>
+					<round>
+						<ductSize>
+							<min mm="0">0</min>
+							<max mm="800">2.6246719160104988</max>
+							<thickness mm="0.8">0.0026246719160104987</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="800">2.6246719160104988</min>
+							<max mm="1250">4.1010498687664043</max>
+							<thickness mm="1">0.0032808398950131233</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="1250">4.1010498687664043</min>
+							<max mm="MaxValue">1.7976931348623157E+308</max>
+							<thickness mm="1.2">0.003937007874015748</thickness>
+						</ductSize>
+					</round>
+					<convertToMillimeters>false</convertToMillimeters>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Имя системы</name>
+					<bip>-1140324</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>Contains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">ДП</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="4" enable="true">
+		<comment>Наименование отводов прямоугольных</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Комментарии к типоразмеру(T)] [ADSK_Размер_УголПоворота]° [ADSK_Размер_Ширина]х[ADSK_Размер_Высота]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Комментарии к типоразмеру</name>
+						<bip>-1010105</bip>
+					</paramId>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>ADSK_Размер_УголПоворота</name>
+						<guid>a7397d18-200b-4659-b34c-3d8ae1c54317</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:degrees-1.0.1</forgeTypeId>
+					<roundDecimal>0</roundDecimal>
+				</fragment>
+				<fragment type="Const">
+					<const desc="° " namespace="System" typeName="String" assemblyName="mscorlib">_x00B0__x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>ADSK_Размер_Ширина</name>
+						<guid>8f2e4f93-9472-4941-a65d-0ac468fd6a5d</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:millimeters-1.0.1</forgeTypeId>
+				</fragment>
+				<fragment type="Const">
+					<const desc="х" namespace="System" typeName="String" assemblyName="mscorlib">х</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>ADSK_Размер_Высота</name>
+						<guid>da753fe3-ecfa-465b-9a2c-02f55d0c2ff1</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:millimeters-1.0.1</forgeTypeId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByPartType">
+				<partType>Elbow</partType>
+			</filter>
+			<filter filterType="ByFamilies">
+				<familyNames>
+					<famName>прямоугол</famName>
+				</familyNames>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="5" enable="true">
+		<comment>Наименование отводов круглых</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Комментарии к типоразмеру(T)] [ADSK_Размер_УголПоворота]° Ø[ADSK_Размер_Диаметр]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Комментарии к типоразмеру</name>
+						<bip>-1010105</bip>
+					</paramId>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>ADSK_Размер_УголПоворота</name>
+						<guid>a7397d18-200b-4659-b34c-3d8ae1c54317</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:degrees-1.0.1</forgeTypeId>
+					<roundDecimal>0</roundDecimal>
+				</fragment>
+				<fragment type="Const">
+					<const desc="° Ø" namespace="System" typeName="String" assemblyName="mscorlib">_x00B0__x0020_Ø</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>ADSK_Размер_Диаметр</name>
+						<guid>9b679ab7-ea2e-49ce-90ab-0549d5aa36ff</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:millimeters-1.0.1</forgeTypeId>
+					<roundDecimal>0</roundDecimal>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByPartType">
+				<partType>Elbow</partType>
+			</filter>
+			<filter filterType="ByFamilies">
+				<familyNames>
+					<famName>круглый</famName>
+				</familyNames>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="6" enable="true">
+		<comment>Наименование переходов</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Комментарии к типоразмеру(T)] [Размер]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Комментарии к типоразмеру</name>
+						<bip>-1010105</bip>
+					</paramId>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>Размер</name>
+						<bip>-1114240</bip>
+					</paramId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByPartType">
+				<partType>Transition</partType>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="7" enable="true">
+		<comment>Наименование тройников</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Комментарии к типоразмеру(T)] [Размер]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Комментарии к типоразмеру</name>
+						<bip>-1010105</bip>
+					</paramId>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>Размер</name>
+						<bip>-1114240</bip>
+					</paramId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByPartType">
+				<partType>Tee</partType>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="8" enable="true">
+		<comment>Наименование заглушек</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Комментарии к типоразмеру(T)] [Размер]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Комментарии к типоразмеру</name>
+						<bip>-1010105</bip>
+					</paramId>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>Размер</name>
+						<bip>-1114240</bip>
+					</paramId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByPartType">
+				<partType>Cap</partType>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="9" enable="true">
+		<comment>ADSK_Имя системы</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Имя системы</name>
+				<guid>4be4ed4d-c509-4ef3-a55d-23d3a406b83c</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Имя системы'&#xD;&#xA;: [Имя системы]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>Имя системы</name>
+						<bip>-1140324</bip>
+					</paramId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctAccessory</category>
+					<category>OST_DuctCurves</category>
+					<category>OST_DuctTerminal</category>
+					<category>OST_FlexDuctCurves</category>
+					<category>OST_DuctInsulations</category>
+					<category>OST_DuctFitting</category>
+					<category>OST_MechanicalEquipment</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="10" enable="true">
+		<comment>Наименование изоляции</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Описание(T)]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Описание</name>
+						<bip>-1010103</bip>
+					</paramId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctInsulations</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="11" enable="true">
+		<comment>Количество изоляции</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Количество</name>
+				<guid>8d057bb3-6ccd-4655-9165-55526691fe3a</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Количество'&#xD;&#xA;: [калькулятор (действий: 1)]">
+				<fragment type="Calculator">
+					<arg1>
+						<fragment type="ParameterValue">
+							<paramGettingMode>Self</paramGettingMode>
+							<paramId>
+								<name>Площадь</name>
+								<bip>-1114120</bip>
+							</paramId>
+							<forgeTypeId>autodesk.unit.unit:squareMeters-1.0.1</forgeTypeId>
+						</fragment>
+					</arg1>
+					<roundDecimal>1</roundDecimal>
+					<operations>
+						<operation type="Multiply">
+							<argument>
+								<scalar namespace="System" typeName="Double" assemblyName="mscorlib">1.4</scalar>
+							</argument>
+						</operation>
+					</operations>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctInsulations</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="12" enable="true">
+		<comment>Наименование воздуховодов</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Комментарии к типоразмеру(T)] , б=[ADSK_Толщина стенки] мм, [Размер]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Комментарии к типоразмеру</name>
+						<bip>-1010105</bip>
+					</paramId>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" , б=" namespace="System" typeName="String" assemblyName="mscorlib">_x0020__x002C__x0020_б_x003D_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>ADSK_Толщина стенки</name>
+						<guid>381b467b-3518-42bb-b183-35169c9bdfb3</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:millimeters-1.0.1</forgeTypeId>
+					<roundDecimal>1</roundDecimal>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" мм, " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_мм_x002C__x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>Размер</name>
+						<bip>-1114240</bip>
+					</paramId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="13" enable="true">
+		<comment>Длина воздуховодов</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Количество</name>
+				<guid>8d057bb3-6ccd-4655-9165-55526691fe3a</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Количество'&#xD;&#xA;: [калькулятор (действий: 1)]">
+				<fragment type="Calculator">
+					<arg1>
+						<fragment type="ParameterValue">
+							<paramGettingMode>Self</paramGettingMode>
+							<paramId>
+								<name>Длина</name>
+								<bip>-1004005</bip>
+							</paramId>
+						</fragment>
+					</arg1>
+					<forgeTypeId>autodesk.unit.unit:meters-1.0.0</forgeTypeId>
+					<roundDecimal>2</roundDecimal>
+					<operations>
+						<operation type="Multiply">
+							<argument>
+								<scalar namespace="System" typeName="Double" assemblyName="mscorlib">1.15</scalar>
+							</argument>
+						</operation>
+					</operations>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+					<category>OST_FlexDuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="14" enable="true">
+		<comment>Норма расхода стали круглых</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Норма расхода стали</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Норма расхода стали'&#xD;&#xA;: [Толщина стенок воздуховода]">
+				<fragment type="DuctThickness">
+					<rectangle />
+					<round>
+						<ductSize>
+							<min mm="0">0</min>
+							<max mm="200">0.65616797900262469</max>
+							<thickness mm="0.6">0.001968503937007874</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="200">0.65616797900262469</min>
+							<max mm="250">0.82020997375328086</max>
+							<thickness mm="0.7">0.0022965879265091863</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="250">0.82020997375328086</min>
+							<max mm="560">1.837270341207349</max>
+							<thickness mm="1.2">0.003937007874015748</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="560">1.837270341207349</min>
+							<max mm="800">2.6246719160104988</max>
+							<thickness mm="2.6">0.00853018372703412</thickness>
+						</ductSize>
+						<ductSize>
+							<min mm="800">2.6246719160104988</min>
+							<max mm="MaxValue">1.7976931348623157E+308</max>
+							<thickness mm="3">0.00984251968503937</thickness>
+						</ductSize>
+					</round>
+					<convertToMillimeters>true</convertToMillimeters>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Размер</name>
+					<bip>-1114240</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>Contains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">Ø</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="15" enable="true">
+		<comment>Периметр воздуховода</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Периметр воздуховода</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Периметр воздуховода'&#xD;&#xA;: [калькулятор (действий: 3)]">
+				<fragment type="Calculator">
+					<arg1>
+						<fragment type="ParameterValue">
+							<paramGettingMode>Self</paramGettingMode>
+							<paramId>
+								<name>Ширина</name>
+								<bip>-1114101</bip>
+							</paramId>
+						</fragment>
+					</arg1>
+					<forgeTypeId>autodesk.unit.unit:millimeters-1.0.1</forgeTypeId>
+					<roundDecimal>0</roundDecimal>
+					<operations>
+						<operation type="Add">
+							<argument>
+								<fragment type="ParameterValue">
+									<paramGettingMode>Self</paramGettingMode>
+									<paramId>
+										<name>Ширина</name>
+										<bip>-1114101</bip>
+									</paramId>
+								</fragment>
+							</argument>
+						</operation>
+						<operation type="Add">
+							<argument>
+								<fragment type="ParameterValue">
+									<paramGettingMode>Self</paramGettingMode>
+									<paramId>
+										<name>Высота</name>
+										<bip>-1114102</bip>
+									</paramId>
+								</fragment>
+							</argument>
+						</operation>
+						<operation type="Add">
+							<argument>
+								<fragment type="ParameterValue">
+									<paramGettingMode>Self</paramGettingMode>
+									<paramId>
+										<name>Высота</name>
+										<bip>-1114102</bip>
+									</paramId>
+								</fragment>
+							</argument>
+						</operation>
+					</operations>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Размер</name>
+					<bip>-1114240</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>NotContains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">Ø</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="16" enable="true">
+		<comment>Норма расхода стали Периметр до 600</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Норма расхода стали</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Норма расхода стали'&#xD;&#xA;: 0,606">
+				<fragment type="Const">
+					<const namespace="System" typeName="Double" assemblyName="mscorlib">0,606</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Размер</name>
+					<bip>-1114240</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>NotContains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">Ø</value>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Периметр воздуховода</name>
+				</paramId>
+				<storageType>Double</storageType>
+				<matchType>LessOrEqual</matchType>
+				<value namespace="System" typeName="Double" assemblyName="mscorlib">600</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="17" enable="true">
+		<comment>Норма расхода стали Периметр от 600 до 900</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Норма расхода стали</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Норма расхода стали'&#xD;&#xA;: 0,702">
+				<fragment type="Const">
+					<const namespace="System" typeName="Double" assemblyName="mscorlib">0,702</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Размер</name>
+					<bip>-1114240</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>NotContains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">Ø</value>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Периметр воздуховода</name>
+				</paramId>
+				<storageType>Double</storageType>
+				<matchType>Greater</matchType>
+				<value namespace="System" typeName="Double" assemblyName="mscorlib">600</value>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Периметр воздуховода</name>
+				</paramId>
+				<storageType>Double</storageType>
+				<matchType>LessOrEqual</matchType>
+				<value namespace="System" typeName="Double" assemblyName="mscorlib">900</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="18" enable="true">
+		<comment>Норма расхода стали Периметр от 900 до 1600</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Норма расхода стали</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Норма расхода стали'&#xD;&#xA;: 1,22">
+				<fragment type="Const">
+					<const namespace="System" typeName="Double" assemblyName="mscorlib">1,22</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Размер</name>
+					<bip>-1114240</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>NotContains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">Ø</value>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Периметр воздуховода</name>
+				</paramId>
+				<storageType>Double</storageType>
+				<matchType>Greater</matchType>
+				<value namespace="System" typeName="Double" assemblyName="mscorlib">900</value>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Периметр воздуховода</name>
+				</paramId>
+				<storageType>Double</storageType>
+				<matchType>LessOrEqual</matchType>
+				<value namespace="System" typeName="Double" assemblyName="mscorlib">1600</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="19" enable="true">
+		<comment>Норма расхода стали Периметр от 1600 до 3600</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Норма расхода стали</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Норма расхода стали'&#xD;&#xA;: 2,25">
+				<fragment type="Const">
+					<const namespace="System" typeName="Double" assemblyName="mscorlib">2,25</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Размер</name>
+					<bip>-1114240</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>NotContains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">Ø</value>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Периметр воздуховода</name>
+				</paramId>
+				<storageType>Double</storageType>
+				<matchType>Greater</matchType>
+				<value namespace="System" typeName="Double" assemblyName="mscorlib">1600</value>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Периметр воздуховода</name>
+				</paramId>
+				<storageType>Double</storageType>
+				<matchType>LessOrEqual</matchType>
+				<value namespace="System" typeName="Double" assemblyName="mscorlib">3600</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="20" enable="true">
+		<comment>Норма расхода стали Периметр от 3600</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Норма расхода стали</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Норма расхода стали'&#xD;&#xA;: 2,2">
+				<fragment type="Const">
+					<const namespace="System" typeName="Double" assemblyName="mscorlib">2,2</const>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Размер</name>
+					<bip>-1114240</bip>
+				</paramId>
+				<storageType>String</storageType>
+				<matchType>NotContains</matchType>
+				<value namespace="System" typeName="String" assemblyName="mscorlib">Ø</value>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+			<filter filterType="ByParameterValue">
+				<paramId>
+					<name>Периметр воздуховода</name>
+				</paramId>
+				<storageType>Double</storageType>
+				<matchType>Greater</matchType>
+				<value namespace="System" typeName="Double" assemblyName="mscorlib">3600</value>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="21" enable="true">
+		<comment>Масса стали для крепления</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Масса стали для крепления</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Масса стали для крепления'&#xD;&#xA;: [калькулятор (действий: 1)]">
+				<fragment type="Calculator">
+					<arg1>
+						<fragment type="ParameterValue">
+							<paramGettingMode>Self</paramGettingMode>
+							<paramId>
+								<name>Норма расхода стали</name>
+							</paramId>
+						</fragment>
+					</arg1>
+					<roundDecimal>3</roundDecimal>
+					<operations>
+						<operation type="Multiply">
+							<argument>
+								<fragment type="ParameterValue">
+									<paramGettingMode>Self</paramGettingMode>
+									<paramId>
+										<name>Площадь</name>
+										<bip>-1114120</bip>
+									</paramId>
+									<forgeTypeId>autodesk.unit.unit:squareMeters-1.0.1</forgeTypeId>
+								</fragment>
+							</argument>
+						</operation>
+					</operations>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="22" enable="true">
+		<comment>Расход клея</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Расход клея</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Расход клея'&#xD;&#xA;: [калькулятор (действий: 1)]">
+				<fragment type="Calculator">
+					<arg1>
+						<fragment type="ParameterValue">
+							<paramGettingMode>Self</paramGettingMode>
+							<paramId>
+								<name>Площадь</name>
+								<bip>-1114120</bip>
+							</paramId>
+							<forgeTypeId>autodesk.unit.unit:squareMeters-1.0.1</forgeTypeId>
+						</fragment>
+					</arg1>
+					<operations>
+						<operation type="Multiply">
+							<argument>
+								<fragment type="ParameterValue">
+									<paramGettingMode>Type</paramGettingMode>
+									<paramId>
+										<name>Норма расхода клея</name>
+									</paramId>
+								</fragment>
+							</argument>
+						</operation>
+					</operations>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctInsulations</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="23" enable="true">
+		<comment>Количество окожушки</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>Количество окожушки</name>
+			</paramId>
+			<fragments desc="Запись в параметр 'Количество окожушки'&#xD;&#xA;: [калькулятор (действий: 1)]">
+				<fragment type="Calculator">
+					<arg1>
+						<fragment type="ParameterValue">
+							<paramGettingMode>Self</paramGettingMode>
+							<paramId>
+								<name>Площадь</name>
+								<bip>-1114120</bip>
+							</paramId>
+							<forgeTypeId>autodesk.unit.unit:squareMeters-1.0.1</forgeTypeId>
+						</fragment>
+					</arg1>
+					<roundDecimal>2</roundDecimal>
+					<operations>
+						<operation type="Multiply">
+							<argument>
+								<fragment type="ParameterValue">
+									<paramGettingMode>Type</paramGettingMode>
+									<paramId>
+										<name>Расход окожушки</name>
+									</paramId>
+								</fragment>
+							</argument>
+						</operation>
+					</operations>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctInsulations</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="24" enable="true">
+		<comment>Название гибких воздуховодов</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Комментарии к типоразмеру(T)] [Общий размер]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Комментарии к типоразмеру</name>
+						<bip>-1010105</bip>
+					</paramId>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>Общий размер</name>
+						<bip>-1150434</bip>
+					</paramId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_FlexDuctCurves</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="25" enable="true">
+		<comment>Номер секции изоляции</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Номер секции</name>
+				<guid>b59a3474-a5f4-430a-b087-a20f1a4eb57e</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Номер секции'&#xD;&#xA;: [ADSK_Номер секции(H)]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Host</paramGettingMode>
+					<paramId>
+						<name>ADSK_Номер секции</name>
+						<guid>b59a3474-a5f4-430a-b087-a20f1a4eb57e</guid>
+					</paramId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctInsulations</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="26" enable="true">
+		<comment>Площадь изоляции на фитингах</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Количество</name>
+				<guid>8d057bb3-6ccd-4655-9165-55526691fe3a</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Количество'&#xD;&#xA;: [ADSK_Площадь(H)]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Host</paramGettingMode>
+					<paramId>
+						<name>ADSK_Площадь</name>
+						<guid>ad6d75f1-b48a-458e-8610-af5f33d58fce</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:squareMeters-1.0.1</forgeTypeId>
+					<roundDecimal>2</roundDecimal>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctInsulations</category>
+				</categories>
+			</filter>
+			<filter filterType="ByHostCategories">
+				<categories>
+					<category>OST_DuctFitting</category>
+				</categories>
+			</filter>
+			<filter filterType="ElementIsElementType" inverted="true" />
+		</filters>
+	</rule>
+	<rule index="27" enable="true">
+		<comment>Масса стали итого</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Количество</name>
+				<guid>8d057bb3-6ccd-4655-9165-55526691fe3a</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Количество'&#xD;&#xA;: [Сумма параметра 'Масса стали для крепления']">
+				<fragment type="SumMEPsystemParam">
+					<sysParam>
+						<paramId>
+							<name>ADSK_Имя системы</name>
+							<guid>4be4ed4d-c509-4ef3-a55d-23d3a406b83c</guid>
+						</paramId>
+					</sysParam>
+					<totalParam>
+						<paramId>
+							<name>Масса стали для крепления</name>
+						</paramId>
+					</totalParam>
+					<roundDecimal>2</roundDecimal>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctAccessory</category>
+				</categories>
+			</filter>
+			<filter filterType="ByFamilies">
+				<familyNames>
+					<famName>Крепление</famName>
+				</familyNames>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="28" enable="true">
+		<comment>Раход клея итого</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Количество</name>
+				<guid>8d057bb3-6ccd-4655-9165-55526691fe3a</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Количество'&#xD;&#xA;: [Сумма параметра 'Расход клея']">
+				<fragment type="SumMEPsystemParam">
+					<sysParam>
+						<paramId>
+							<name>ADSK_Имя системы</name>
+							<guid>4be4ed4d-c509-4ef3-a55d-23d3a406b83c</guid>
+						</paramId>
+					</sysParam>
+					<totalParam>
+						<paramId>
+							<name>Расход клея</name>
+						</paramId>
+					</totalParam>
+					<roundDecimal>0</roundDecimal>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctAccessory</category>
+				</categories>
+			</filter>
+			<filter filterType="ByFamilies">
+				<familyNames>
+					<famName>Клей</famName>
+				</familyNames>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="29" enable="true">
+		<comment>Окожушка итого</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Количество</name>
+				<guid>8d057bb3-6ccd-4655-9165-55526691fe3a</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Количество'&#xD;&#xA;: [Сумма параметра 'Количество окожушки']">
+				<fragment type="SumMEPsystemParam">
+					<sysParam>
+						<paramId>
+							<name>ADSK_Имя системы</name>
+							<guid>4be4ed4d-c509-4ef3-a55d-23d3a406b83c</guid>
+						</paramId>
+					</sysParam>
+					<totalParam>
+						<paramId>
+							<name>Количество окожушки</name>
+						</paramId>
+					</totalParam>
+					<roundDecimal>0</roundDecimal>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctAccessory</category>
+				</categories>
+			</filter>
+			<filter filterType="ByFamilies">
+				<familyNames>
+					<famName>Окожушка</famName>
+				</familyNames>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="30" enable="true">
+		<comment>Длина скотча</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Количество</name>
+				<guid>8d057bb3-6ccd-4655-9165-55526691fe3a</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Количество'&#xD;&#xA;: [Сумма параметра 'Длина']">
+				<fragment type="SumMEPsystemParam">
+					<sysParam>
+						<paramId>
+							<name>ADSK_Номер секции</name>
+							<guid>b59a3474-a5f4-430a-b087-a20f1a4eb57e</guid>
+						</paramId>
+					</sysParam>
+					<totalParam>
+						<paramId>
+							<name>Длина</name>
+							<bip>-1004005</bip>
+						</paramId>
+					</totalParam>
+					<roundDecimal>0</roundDecimal>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctAccessory</category>
+				</categories>
+			</filter>
+			<filter filterType="ByFamilies">
+				<familyNames>
+					<famName>Скотч</famName>
+				</familyNames>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="31" enable="true">
+		<comment>РКДВ</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Марка</name>
+				<guid>2204049c-d557-4dfc-8d70-13f19715e46d</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Марка'&#xD;&#xA;:  Решетка РКДВ [ADSK_Размер_Ширина]х[ADSK_Размер_Высота]">
+				<fragment type="Const">
+					<const desc=" Решетка РКДВ " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_Решетка_x0020_РКДВ_x0020_</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>ADSK_Размер_Ширина</name>
+						<guid>8f2e4f93-9472-4941-a65d-0ac468fd6a5d</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:millimeters-1.0.1</forgeTypeId>
+				</fragment>
+				<fragment type="Const">
+					<const desc="х" namespace="System" typeName="String" assemblyName="mscorlib">х</const>
+				</fragment>
+				<fragment type="ParameterValue">
+					<paramGettingMode>Self</paramGettingMode>
+					<paramId>
+						<name>ADSK_Размер_Высота</name>
+						<guid>da753fe3-ecfa-465b-9a2c-02f55d0c2ff1</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:millimeters-1.0.1</forgeTypeId>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctTerminal</category>
+				</categories>
+			</filter>
+			<filter filterType="ByFamilies">
+				<familyNames>
+					<famName>РКДВ</famName>
+				</familyNames>
+			</filter>
+		</filters>
+	</rule>
+	<rule index="32" enable="true">
+		<comment>врезки</comment>
+		<action actionType="SetParamValue">
+			<errorReport></errorReport>
+			<paramId>
+				<name>ADSK_Наименование</name>
+				<guid>e6e0f5cd-3e26-485b-9342-23882b20eb43</guid>
+			</paramId>
+			<fragments desc="Запись в параметр 'ADSK_Наименование'&#xD;&#xA;: [Комментарии к типоразмеру(T)] [Размер врезки воздуховода]">
+				<fragment type="ParameterValue">
+					<paramGettingMode>Type</paramGettingMode>
+					<paramId>
+						<name>Комментарии к типоразмеру</name>
+						<bip>-1010105</bip>
+					</paramId>
+				</fragment>
+				<fragment type="Const">
+					<const desc=" " namespace="System" typeName="String" assemblyName="mscorlib">_x0020_</const>
+				</fragment>
+				<fragment type="DuctTapSize">
+					<paramId>
+						<name>ADSK_Толщина стенки</name>
+						<guid>381b467b-3518-42bb-b183-35169c9bdfb3</guid>
+					</paramId>
+					<forgeTypeId>autodesk.unit.unit:millimeters-1.0.1</forgeTypeId>
+					<roundDecimal>1</roundDecimal>
+				</fragment>
+			</fragments>
+		</action>
+		<filters>
+			<filter filterType="ByCategories">
+				<categories>
+					<category>OST_DuctFitting</category>
+				</categories>
+			</filter>
+			<filter filterType="ByPartType">
+				<partType>TapAdjustable</partType>
+			</filter>
+		</filters>
+	</rule>
+</rules>

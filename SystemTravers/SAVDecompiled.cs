@@ -12239,6 +12239,60 @@ namespace SAV
 						result = obj;
 					}
 				}
+				else if (t == typeof(double))
+				{
+					string val = (xe.Value ?? "").Trim();
+					if (val.Try2Double(out double dVal))
+					{
+						return dVal;
+					}
+					return "ConvertError";
+				}
+				else if (t == typeof(float))
+				{
+					string val = (xe.Value ?? "").Trim();
+					if (val.Try2Double(out double dVal))
+					{
+						return (float)dVal;
+					}
+					return "ConvertError";
+				}
+				else if (t == typeof(decimal))
+				{
+					string val = (xe.Value ?? "").Trim().Replace(',', '.');
+					if (decimal.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal decVal))
+					{
+						return decVal;
+					}
+					return "ConvertError";
+				}
+				else if (t == typeof(int))
+				{
+					string val = (xe.Value ?? "").Trim();
+					if (int.TryParse(val, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intVal))
+					{
+						return intVal;
+					}
+					return "ConvertError";
+				}
+				else if (t == typeof(long))
+				{
+					string val = (xe.Value ?? "").Trim();
+					if (long.TryParse(val, NumberStyles.Integer, CultureInfo.InvariantCulture, out long longVal))
+					{
+						return longVal;
+					}
+					return "ConvertError";
+				}
+				else if (t == typeof(bool))
+				{
+					string val = (xe.Value ?? "").Trim();
+					if (bool.TryParse(val, out bool bVal))
+					{
+						return bVal;
+					}
+					return "ConvertError";
+				}
 				else
 				{
 					TypeConverter converter = TypeDescriptor.GetConverter(t);
@@ -12269,6 +12323,60 @@ namespace SAV
 			if (flag)
 			{
 				result = "ConvertError";
+			}
+			else if (t == typeof(double))
+			{
+				string val = (xa.Value ?? "").Trim();
+				if (val.Try2Double(out double dVal))
+				{
+					return dVal;
+				}
+				return "ConvertError";
+			}
+			else if (t == typeof(float))
+			{
+				string val = (xa.Value ?? "").Trim();
+				if (val.Try2Double(out double dVal))
+				{
+					return (float)dVal;
+				}
+				return "ConvertError";
+			}
+			else if (t == typeof(decimal))
+			{
+				string val = (xa.Value ?? "").Trim().Replace(',', '.');
+				if (decimal.TryParse(val, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal decVal))
+				{
+					return decVal;
+				}
+				return "ConvertError";
+			}
+			else if (t == typeof(int))
+			{
+				string val = (xa.Value ?? "").Trim();
+				if (int.TryParse(val, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intVal))
+				{
+					return intVal;
+				}
+				return "ConvertError";
+			}
+			else if (t == typeof(long))
+			{
+				string val = (xa.Value ?? "").Trim();
+				if (long.TryParse(val, NumberStyles.Integer, CultureInfo.InvariantCulture, out long longVal))
+				{
+					return longVal;
+				}
+				return "ConvertError";
+			}
+			else if (t == typeof(bool))
+			{
+				string val = (xa.Value ?? "").Trim();
+				if (bool.TryParse(val, out bool bVal))
+				{
+					return bVal;
+				}
+				return "ConvertError";
 			}
 			else
 			{
@@ -26951,7 +27059,7 @@ namespace SAV.ParamRules
 						if (flag4)
 						{
 							this.rdoDouble.Checked = true;
-							this.txtDouble.Text = this.Literal.ToString();
+							this.txtDouble.Text = (this.Literal is double d ? d.ToString("0.################", CultureInfo.CurrentCulture) : this.Literal.ToString());
 						}
 						else
 						{
@@ -27045,7 +27153,7 @@ namespace SAV.ParamRules
 			this._errP.SetError(this.txtDouble, string.Empty);
 			string value = "Здесь должно быть вещественное число.";
 			double num = 0.0;
-			bool flag = !double.TryParse(this.txtDouble.Text, out num);
+			bool flag = !this.txtDouble.Text.Try2Double(out num);
 			if (flag)
 			{
 				this._errP.SetError(this.txtDouble, value);
@@ -37409,9 +37517,10 @@ namespace SAV.ParamRules.Fragments
 			bool flag = !string.IsNullOrEmpty(base.ErrReport);
 			if (!flag)
 			{
-				base.DescriptionShort = this.Literal.ToString();
-				base.DescriptionDebug = string.Format("const: {0}", this.Literal);
-				base.DescriptionLong = this.Literal.ToString();
+				string disp = this.Literal != null ? (this.Literal is double d ? d.ToString("0.################", CultureInfo.CurrentCulture) : this.Literal.ToString()) : "";
+				base.DescriptionShort = disp;
+				base.DescriptionDebug = string.Format("const: {0}", disp);
+				base.DescriptionLong = disp;
 			}
 		}
 		public object GetValue(ModelData md, Element e)
@@ -37429,9 +37538,29 @@ namespace SAV.ParamRules.Fragments
 				xElement2.Value = XmlConvert.EncodeName(text);
 				xElement2.Add(new XAttribute("desc", this.Literal));
 			}
-			else
+			else if (this.Literal is double d)
+			{
+				xElement2.Value = d.ToString(CultureInfo.InvariantCulture);
+			}
+			else if (this.Literal is float f)
+			{
+				xElement2.Value = f.ToString(CultureInfo.InvariantCulture);
+			}
+			else if (this.Literal is decimal m)
+			{
+				xElement2.Value = m.ToString(CultureInfo.InvariantCulture);
+			}
+			else if (this.Literal is IFormattable formattable)
+			{
+				xElement2.Value = formattable.ToString(null, CultureInfo.InvariantCulture);
+			}
+			else if (this.Literal != null)
 			{
 				xElement2.Value = this.Literal.ToString();
+			}
+			else
+			{
+				xElement2.Value = "null";
 			}
 			bool flag2 = this.Literal != null;
 			if (flag2)
