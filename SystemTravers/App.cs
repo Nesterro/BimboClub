@@ -140,6 +140,11 @@ namespace BimboClub
 				ToolTip = "Переименовывает выбранное на виде семейство или позволяет выбрать любое загружаемое семейство из списка в проекте."
 			};
 
+			PushButtonData pushButtonDataDeleteFamilyParams = new PushButtonData("cmdDeleteFamilyParams", "Параметры в семействах", text4, "BimboClub.DeleteFamilyParamsCommand")
+			{
+				ToolTip = "Пакетное удаление выбранных параметров (семейных и общих) из загружаемых семейств проекта по категориям или списку."
+			};
+
 			PushButtonData pushButtonDataPlacement = new PushButtonData("cmdNetworkPlacement", "Расстановка по сети", text4, "BimboClub.PlacementCommand")
 			{
 				ToolTip = "Автоматически расставляет крепления, подвесы или датчики вдоль осей воздуховодов, трубопроводов и лотков с заданным шагом и смещением."
@@ -287,8 +292,16 @@ namespace BimboClub
 
 			BitmapSource bitmapSourceRename = LoadImage(System.IO.Path.Combine(text, "icon_rename.png"));
 			BitmapSource bitmapSourceRename16 = LoadImage(System.IO.Path.Combine(text, "icon_rename_16.png"));
-			if (bitmapSourceRename != null) pushButtonDataRename.LargeImage = bitmapSourceRename;
-			if (bitmapSourceRename16 != null) pushButtonDataRename.Image = bitmapSourceRename16;
+			if (bitmapSourceRename != null)
+			{
+				pushButtonDataRename.LargeImage = bitmapSourceRename;
+				pushButtonDataDeleteFamilyParams.LargeImage = bitmapSourceRename;
+			}
+			if (bitmapSourceRename16 != null)
+			{
+				pushButtonDataRename.Image = bitmapSourceRename16;
+				pushButtonDataDeleteFamilyParams.Image = bitmapSourceRename16;
+			}
 
 			BitmapSource bitmapSourceNetwork = LoadImage(System.IO.Path.Combine(text, "icon_network.png"));
 			BitmapSource bitmapSourceNetwork16 = LoadImage(System.IO.Path.Combine(text, "icon_network_16.png"));
@@ -451,6 +464,7 @@ namespace BimboClub
 					pd.AddPushButton(pushButtonDataHeatLossBcc);
 					pd.AddPushButton(pushButtonDataParamRulesBcc);
 					pd.AddPushButton(pushButtonDataBatchParamsBcc);
+					pd.AddPushButton(pushButtonDataDeleteFamilyParams);
 					pd.AddPushButton(pushButtonDataRename);
 					pd.AddPushButton(pushButtonDataParamCopy);
 				}

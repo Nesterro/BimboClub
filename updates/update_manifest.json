@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.2.7",
-    "releaseDate":  "2026-09-01",
+    "latestVersion":  "2.2.8",
+    "releaseDate":  "2026-09-02",
     "changelog":  [
-                      "Fixed culture formatting bug in ParamRules for floating point constants (e.g. 0.606 getting parsed as 606 due to comma separator)",
-                      "Added universal dot/comma parsing for double/float/decimal/int in XML deserialization",
-                      "Ensured invariant culture XML serialization for FragmentConst"
+                      "Added new module: Batch Family Parameter Remover (Удаление параметров из семейств)",
+                      "Support for filtering families by category and search keyword",
+                      "Batch scanning of family parameters and safe deletion via FamilyManager with auto-reload"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.7/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.7/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.8/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.8/bimboclub_net8.zip"
                  }
 }
