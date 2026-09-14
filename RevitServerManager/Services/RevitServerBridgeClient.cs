@@ -67,24 +67,27 @@ namespace RevitServerManager.Services
                 foreach (var k in RequiredFiles)
                 {
                     string targetFile = Path.Combine(appDataDir, k);
-                    if (!File.Exists(targetFile) || new FileInfo(targetFile).Length == 0)
+                    foreach (var res in resNames)
                     {
-                        foreach (var res in resNames)
+                        if (res.EndsWith(k, StringComparison.OrdinalIgnoreCase))
                         {
-                            if (res.EndsWith(k, StringComparison.OrdinalIgnoreCase))
+                            try
                             {
-                                try
+                                using var stream = assembly.GetManifestResourceStream(res);
+                                if (stream != null)
                                 {
-                                    using var stream = assembly.GetManifestResourceStream(res);
-                                    if (stream != null)
+                                    bool needsUpdate = !File.Exists(targetFile) ||
+                                                       new FileInfo(targetFile).Length != stream.Length;
+
+                                    if (needsUpdate)
                                     {
                                         using var fs = new FileStream(targetFile, FileMode.Create, FileAccess.Write);
                                         stream.CopyTo(fs);
                                     }
                                 }
-                                catch { }
-                                break;
                             }
+                            catch { }
+                            break;
                         }
                     }
                 }

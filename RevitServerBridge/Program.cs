@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel;
 using System.Web.Script.Serialization;
 using Autodesk.RevitServer.Enterprise.Common.ClientServer.DataContract.SessionToken;
@@ -11,8 +12,6 @@ namespace RevitServerBridge
     class Program
     {
         static readonly string[] YearOrder = { "2022", "2021", "2023", "2020", "2024", "2019", "2018", "2025" };
-        // Root path candidates - try all of these for root listing
-        static readonly string[] RootPaths = { "", "|", "/", "\\", "root", " " };
 
         static int Main(string[] args)
         {
@@ -23,74 +22,65 @@ namespace RevitServerBridge
             }
 
             string serverHost = args[0].Trim().Replace("http://", "").Replace("https://", "").Trim('/');
-            // Normalize: treat "2022", "2021" etc passed as path as version numbers (user mistake)
-            string rawPath = args.Length > 1 ? args[1] : "";
-            string preferredYear = args.Length > 2 ? args[2].Trim() : "2022";
+            string inputPath = "";
+            string preferredYear = "2022";
 
-            // If rawPath looks like a year, it was probably passed as version by mistake
-            bool rawPathIsYear = rawPath.Length == 4 && rawPath.StartsWith("20") && int.TryParse(rawPath, out _);
-            if (rawPathIsYear && args.Length == 2)
+            if (args.Length == 2)
             {
-                preferredYear = rawPath;
-                rawPath = "";
+                string a1 = args[1].Trim();
+                if (a1.Length == 4 && a1.StartsWith("20") && int.TryParse(a1, out _))
+                {
+                    preferredYear = a1;
+                    inputPath = "";
+                }
+                else
+                {
+                    inputPath = a1;
+                }
             }
-
-            string folderPath = rawPath;
-            bool isRootRequest = string.IsNullOrEmpty(folderPath) || folderPath == "|" || folderPath == "/" || folderPath == "\\";
+            else if (args.Length >= 3)
+            {
+                inputPath = args[1].Trim();
+                preferredYear = args[2].Trim();
+            }
 
             var years = new List<string> { preferredYear };
             foreach (var y in YearOrder)
                 if (!years.Contains(y)) years.Add(y);
 
+            var pathsToTry = GetWcfPathsToTry(inputPath);
+
             Exception lastEx = null;
-            var diagnostics = new List<string>();
+            Dictionary<string, object> emptySuccessResult = null;
 
             foreach (var year in years)
             {
-                var pathsToTry = isRootRequest ? RootPaths : new[] { folderPath };
-
                 foreach (var pathCandidate in pathsToTry)
                 {
                     try
                     {
-                        var result = TryConnect(serverHost, pathCandidate, year, diagnostics);
+                        var result = TryConnect(serverHost, pathCandidate, year);
                         if (result != null)
                         {
                             var folders = (List<string>)result["Folders"];
                             var models = (List<Dictionary<string, object>>)result["Models"];
 
-                            bool hasContent = folders.Count > 0 || models.Count > 0;
-
-                            // Accept result if: has content, not root request, or last candidate
-                            if (!isRootRequest || hasContent || pathCandidate == RootPaths[RootPaths.Length - 1])
+                            if (folders.Count > 0 || models.Count > 0)
                             {
-                                var output = new Dictionary<string, object>
-                                {
-                                    { "Success", true },
-                                    { "Host", serverHost },
-                                    { "Path", pathCandidate },
-                                    { "Year", year },
-                                    { "Endpoint", result["Endpoint"] },
-                                    { "Auth", result["Auth"] },
-                                    { "IsHostNode", result["IsHostNode"] },
-                                    { "MaxPathLen", result["MaxPathLen"] },
-                                    { "RawSubFoldersNull", result["RawSubFoldersNull"] },
-                                    { "RawModelsNull", result["RawModelsNull"] },
-                                    { "Folders", folders },
-                                    { "Models", models },
-                                    { "Diagnostics", diagnostics }
-                                };
-                                Console.WriteLine(new JavaScriptSerializer().Serialize(output));
+                                Console.WriteLine(new JavaScriptSerializer().Serialize(result));
                                 return 0;
                             }
-                            // Empty root result, try next path
-                            diagnostics.Add($"Path '{pathCandidate}' returned empty (year={year})");
+
+                            // Keep the first working connection as fallback even if empty
+                            if (emptySuccessResult == null)
+                            {
+                                emptySuccessResult = result;
+                            }
                         }
                     }
                     catch (EndpointNotFoundException)
                     {
-                        diagnostics.Add($"EndpointNotFound for year={year}");
-                        break;
+                        break; // This year endpoint doesn't exist, try next year
                     }
                     catch (CommunicationException ex) when (
                         ex.Message.Contains("404") ||
@@ -98,8 +88,7 @@ namespace RevitServerBridge
                         ex.Message.Contains("ReadingUpgradeRecord"))
                     {
                         lastEx = ex;
-                        diagnostics.Add($"CommEx for year={year}: {ex.Message.Substring(0, Math.Min(80, ex.Message.Length))}");
-                        break;
+                        break; // Try next year
                     }
                     catch (Exception ex)
                     {
@@ -111,15 +100,49 @@ namespace RevitServerBridge
             }
 
             done:
-            string errMsg = lastEx?.InnerException?.Message ?? lastEx?.Message ?? "Failed to connect";
+            if (emptySuccessResult != null)
+            {
+                Console.WriteLine(new JavaScriptSerializer().Serialize(emptySuccessResult));
+                return 0;
+            }
+
+            string errMsg = lastEx?.InnerException?.Message ?? lastEx?.Message ?? "Failed to connect to Revit Server";
             Console.WriteLine(new JavaScriptSerializer().Serialize(new Dictionary<string, object>
             {
                 { "Success", false },
                 { "Error", errMsg },
-                { "Diagnostics", diagnostics },
                 { "Details", lastEx?.ToString() ?? "" }
             }));
             return 3;
+        }
+
+        static List<string> GetWcfPathsToTry(string inputPath)
+        {
+            var list = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(inputPath) || inputPath == "|" || inputPath == "/" || inputPath == "\\")
+            {
+                list.Add("");
+                list.Add("\\");
+                list.Add("/");
+                list.Add("|");
+                return list;
+            }
+
+            var parts = inputPath.Split(new[] { '|', '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0)
+            {
+                list.Add("");
+                return list;
+            }
+
+            list.Add(string.Join("\\", parts) + "\\");
+            list.Add(string.Join("\\", parts));
+            list.Add(string.Join("/", parts) + "/");
+            list.Add(string.Join("/", parts));
+            if (!list.Contains(inputPath)) list.Add(inputPath);
+
+            return list;
         }
 
         static bool IsDnsOrSocketError(Exception ex)
@@ -130,7 +153,7 @@ namespace RevitServerBridge
                    ex.InnerException is System.Net.Sockets.SocketException;
         }
 
-        static Dictionary<string, object> TryConnect(string serverHost, string folderPath, string year, List<string> diagnostics)
+        static Dictionary<string, object> TryConnect(string serverHost, string folderPath, string year)
         {
             string[] bindingSuffixes = { "tcpbuffer", "tcpstreamed", "" };
             bool[] authModes = { true, false };
@@ -155,20 +178,14 @@ namespace RevitServerBridge
                             channel = factory.CreateChannel();
                             ((IClientChannel)channel).Open(TimeSpan.FromSeconds(12));
 
+                            string machine = Environment.MachineName;
+                            string userName = "RevitServerTool:" + machine + ":1";
                             var token = new ServiceSessionToken(
-                                Environment.UserName,
-                                Environment.UserName,
-                                Environment.MachineName,
+                                userName,
+                                userName,
+                                machine,
                                 Guid.NewGuid().ToString()
                             );
-
-                            // Diagnostic: verify basic WCF calls work
-                            bool isHostNode = false;
-                            int maxPathLen = -1;
-                            try { isHostNode = channel.IsHostNode(); } catch { }
-                            try { maxPathLen = channel.GetMaxModelPathLength(token); } catch { }
-
-                            diagnostics.Add($"Connected: endpoint={endpointUrl}, auth={useWindowsAuth}, IsHostNode={isHostNode}, MaxPathLen={maxPathLen}");
 
                             var folders = new List<string>();
                             var models = new List<Dictionary<string, object>>();
@@ -176,34 +193,27 @@ namespace RevitServerBridge
                             // Method 1: ListSubFoldersAndModels
                             ArrayList subFolders = null;
                             ArrayList modelList = null;
-                            bool querySuccess = false;
                             try
                             {
-                                querySuccess = channel.ListSubFoldersAndModels(token, folderPath, out subFolders, out modelList);
-                                diagnostics.Add($"ListSubFoldersAndModels('{folderPath}'): success={querySuccess}, subFolders={subFolders?.Count.ToString() ?? "null"}, models={modelList?.Count.ToString() ?? "null"}");
+                                channel.ListSubFoldersAndModels(token, folderPath, out subFolders, out modelList);
                             }
-                            catch (Exception ex)
-                            {
-                                diagnostics.Add($"ListSubFoldersAndModels EXCEPTION: {ex.Message.Substring(0, Math.Min(120, ex.Message.Length))}");
-                            }
-
-                            bool rawSubNull = subFolders == null;
-                            bool rawModNull = modelList == null;
+                            catch { }
 
                             if (subFolders != null)
+                            {
                                 foreach (var f in subFolders)
                                 {
-                                    string fn = ExtractName(f);
-                                    if (!string.IsNullOrEmpty(fn) && !folders.Contains(fn))
-                                        folders.Add(fn);
+                                    ParseItem(f, folders);
                                 }
+                            }
+
                             if (modelList != null)
+                            {
                                 foreach (var m in modelList)
                                 {
-                                    string mn = ExtractName(m);
-                                    if (!string.IsNullOrEmpty(mn))
-                                        models.Add(new Dictionary<string, object> { { "Name", mn }, { "Size", 0L } });
+                                    ParseModel(m, models);
                                 }
+                            }
 
                             // Method 2: GetListOfModelFilesAndFolders fallback
                             if (folders.Count == 0 && models.Count == 0)
@@ -212,25 +222,25 @@ namespace RevitServerBridge
                                 {
                                     List<string> filesOut = null;
                                     List<string> foldersOut = null;
-                                    var status = channel.GetListOfModelFilesAndFolders(token, folderPath, out filesOut, out foldersOut);
-                                    diagnostics.Add($"GetListOfModelFilesAndFolders('{folderPath}'): status={status}, files={filesOut?.Count.ToString() ?? "null"}, folders={foldersOut?.Count.ToString() ?? "null"}");
+                                    channel.GetListOfModelFilesAndFolders(token, folderPath, out filesOut, out foldersOut);
+
                                     if (foldersOut != null)
+                                    {
                                         foreach (var f in foldersOut)
                                         {
-                                            if (!string.IsNullOrWhiteSpace(f) && !folders.Contains(f.Trim()))
-                                                folders.Add(f.Trim());
+                                            ParseItem(f, folders);
                                         }
+                                    }
+
                                     if (filesOut != null)
+                                    {
                                         foreach (var f in filesOut)
                                         {
-                                            if (!string.IsNullOrWhiteSpace(f))
-                                                models.Add(new Dictionary<string, object> { { "Name", f.Trim() }, { "Size", 0L } });
+                                            ParseModel(f, models);
                                         }
+                                    }
                                 }
-                                catch (Exception ex)
-                                {
-                                    diagnostics.Add($"GetListOfModelFilesAndFolders EXCEPTION: {ex.Message.Substring(0, Math.Min(120, ex.Message.Length))}");
-                                }
+                                catch { }
                             }
 
                             return new Dictionary<string, object>
@@ -241,10 +251,6 @@ namespace RevitServerBridge
                                 { "Year", year },
                                 { "Endpoint", endpointUrl },
                                 { "Auth", useWindowsAuth ? "Windows" : "None" },
-                                { "IsHostNode", isHostNode },
-                                { "MaxPathLen", maxPathLen },
-                                { "RawSubFoldersNull", rawSubNull },
-                                { "RawModelsNull", rawModNull },
                                 { "Folders", folders },
                                 { "Models", models }
                             };
@@ -258,8 +264,11 @@ namespace RevitServerBridge
                     catch (EndpointNotFoundException) { throw; }
                     catch (CommunicationException ex) when (
                         ex.Message.Contains("ReadingUpgradeRecord") ||
-                        ex.Message.Contains("rejected"))
-                    { continue; }
+                        ex.Message.Contains("rejected") ||
+                        ex.Message.Contains("404"))
+                    {
+                        continue;
+                    }
                     catch (CommunicationException) { throw; }
                     catch (Exception) { throw; }
                 }
@@ -267,22 +276,45 @@ namespace RevitServerBridge
             return null;
         }
 
-        static string ExtractName(object item)
+        static void ParseItem(object item, List<string> list)
         {
-            if (item == null) return null;
-            if (item is string s) return s.Trim();
-            var type = item.GetType();
-            foreach (var pname in new[] { "Name", "FolderName", "ModelName", "Path", "RelativePath", "Value" })
+            if (item == null) return;
+            string s = item.ToString();
+            if (string.IsNullOrWhiteSpace(s)) return;
+
+            string[] parts = s.Split('|');
+            string name = parts.Length > 0 ? parts[0].Trim() : s.Trim();
+            if (!string.IsNullOrEmpty(name) && !list.Contains(name))
             {
-                var prop = type.GetProperty(pname);
-                if (prop != null)
+                list.Add(name);
+            }
+        }
+
+        static void ParseModel(object item, List<Dictionary<string, object>> list)
+        {
+            if (item == null) return;
+            string s = item.ToString();
+            if (string.IsNullOrWhiteSpace(s)) return;
+
+            string[] parts = s.Split('|');
+            string name = parts.Length > 0 ? parts[0].Trim() : s.Trim();
+            long size = 0;
+            if (parts.Length > 2)
+            {
+                long.TryParse(parts[2].Trim(), out size);
+            }
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                if (!list.Any(m => (string)m["Name"] == name))
                 {
-                    var val = prop.GetValue(item)?.ToString()?.Trim();
-                    if (!string.IsNullOrEmpty(val)) return val;
+                    list.Add(new Dictionary<string, object>
+                    {
+                        { "Name", name },
+                        { "Size", size }
+                    });
                 }
             }
-            string str = item.ToString();
-            return (str.Contains(".") && str.Contains("Common")) ? null : str.Trim();
         }
 
         static NetTcpBinding CreateBinding(bool windowsAuth = false)
@@ -293,9 +325,9 @@ namespace RevitServerBridge
                 MaxReceivedMessageSize = 67108864L,
                 MaxBufferSize = 67108864,
                 MaxBufferPoolSize = 67108864L,
-                SendTimeout = TimeSpan.FromSeconds(30),
+                SendTimeout = TimeSpan.FromMinutes(2),
                 ReceiveTimeout = TimeSpan.FromMinutes(5),
-                OpenTimeout = TimeSpan.FromSeconds(15),
+                OpenTimeout = TimeSpan.FromSeconds(20),
                 CloseTimeout = TimeSpan.FromSeconds(10),
                 ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas
                 {

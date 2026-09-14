@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.4",
+    "latestVersion":  "2.4.5",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Diagnostic RSBridge: log IsHostNode/MaxPathLen/raw null status,Auto-detect year passed as path argument,Try 6 root path formats with diagnostics"
+                      "Fix: RevitServerBridge WCF path normalization (empty root, trailing backslash subfolders),Fix: ServiceSessionToken format parity with RevitServerTool,Fix: auto-update extracted RSBridge.exe in AppData"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.4/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.4/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.5/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.5/bimboclub_net8.zip"
                  }
 }
