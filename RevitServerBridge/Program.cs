@@ -51,7 +51,7 @@ namespace RevitServerBridge
             var pathsToTry = GetWcfPathsToTry(inputPath);
 
             Exception lastEx = null;
-            Dictionary<string, object> emptySuccessResult = null;
+            Dictionary<string, object> workingEmptyResult = null;
 
             foreach (var year in years)
             {
@@ -59,7 +59,9 @@ namespace RevitServerBridge
                 {
                     try
                     {
-                        var result = TryConnect(serverHost, pathCandidate, year);
+                        var result = TryConnect(serverHost, pathCandidate, year, out Exception connEx);
+                        if (connEx != null) lastEx = connEx;
+
                         if (result != null)
                         {
                             var folders = (List<string>)result["Folders"];
@@ -71,42 +73,48 @@ namespace RevitServerBridge
                                 return 0;
                             }
 
-                            // Keep the first working connection as fallback even if empty
-                            if (emptySuccessResult == null)
+                            if (workingEmptyResult == null)
                             {
-                                emptySuccessResult = result;
+                                workingEmptyResult = result;
                             }
                         }
-                    }
-                    catch (EndpointNotFoundException)
-                    {
-                        break; // This year endpoint doesn't exist, try next year
-                    }
-                    catch (CommunicationException ex) when (
-                        ex.Message.Contains("404") ||
-                        ex.Message.Contains("rejected") ||
-                        ex.Message.Contains("ReadingUpgradeRecord"))
-                    {
-                        lastEx = ex;
-                        break; // Try next year
                     }
                     catch (Exception ex)
                     {
                         lastEx = ex;
-                        if (IsDnsOrSocketError(ex)) goto done;
-                        break;
                     }
+
+                    if (IsDnsOrSocketError(lastEx))
+                    {
+                        // Network/DNS down (e.g. VPN off), no point in trying other years
+                        goto done;
+                    }
+                }
+
+                // If this year connected successfully (even if empty), don't try older Revit versions!
+                if (workingEmptyResult != null)
+                {
+                    break;
                 }
             }
 
             done:
-            if (emptySuccessResult != null)
+            if (workingEmptyResult != null)
             {
-                Console.WriteLine(new JavaScriptSerializer().Serialize(emptySuccessResult));
+                Console.WriteLine(new JavaScriptSerializer().Serialize(workingEmptyResult));
                 return 0;
             }
 
-            string errMsg = lastEx?.InnerException?.Message ?? lastEx?.Message ?? "Failed to connect to Revit Server";
+            string errMsg = "Не удалось подключиться к Revit Server";
+            if (lastEx != null)
+            {
+                errMsg = lastEx.InnerException?.Message ?? lastEx.Message;
+            }
+            if (IsDnsOrSocketError(lastEx))
+            {
+                errMsg = $"Хост {serverHost} недоступен (проверьте подключение к корпоративному VPN). Ошибка сети: {errMsg}";
+            }
+
             Console.WriteLine(new JavaScriptSerializer().Serialize(new Dictionary<string, object>
             {
                 { "Success", false },
@@ -123,8 +131,6 @@ namespace RevitServerBridge
             if (string.IsNullOrWhiteSpace(inputPath) || inputPath == "|" || inputPath == "/" || inputPath == "\\")
             {
                 list.Add("");
-                list.Add("\\");
-                list.Add("/");
                 list.Add("|");
                 return list;
             }
@@ -138,25 +144,44 @@ namespace RevitServerBridge
 
             list.Add(string.Join("\\", parts) + "\\");
             list.Add(string.Join("\\", parts));
-            list.Add(string.Join("/", parts) + "/");
-            list.Add(string.Join("/", parts));
-            if (!list.Contains(inputPath)) list.Add(inputPath);
+            list.Add(inputPath);
 
             return list;
         }
 
         static bool IsDnsOrSocketError(Exception ex)
         {
-            var msg = ex.Message + (ex.InnerException?.Message ?? "");
-            return msg.Contains("DNS") || msg.Contains("No such host") ||
-                   msg.Contains("SocketException") ||
-                   ex.InnerException is System.Net.Sockets.SocketException;
+            if (ex == null) return false;
+            if (ex is System.Net.Sockets.SocketException || ex.InnerException is System.Net.Sockets.SocketException)
+                return true;
+
+            string msg = (ex.Message + " " + (ex.InnerException?.Message ?? "")).ToLowerInvariant();
+            return msg.Contains("dns") ||
+                   msg.Contains("host") ||
+                   msg.Contains("неизвестен") ||
+                   msg.Contains("не удается разрешить") ||
+                   msg.Contains("socket") ||
+                   msg.Contains("refused") ||
+                   msg.Contains("отверг") ||
+                   msg.Contains("timed out") ||
+                   msg.Contains("время ожидания");
         }
 
-        static Dictionary<string, object> TryConnect(string serverHost, string folderPath, string year)
+        static Dictionary<string, object> TryConnect(string serverHost, string folderPath, string year, out Exception lastException)
         {
+            lastException = null;
+
+            // Try anonymous (SecurityMode.None) first as standard Autodesk Revit Server uses it,
+            // then Windows Auth (Transport security) as fallback
+            bool[] authModes = { false, true };
             string[] bindingSuffixes = { "tcpbuffer", "tcpstreamed", "" };
-            bool[] authModes = { true, false };
+
+            // Try both username styles: standard Windows username and Autodesk tool username
+            string machine = Environment.MachineName;
+            string[] userNamesToTry = {
+                Environment.UserName,
+                "RevitServerTool:" + machine + ":1"
+            };
 
             foreach (var useWindowsAuth in authModes)
             {
@@ -167,22 +192,22 @@ namespace RevitServerBridge
                         : $"ModelService{year}/ModelService.svc/{suffix}";
                     string endpointUrl = $"net.tcp://{serverHost}/{svcPath}";
 
+                    IModelService channel = null;
+                    ChannelFactory<IModelService> factory = null;
+
                     try
                     {
                         var binding = CreateBinding(windowsAuth: useWindowsAuth);
-                        var factory = new ChannelFactory<IModelService>(binding, new EndpointAddress(endpointUrl));
+                        factory = new ChannelFactory<IModelService>(binding, new EndpointAddress(endpointUrl));
+                        channel = factory.CreateChannel();
+                        ((IClientChannel)channel).Open(TimeSpan.FromSeconds(8));
 
-                        IModelService channel = null;
-                        try
+                        // Channel is open! Now try listing folders
+                        foreach (var uName in userNamesToTry)
                         {
-                            channel = factory.CreateChannel();
-                            ((IClientChannel)channel).Open(TimeSpan.FromSeconds(12));
-
-                            string machine = Environment.MachineName;
-                            string userName = "RevitServerTool:" + machine + ":1";
                             var token = new ServiceSessionToken(
-                                userName,
-                                userName,
+                                uName,
+                                uName,
                                 machine,
                                 Guid.NewGuid().ToString()
                             );
@@ -197,7 +222,10 @@ namespace RevitServerBridge
                             {
                                 channel.ListSubFoldersAndModels(token, folderPath, out subFolders, out modelList);
                             }
-                            catch { }
+                            catch (Exception ex)
+                            {
+                                lastException = ex;
+                            }
 
                             if (subFolders != null)
                             {
@@ -240,39 +268,57 @@ namespace RevitServerBridge
                                         }
                                     }
                                 }
-                                catch { }
+                                catch (Exception ex)
+                                {
+                                    lastException = ex;
+                                }
                             }
 
-                            return new Dictionary<string, object>
+                            if (folders.Count > 0 || models.Count > 0)
                             {
-                                { "Success", true },
-                                { "Host", serverHost },
-                                { "Path", folderPath },
-                                { "Year", year },
-                                { "Endpoint", endpointUrl },
-                                { "Auth", useWindowsAuth ? "Windows" : "None" },
-                                { "Folders", folders },
-                                { "Models", models }
-                            };
+                                return new Dictionary<string, object>
+                                {
+                                    { "Success", true },
+                                    { "Host", serverHost },
+                                    { "Path", folderPath },
+                                    { "Year", year },
+                                    { "Endpoint", endpointUrl },
+                                    { "Auth", useWindowsAuth ? "Windows" : "None" },
+                                    { "Folders", folders },
+                                    { "Models", models }
+                                };
+                            }
                         }
-                        finally
+
+                        // Connected successfully even if no contents
+                        return new Dictionary<string, object>
                         {
-                            try { ((IClientChannel)channel)?.Close(TimeSpan.FromSeconds(3)); } catch { }
-                            try { factory.Close(TimeSpan.FromSeconds(3)); } catch { }
+                            { "Success", true },
+                            { "Host", serverHost },
+                            { "Path", folderPath },
+                            { "Year", year },
+                            { "Endpoint", endpointUrl },
+                            { "Auth", useWindowsAuth ? "Windows" : "None" },
+                            { "Folders", new List<string>() },
+                            { "Models", new List<Dictionary<string, object>>() }
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        lastException = ex;
+                        if (IsDnsOrSocketError(ex))
+                        {
+                            return null;
                         }
                     }
-                    catch (EndpointNotFoundException) { throw; }
-                    catch (CommunicationException ex) when (
-                        ex.Message.Contains("ReadingUpgradeRecord") ||
-                        ex.Message.Contains("rejected") ||
-                        ex.Message.Contains("404"))
+                    finally
                     {
-                        continue;
+                        try { ((IClientChannel)channel)?.Close(TimeSpan.FromSeconds(2)); } catch { }
+                        try { factory?.Close(TimeSpan.FromSeconds(2)); } catch { }
                     }
-                    catch (CommunicationException) { throw; }
-                    catch (Exception) { throw; }
                 }
             }
+
             return null;
         }
 
@@ -325,10 +371,10 @@ namespace RevitServerBridge
                 MaxReceivedMessageSize = 67108864L,
                 MaxBufferSize = 67108864,
                 MaxBufferPoolSize = 67108864L,
-                SendTimeout = TimeSpan.FromMinutes(2),
-                ReceiveTimeout = TimeSpan.FromMinutes(5),
-                OpenTimeout = TimeSpan.FromSeconds(20),
-                CloseTimeout = TimeSpan.FromSeconds(10),
+                SendTimeout = TimeSpan.FromSeconds(15),
+                ReceiveTimeout = TimeSpan.FromMinutes(2),
+                OpenTimeout = TimeSpan.FromSeconds(8),
+                CloseTimeout = TimeSpan.FromSeconds(5),
                 ReaderQuotas = new System.Xml.XmlDictionaryReaderQuotas
                 {
                     MaxArrayLength = 67108864,

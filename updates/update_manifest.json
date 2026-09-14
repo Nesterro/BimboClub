@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.5",
+    "latestVersion":  "2.4.6",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Fix: RevitServerBridge WCF path normalization (empty root, trailing backslash subfolders),Fix: ServiceSessionToken format parity with RevitServerTool,Fix: auto-update extracted RSBridge.exe in AppData"
+                      "Fix: Stop masking WCF connection failures with misleading REST 404 errors,Fix: WCF fast fail on DNS/network unreachable,Fix: Try anonymous NetTcpBinding first (Autodesk standard) then Windows auth,Fix: Try both Windows and Autodesk username tokens"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.5/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.5/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.6/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.6/bimboclub_net8.zip"
                  }
 }

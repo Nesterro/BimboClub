@@ -205,25 +205,22 @@ namespace RevitServerManager.Services
         public async Task<ServerProperties> CheckConnectionAsync()
         {
             // 1. Try native Revit Server Bridge first
-            try
+            var bridgeResult = await RevitServerBridgeClient.QueryViaBridgeAsync(Host, "|", DiscoveredVersion ?? Version);
+            if (bridgeResult != null)
             {
-                var bridgeResult = await RevitServerBridgeClient.QueryViaBridgeAsync(Host, "|", DiscoveredVersion ?? Version);
-                if (bridgeResult != null)
+                return new ServerProperties
                 {
-                    return new ServerProperties
-                    {
-                        ServerName = Host,
-                        ServerVersion = DiscoveredVersion ?? Version
-                    };
-                }
+                    ServerName = Host,
+                    ServerVersion = DiscoveredVersion ?? Version
+                };
             }
-            catch { }
 
-            await EnsureActiveBaseUrlAsync();
+            string? bridgeError = RevitServerBridgeClient.LastBridgeError;
 
             // 2. Try REST serverProperties
             try
             {
+                await EnsureActiveBaseUrlAsync();
                 var props = await GetAsync<ServerProperties>("serverProperties");
                 if (!string.IsNullOrEmpty(props.ServerVersion))
                 {
@@ -231,35 +228,42 @@ namespace RevitServerManager.Services
                 }
                 return props;
             }
-            catch
+            catch (Exception restEx)
             {
                 // 3. Fallback: query root contents via REST directly
-                var rootContents = await GetContentsAsync("|");
-                if (rootContents != null)
+                try
                 {
-                    return new ServerProperties
+                    var rootContents = await GetContentsAsync("|");
+                    if (rootContents != null)
                     {
-                        ServerName = Host,
-                        ServerVersion = DiscoveredVersion
-                    };
+                        return new ServerProperties
+                        {
+                            ServerName = Host,
+                            ServerVersion = DiscoveredVersion
+                        };
+                    }
+                }
+                catch { }
+
+                if (!string.IsNullOrEmpty(bridgeError))
+                {
+                    throw new InvalidOperationException($"Revit Server: {bridgeError}");
                 }
 
-                throw;
+                throw restEx;
             }
         }
 
         public async Task<FolderContents> GetContentsAsync(string serverRelativePath)
         {
             // 1. Try native Revit Server Bridge first (100% parity with Autodesk Revit)
-            try
+            var bridgeResult = await RevitServerBridgeClient.QueryViaBridgeAsync(Host, serverRelativePath, DiscoveredVersion ?? Version);
+            if (bridgeResult != null)
             {
-                var bridgeResult = await RevitServerBridgeClient.QueryViaBridgeAsync(Host, serverRelativePath, DiscoveredVersion ?? Version);
-                if (bridgeResult != null)
-                {
-                    return bridgeResult;
-                }
+                return bridgeResult;
             }
-            catch { }
+
+            string? bridgeError = RevitServerBridgeClient.LastBridgeError;
 
             // 2. Fallback to REST API
             string path = string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|"
@@ -280,9 +284,19 @@ namespace RevitServerManager.Services
                     }
                     catch
                     {
-                        return await GetAsync<FolderContents>("root/contents");
+                        try
+                        {
+                            return await GetAsync<FolderContents>("root/contents");
+                        }
+                        catch { }
                     }
                 }
+
+                if (!string.IsNullOrEmpty(bridgeError))
+                {
+                    throw new InvalidOperationException($"Revit Server: {bridgeError}");
+                }
+
                 throw;
             }
         }

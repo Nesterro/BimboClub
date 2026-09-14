@@ -110,10 +110,17 @@ namespace RevitServerManager.Services
             }
         }
 
+        public static string? LastBridgeError { get; private set; }
+
         public static async Task<FolderContents?> QueryViaBridgeAsync(string host, string folderPath, string version, CancellationToken ct = default)
         {
+            LastBridgeError = null;
             string? bridgeExe = EnsureBridgeExecutable();
-            if (bridgeExe == null) return null;
+            if (bridgeExe == null)
+            {
+                LastBridgeError = "Не удалось найти или извлечь RSBridge.exe";
+                return null;
+            }
 
             try
             {
@@ -133,10 +140,26 @@ namespace RevitServerManager.Services
                 using var proc = new Process { StartInfo = psi };
                 proc.Start();
 
-                string output = await proc.StandardOutput.ReadToEndAsync();
+                var outTask = proc.StandardOutput.ReadToEndAsync();
+                var errTask = proc.StandardError.ReadToEndAsync();
+
+                await Task.WhenAll(outTask, errTask);
                 await proc.WaitForExitAsync(ct);
 
-                if (string.IsNullOrWhiteSpace(output)) return null;
+                string output = outTask.Result;
+                string errText = errTask.Result;
+
+                if (!string.IsNullOrWhiteSpace(errText))
+                {
+                    LastBridgeError = errText.Trim();
+                }
+
+                if (string.IsNullOrWhiteSpace(output))
+                {
+                    if (string.IsNullOrWhiteSpace(LastBridgeError))
+                        LastBridgeError = "RSBridge завершился без вывода данных";
+                    return null;
+                }
 
                 using var doc = JsonDocument.Parse(output);
                 var root = doc.RootElement;
@@ -179,10 +202,17 @@ namespace RevitServerManager.Services
 
                     return result;
                 }
+                else
+                {
+                    if (root.TryGetProperty("Error", out var errElem))
+                    {
+                        LastBridgeError = errElem.GetString();
+                    }
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                // Fall back to REST on bridge failure
+                LastBridgeError = ex.Message;
             }
 
             return null;
