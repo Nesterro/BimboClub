@@ -113,11 +113,11 @@ namespace RevitServerManager.Services
                 }
 
                 // 2. Формирование аргументов для RevitServerTool.exe
-                // Формат: createLocalModel "<modelPath>" -s "<server>" -d "<destinationDir>" [-o]
-                // modelPath: e.g. "FolderA/Model.rvt" (слеши прямые /)
-                string relativePathWithSlashes = model.ServerRelativeModelPath.Replace('|', '/');
+                // Формат: createLocalRVT "<modelPath>" -s "<server>" -d "<destinationDir>" [-o]
+                // modelPath: e.g. "FolderA\Model.rvt" (слеши обратные \)
+                string relativePath = model.ServerRelativeModelPath.Replace('/', '\\').Replace('|', '\\');
                 string overwriteFlag = overwrite ? "-o" : "";
-                string arguments = $"createLocalModel \"{relativePathWithSlashes}\" -s \"{serverName}\" -d \"{targetDir}\" {overwriteFlag}".Trim();
+                string arguments = $"createLocalRVT \"{relativePath}\" -s \"{serverName}\" -d \"{targetDir}\" {overwriteFlag}".Trim();
 
                 logCallback?.Invoke($"Запуск: {Path.GetFileName(revitServerToolExe)} {arguments}");
                 model.Status = "Скачивание...";

@@ -224,16 +224,49 @@ namespace RevitServerManager
                 ProgressStatusTextBlock.Text = $"Загрузка структуры каталогов {props.ServerName}...";
                 var rootContents = await client.GetContentsAsync("|");
 
+                var serverNode = new ServerNodeViewModel(host, actualVer);
+                serverNode.SubFolders.Clear();
+
                 if (rootContents?.Folders != null)
                 {
                     foreach (var folder in rootContents.Folders)
                     {
                         bool hasSub = folder.FolderCount > 0;
-                        RootTreeItems.Add(new FolderViewModel(folder.Name, folder.Name, host, actualVer, hasSub));
+                        serverNode.SubFolders.Add(new FolderViewModel(folder.Name, folder.Name, host, actualVer, hasSub));
                     }
                 }
 
-                ProgressStatusTextBlock.Text = $"Подключено к {props.ServerName}. Корневых папок: {RootTreeItems.Count}";
+                serverNode.IsLoaded = true;
+                serverNode.StatusText = $"{serverNode.SubFolders.Count} папок";
+                RootTreeItems.Add(serverNode);
+
+                // Populate root models immediately
+                CurrentFolderModels.Clear();
+                if (rootContents?.Models != null)
+                {
+                    foreach (var m in rootContents.Models)
+                    {
+                        var modelVm = new ModelFileViewModel(
+                            m.Name,
+                            "",
+                            m.Size,
+                            host,
+                            actualVer);
+
+                        string key = $"{host}_{modelVm.ServerRelativeModelPath}";
+                        if (_selectedModels.ContainsKey(key))
+                        {
+                            modelVm.IsSelected = true;
+                        }
+
+                        CurrentFolderModels.Add(modelVm);
+                    }
+                }
+
+                CurrentPathTextBlock.Text = $"{host} (Корень)";
+                ModelsCountTextBlock.Text = $"Моделей: {CurrentFolderModels.Count}";
+                ProgressStatusTextBlock.Text = $"Подключено к {props.ServerName}. Корневых папок: {serverNode.SubFolders.Count}, моделей в корне: {CurrentFolderModels.Count}";
+                _modelsView?.Refresh();
             }
             catch (Exception ex)
             {

@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.6",
+    "latestVersion":  "2.4.7",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Fix: Stop masking WCF connection failures with misleading REST 404 errors,Fix: WCF fast fail on DNS/network unreachable,Fix: Try anonymous NetTcpBinding first (Autodesk standard) then Windows auth,Fix: Try both Windows and Autodesk username tokens"
+                      "Fix: Show server root models immediately on connect,Fix: Add Server root node to tree in single-server connect mode,Fix: Call GetListOfModelFilesAndFolders if models are empty even when folders exist,Fix: Support all folder path styles in RSBridge (backslash, leading backslash, pipe),Fix: Robust reflection-based extraction of model name and size in RSBridge,Fix: Use createLocalRVT and proper backslash paths for model downloads via RevitServerTool"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.6/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.6/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.7/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.7/bimboclub_net8.zip"
                  }
 }

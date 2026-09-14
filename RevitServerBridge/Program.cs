@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Web.Script.Serialization;
@@ -132,6 +133,8 @@ namespace RevitServerBridge
             {
                 list.Add("");
                 list.Add("|");
+                list.Add("\\");
+                list.Add("/");
                 return list;
             }
 
@@ -142,11 +145,18 @@ namespace RevitServerBridge
                 return list;
             }
 
-            list.Add(string.Join("\\", parts) + "\\");
-            list.Add(string.Join("\\", parts));
-            list.Add(inputPath);
+            string backslash = string.Join("\\", parts);
+            string pipe = string.Join("|", parts);
+            string slash = string.Join("/", parts);
 
-            return list;
+            list.Add(backslash);
+            list.Add("\\" + backslash);
+            list.Add(backslash + "\\");
+            list.Add(pipe);
+            list.Add("|" + pipe);
+            list.Add(slash);
+
+            return list.Distinct().ToList();
         }
 
         static bool IsDnsOrSocketError(Exception ex)
@@ -243,8 +253,8 @@ namespace RevitServerBridge
                                 }
                             }
 
-                            // Method 2: GetListOfModelFilesAndFolders fallback
-                            if (folders.Count == 0 && models.Count == 0)
+                            // Method 2: GetListOfModelFilesAndFolders fallback if models or folders missing
+                            if (models.Count == 0 || folders.Count == 0)
                             {
                                 try
                                 {
@@ -252,7 +262,7 @@ namespace RevitServerBridge
                                     List<string> foldersOut = null;
                                     channel.GetListOfModelFilesAndFolders(token, folderPath, out filesOut, out foldersOut);
 
-                                    if (foldersOut != null)
+                                    if (folders.Count == 0 && foldersOut != null)
                                     {
                                         foreach (var f in foldersOut)
                                         {
@@ -260,7 +270,7 @@ namespace RevitServerBridge
                                         }
                                     }
 
-                                    if (filesOut != null)
+                                    if (models.Count == 0 && filesOut != null)
                                     {
                                         foreach (var f in filesOut)
                                         {
@@ -325,34 +335,80 @@ namespace RevitServerBridge
         static void ParseItem(object item, List<string> list)
         {
             if (item == null) return;
-            string s = item.ToString();
-            if (string.IsNullOrWhiteSpace(s)) return;
 
-            string[] parts = s.Split('|');
-            string name = parts.Length > 0 ? parts[0].Trim() : s.Trim();
-            if (!string.IsNullOrEmpty(name) && !list.Contains(name))
+            string name = null;
+            var type = item.GetType();
+            var nameProp = type.GetProperty("Name") ?? type.GetProperty("FolderName") ?? type.GetProperty("Path");
+            if (nameProp != null)
             {
-                list.Add(name);
+                name = nameProp.GetValue(item, null)?.ToString();
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                string s = item.ToString();
+                if (string.IsNullOrWhiteSpace(s)) return;
+                string[] parts = s.Split('|');
+                name = parts.Length > 0 ? parts[0].Trim() : s.Trim();
+            }
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                if (name.Contains('\\') || name.Contains('/'))
+                {
+                    name = Path.GetFileName(name.TrimEnd('\\', '/'));
+                }
+                if (!string.IsNullOrEmpty(name) && !list.Contains(name))
+                {
+                    list.Add(name);
+                }
             }
         }
 
         static void ParseModel(object item, List<Dictionary<string, object>> list)
         {
             if (item == null) return;
-            string s = item.ToString();
-            if (string.IsNullOrWhiteSpace(s)) return;
 
-            string[] parts = s.Split('|');
-            string name = parts.Length > 0 ? parts[0].Trim() : s.Trim();
+            string name = null;
             long size = 0;
-            if (parts.Length > 2)
+
+            var type = item.GetType();
+            var nameProp = type.GetProperty("Name") ?? type.GetProperty("ModelName") ?? type.GetProperty("FileName") ?? type.GetProperty("Path");
+            if (nameProp != null)
             {
-                long.TryParse(parts[2].Trim(), out size);
+                name = nameProp.GetValue(item, null)?.ToString();
+            }
+
+            var sizeProp = type.GetProperty("Size") ?? type.GetProperty("ModelSize") ?? type.GetProperty("FileSize");
+            if (sizeProp != null)
+            {
+                var val = sizeProp.GetValue(item, null);
+                if (val is long l) size = l;
+                else if (val is int i) size = i;
+                else if (val != null) long.TryParse(val.ToString(), out size);
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                string s = item.ToString();
+                if (string.IsNullOrWhiteSpace(s)) return;
+
+                string[] parts = s.Split('|');
+                name = parts.Length > 0 ? parts[0].Trim() : s.Trim();
+                if (parts.Length > 2 && size == 0)
+                {
+                    long.TryParse(parts[2].Trim(), out size);
+                }
             }
 
             if (!string.IsNullOrEmpty(name))
             {
-                if (!list.Any(m => (string)m["Name"] == name))
+                if (name.Contains('\\') || name.Contains('/'))
+                {
+                    name = Path.GetFileName(name);
+                }
+
+                if (!string.IsNullOrEmpty(name) && !list.Any(m => (string)m["Name"] == name))
                 {
                     list.Add(new Dictionary<string, object>
                     {
