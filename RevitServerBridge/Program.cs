@@ -11,9 +11,8 @@ namespace RevitServerBridge
     class Program
     {
         static readonly string[] YearOrder = { "2022", "2021", "2023", "2020", "2024", "2019", "2018", "2025" };
-
-        // Root folder path candidates: empty string is the most likely for Revit Server root
-        static readonly string[] RootPathCandidates = { "", "|", "/", "\\" };
+        // Root path candidates - try all of these for root listing
+        static readonly string[] RootPaths = { "", "|", "/", "\\", "root", " " };
 
         static int Main(string[] args)
         {
@@ -24,41 +23,47 @@ namespace RevitServerBridge
             }
 
             string serverHost = args[0].Trim().Replace("http://", "").Replace("https://", "").Trim('/');
-            string folderPath = args.Length > 1 ? args[1] : "";
+            // Normalize: treat "2022", "2021" etc passed as path as version numbers (user mistake)
+            string rawPath = args.Length > 1 ? args[1] : "";
             string preferredYear = args.Length > 2 ? args[2].Trim() : "2022";
 
-            // For root requests, try all root path candidates
-            bool isRootRequest = folderPath == "|" || folderPath == "" || folderPath == "/";
+            // If rawPath looks like a year, it was probably passed as version by mistake
+            bool rawPathIsYear = rawPath.Length == 4 && rawPath.StartsWith("20") && int.TryParse(rawPath, out _);
+            if (rawPathIsYear && args.Length == 2)
+            {
+                preferredYear = rawPath;
+                rawPath = "";
+            }
+
+            string folderPath = rawPath;
+            bool isRootRequest = string.IsNullOrEmpty(folderPath) || folderPath == "|" || folderPath == "/" || folderPath == "\\";
 
             var years = new List<string> { preferredYear };
             foreach (var y in YearOrder)
                 if (!years.Contains(y)) years.Add(y);
 
             Exception lastEx = null;
+            var diagnostics = new List<string>();
 
             foreach (var year in years)
             {
-                // Determine which paths to try for this request
-                var pathsToTry = isRootRequest
-                    ? RootPathCandidates
-                    : new[] { folderPath };
+                var pathsToTry = isRootRequest ? RootPaths : new[] { folderPath };
 
                 foreach (var pathCandidate in pathsToTry)
                 {
                     try
                     {
-                        var result = TryConnect(serverHost, pathCandidate, year);
+                        var result = TryConnect(serverHost, pathCandidate, year, diagnostics);
                         if (result != null)
                         {
-                            // Only accept root result if it has content OR all candidates are exhausted
-                            bool hasContent = result.ContainsKey("Folders") &&
-                                             ((List<string>)result["Folders"]).Count > 0;
-                            bool hasModels = result.ContainsKey("Models") &&
-                                            ((List<Dictionary<string, object>>)result["Models"]).Count > 0;
+                            var folders = (List<string>)result["Folders"];
+                            var models = (List<Dictionary<string, object>>)result["Models"];
 
-                            if (!isRootRequest || hasContent || hasModels || pathCandidate == pathsToTry[pathsToTry.Length - 1])
+                            bool hasContent = folders.Count > 0 || models.Count > 0;
+
+                            // Accept result if: has content, not root request, or last candidate
+                            if (!isRootRequest || hasContent || pathCandidate == RootPaths[RootPaths.Length - 1])
                             {
-                                // Convert to serializable format
                                 var output = new Dictionary<string, object>
                                 {
                                     { "Success", true },
@@ -67,27 +72,34 @@ namespace RevitServerBridge
                                     { "Year", year },
                                     { "Endpoint", result["Endpoint"] },
                                     { "Auth", result["Auth"] },
-                                    { "Folders", result["Folders"] },
-                                    { "Models", result["Models"] }
+                                    { "IsHostNode", result["IsHostNode"] },
+                                    { "MaxPathLen", result["MaxPathLen"] },
+                                    { "RawSubFoldersNull", result["RawSubFoldersNull"] },
+                                    { "RawModelsNull", result["RawModelsNull"] },
+                                    { "Folders", folders },
+                                    { "Models", models },
+                                    { "Diagnostics", diagnostics }
                                 };
                                 Console.WriteLine(new JavaScriptSerializer().Serialize(output));
                                 return 0;
                             }
-                            // Root returned empty - try next path candidate
+                            // Empty root result, try next path
+                            diagnostics.Add($"Path '{pathCandidate}' returned empty (year={year})");
                         }
                     }
                     catch (EndpointNotFoundException)
                     {
-                        break; // This year doesn't have an endpoint - skip all paths, try next year
+                        diagnostics.Add($"EndpointNotFound for year={year}");
+                        break;
                     }
                     catch (CommunicationException ex) when (
                         ex.Message.Contains("404") ||
-                        ex.Message.Contains("not found") ||
                         ex.Message.Contains("rejected") ||
                         ex.Message.Contains("ReadingUpgradeRecord"))
                     {
                         lastEx = ex;
-                        break; // Try next year
+                        diagnostics.Add($"CommEx for year={year}: {ex.Message.Substring(0, Math.Min(80, ex.Message.Length))}");
+                        break;
                     }
                     catch (Exception ex)
                     {
@@ -99,11 +111,12 @@ namespace RevitServerBridge
             }
 
             done:
-            string errMsg = lastEx?.InnerException?.Message ?? lastEx?.Message ?? "Failed to connect to Revit Server";
+            string errMsg = lastEx?.InnerException?.Message ?? lastEx?.Message ?? "Failed to connect";
             Console.WriteLine(new JavaScriptSerializer().Serialize(new Dictionary<string, object>
             {
                 { "Success", false },
                 { "Error", errMsg },
+                { "Diagnostics", diagnostics },
                 { "Details", lastEx?.ToString() ?? "" }
             }));
             return 3;
@@ -113,11 +126,11 @@ namespace RevitServerBridge
         {
             var msg = ex.Message + (ex.InnerException?.Message ?? "");
             return msg.Contains("DNS") || msg.Contains("No such host") ||
-                   msg.Contains("SocketException") || msg.Contains("actively refused") ||
+                   msg.Contains("SocketException") ||
                    ex.InnerException is System.Net.Sockets.SocketException;
         }
 
-        static Dictionary<string, object> TryConnect(string serverHost, string folderPath, string year)
+        static Dictionary<string, object> TryConnect(string serverHost, string folderPath, string year, List<string> diagnostics)
         {
             string[] bindingSuffixes = { "tcpbuffer", "tcpstreamed", "" };
             bool[] authModes = { true, false };
@@ -149,18 +162,33 @@ namespace RevitServerBridge
                                 Guid.NewGuid().ToString()
                             );
 
+                            // Diagnostic: verify basic WCF calls work
+                            bool isHostNode = false;
+                            int maxPathLen = -1;
+                            try { isHostNode = channel.IsHostNode(); } catch { }
+                            try { maxPathLen = channel.GetMaxModelPathLength(token); } catch { }
+
+                            diagnostics.Add($"Connected: endpoint={endpointUrl}, auth={useWindowsAuth}, IsHostNode={isHostNode}, MaxPathLen={maxPathLen}");
+
                             var folders = new List<string>();
                             var models = new List<Dictionary<string, object>>();
 
                             // Method 1: ListSubFoldersAndModels
-                            // relativeFolderPath: "" for root, or subfolder path
                             ArrayList subFolders = null;
                             ArrayList modelList = null;
+                            bool querySuccess = false;
                             try
                             {
-                                channel.ListSubFoldersAndModels(token, folderPath, out subFolders, out modelList);
+                                querySuccess = channel.ListSubFoldersAndModels(token, folderPath, out subFolders, out modelList);
+                                diagnostics.Add($"ListSubFoldersAndModels('{folderPath}'): success={querySuccess}, subFolders={subFolders?.Count.ToString() ?? "null"}, models={modelList?.Count.ToString() ?? "null"}");
                             }
-                            catch { }
+                            catch (Exception ex)
+                            {
+                                diagnostics.Add($"ListSubFoldersAndModels EXCEPTION: {ex.Message.Substring(0, Math.Min(120, ex.Message.Length))}");
+                            }
+
+                            bool rawSubNull = subFolders == null;
+                            bool rawModNull = modelList == null;
 
                             if (subFolders != null)
                                 foreach (var f in subFolders)
@@ -177,31 +205,32 @@ namespace RevitServerBridge
                                         models.Add(new Dictionary<string, object> { { "Name", mn }, { "Size", 0L } });
                                 }
 
-                            // Method 2: GetListOfModelFilesAndFolders (uses List<string>)
-                            // Only use as fallback if Method 1 returned nothing
+                            // Method 2: GetListOfModelFilesAndFolders fallback
                             if (folders.Count == 0 && models.Count == 0)
                             {
                                 try
                                 {
                                     List<string> filesOut = null;
                                     List<string> foldersOut = null;
-                                    channel.GetListOfModelFilesAndFolders(token, folderPath, out filesOut, out foldersOut);
+                                    var status = channel.GetListOfModelFilesAndFolders(token, folderPath, out filesOut, out foldersOut);
+                                    diagnostics.Add($"GetListOfModelFilesAndFolders('{folderPath}'): status={status}, files={filesOut?.Count.ToString() ?? "null"}, folders={foldersOut?.Count.ToString() ?? "null"}");
                                     if (foldersOut != null)
                                         foreach (var f in foldersOut)
                                         {
-                                            string fn = f?.Trim();
-                                            if (!string.IsNullOrWhiteSpace(fn) && !folders.Contains(fn))
-                                                folders.Add(fn);
+                                            if (!string.IsNullOrWhiteSpace(f) && !folders.Contains(f.Trim()))
+                                                folders.Add(f.Trim());
                                         }
                                     if (filesOut != null)
                                         foreach (var f in filesOut)
                                         {
-                                            string fn = f?.Trim();
-                                            if (!string.IsNullOrWhiteSpace(fn))
-                                                models.Add(new Dictionary<string, object> { { "Name", fn }, { "Size", 0L } });
+                                            if (!string.IsNullOrWhiteSpace(f))
+                                                models.Add(new Dictionary<string, object> { { "Name", f.Trim() }, { "Size", 0L } });
                                         }
                                 }
-                                catch { }
+                                catch (Exception ex)
+                                {
+                                    diagnostics.Add($"GetListOfModelFilesAndFolders EXCEPTION: {ex.Message.Substring(0, Math.Min(120, ex.Message.Length))}");
+                                }
                             }
 
                             return new Dictionary<string, object>
@@ -212,6 +241,10 @@ namespace RevitServerBridge
                                 { "Year", year },
                                 { "Endpoint", endpointUrl },
                                 { "Auth", useWindowsAuth ? "Windows" : "None" },
+                                { "IsHostNode", isHostNode },
+                                { "MaxPathLen", maxPathLen },
+                                { "RawSubFoldersNull", rawSubNull },
+                                { "RawModelsNull", rawModNull },
                                 { "Folders", folders },
                                 { "Models", models }
                             };
@@ -225,16 +258,12 @@ namespace RevitServerBridge
                     catch (EndpointNotFoundException) { throw; }
                     catch (CommunicationException ex) when (
                         ex.Message.Contains("ReadingUpgradeRecord") ||
-                        ex.Message.Contains("rejected") ||
-                        ex.Message.Contains("404"))
-                    {
-                        continue;
-                    }
+                        ex.Message.Contains("rejected"))
+                    { continue; }
                     catch (CommunicationException) { throw; }
                     catch (Exception) { throw; }
                 }
             }
-
             return null;
         }
 
@@ -242,27 +271,23 @@ namespace RevitServerBridge
         {
             if (item == null) return null;
             if (item is string s) return s.Trim();
-
-            // Try to get Name property via reflection (for data contract objects)
             var type = item.GetType();
-            var nameProp = type.GetProperty("Name") ?? type.GetProperty("FolderName")
-                ?? type.GetProperty("ModelName") ?? type.GetProperty("Path")
-                ?? type.GetProperty("RelativePath");
-            if (nameProp != null)
+            foreach (var pname in new[] { "Name", "FolderName", "ModelName", "Path", "RelativePath", "Value" })
             {
-                var val = nameProp.GetValue(item)?.ToString()?.Trim();
-                if (!string.IsNullOrEmpty(val)) return val;
+                var prop = type.GetProperty(pname);
+                if (prop != null)
+                {
+                    var val = prop.GetValue(item)?.ToString()?.Trim();
+                    if (!string.IsNullOrEmpty(val)) return val;
+                }
             }
-
-            // Last resort: ToString() but skip type names
             string str = item.ToString();
-            if (str.Contains(".") && str.Contains("Common")) return null; // Looks like a type name
-            return str.Trim();
+            return (str.Contains(".") && str.Contains("Common")) ? null : str.Trim();
         }
 
         static NetTcpBinding CreateBinding(bool windowsAuth = false)
         {
-            var binding = new NetTcpBinding
+            var b = new NetTcpBinding
             {
                 TransferMode = TransferMode.Buffered,
                 MaxReceivedMessageSize = 67108864L,
@@ -281,18 +306,16 @@ namespace RevitServerBridge
                     MaxStringContentLength = 67108864
                 }
             };
-
             if (windowsAuth)
             {
-                binding.Security.Mode = SecurityMode.Transport;
-                binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+                b.Security.Mode = SecurityMode.Transport;
+                b.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
             }
             else
             {
-                binding.Security.Mode = SecurityMode.None;
+                b.Security.Mode = SecurityMode.None;
             }
-
-            return binding;
+            return b;
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.3",
+    "latestVersion":  "2.4.4",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Fix root folder path for Revit Server WCF (try empty string first),Fix ArrayList item extraction via reflection,Try multiple root path formats automatically"
+                      "Diagnostic RSBridge: log IsHostNode/MaxPathLen/raw null status,Auto-detect year passed as path argument,Try 6 root path formats with diagnostics"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.3/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.3/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.4/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.4/bimboclub_net8.zip"
                  }
 }
