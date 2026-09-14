@@ -15,6 +15,19 @@ namespace RevitServerManager.Services
         private static string? _cachedBridgePath;
         private static readonly object _lock = new();
 
+        private static readonly string[] RequiredFiles = new[]
+        {
+            "RSBridge.exe",
+            "Castle.Core.dll",
+            "Castle.Windsor.dll",
+            "Autodesk.RevitServer.Social.dll",
+            "RS.Enterprise.Common.ClientServer.DataContract.dll",
+            "RS.Enterprise.Common.ClientServer.Helper.dll",
+            "RS.Enterprise.Common.ClientServer.Proxy.dll",
+            "RS.Enterprise.Common.ClientServer.ServiceContract.Local.dll",
+            "RS.Enterprise.Common.ClientServer.ServiceContract.Model.dll"
+        };
+
         public static string? EnsureBridgeExecutable()
         {
             lock (_lock)
@@ -27,7 +40,7 @@ namespace RevitServerManager.Services
                 // 1. Check current application directory
                 string baseDir = AppDomain.CurrentDomain.BaseDirectory;
                 string localExe = Path.Combine(baseDir, "RSBridge.exe");
-                if (File.Exists(localExe))
+                if (File.Exists(localExe) && File.Exists(Path.Combine(baseDir, "RS.Enterprise.Common.ClientServer.Proxy.dll")))
                 {
                     _cachedBridgePath = localExe;
                     return _cachedBridgePath;
@@ -37,7 +50,8 @@ namespace RevitServerManager.Services
                 string appDataDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     "BimboClub",
-                    "RevitServerManager");
+                    "RevitServerManager",
+                    "Bridge");
 
                 if (!Directory.Exists(appDataDir))
                 {
@@ -46,33 +60,33 @@ namespace RevitServerManager.Services
 
                 string appDataExe = Path.Combine(appDataDir, "RSBridge.exe");
 
-                // 3. Extract from EmbeddedResource if present
+                // 3. Extract embedded files if needed
                 var assembly = Assembly.GetExecutingAssembly();
-                string[] resNames = assembly.GetManifestResourceNames();
-                string? bridgeRes = null;
-                foreach (var name in resNames)
-                {
-                    if (name.EndsWith("RSBridge.exe", StringComparison.OrdinalIgnoreCase))
-                    {
-                        bridgeRes = name;
-                        break;
-                    }
-                }
+                var resNames = assembly.GetManifestResourceNames();
 
-                if (bridgeRes != null)
+                foreach (var k in RequiredFiles)
                 {
-                    try
+                    string targetFile = Path.Combine(appDataDir, k);
+                    if (!File.Exists(targetFile) || new FileInfo(targetFile).Length == 0)
                     {
-                        using var stream = assembly.GetManifestResourceStream(bridgeRes);
-                        if (stream != null)
+                        foreach (var res in resNames)
                         {
-                            using var fs = new FileStream(appDataExe, FileMode.Create, FileAccess.Write);
-                            stream.CopyTo(fs);
-                            _cachedBridgePath = appDataExe;
-                            return _cachedBridgePath;
+                            if (res.EndsWith(k, StringComparison.OrdinalIgnoreCase))
+                            {
+                                try
+                                {
+                                    using var stream = assembly.GetManifestResourceStream(res);
+                                    if (stream != null)
+                                    {
+                                        using var fs = new FileStream(targetFile, FileMode.Create, FileAccess.Write);
+                                        stream.CopyTo(fs);
+                                    }
+                                }
+                                catch { }
+                                break;
+                            }
                         }
                     }
-                    catch { }
                 }
 
                 if (File.Exists(appDataExe))
@@ -104,6 +118,7 @@ namespace RevitServerManager.Services
                 {
                     FileName = bridgeExe,
                     Arguments = $"\"{host}\" \"{folderPath}\" \"{version}\"",
+                    WorkingDirectory = Path.GetDirectoryName(bridgeExe) ?? "",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -164,7 +179,7 @@ namespace RevitServerManager.Services
             }
             catch
             {
-                // Fall back to REST on any bridge execution issue
+                // Fall back to REST on bridge failure
             }
 
             return null;

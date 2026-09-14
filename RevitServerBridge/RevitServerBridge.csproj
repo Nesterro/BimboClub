@@ -12,6 +12,44 @@
   <ItemGroup>
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="Castle.Core">
+      <HintPath>Libs\Castle.Core.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>Libs\Castle.Windsor.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Autodesk.RevitServer.Social">
+      <HintPath>Libs\Autodesk.RevitServer.Social.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="RS.Enterprise.Common.ClientServer.DataContract">
+      <HintPath>Libs\RS.Enterprise.Common.ClientServer.DataContract.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="RS.Enterprise.Common.ClientServer.Helper">
+      <HintPath>Libs\RS.Enterprise.Common.ClientServer.Helper.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="RS.Enterprise.Common.ClientServer.Proxy">
+      <HintPath>Libs\RS.Enterprise.Common.ClientServer.Proxy.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="RS.Enterprise.Common.ClientServer.ServiceContract.Local">
+      <HintPath>Libs\RS.Enterprise.Common.ClientServer.ServiceContract.Local.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="RS.Enterprise.Common.ClientServer.ServiceContract.Model">
+      <HintPath>Libs\RS.Enterprise.Common.ClientServer.ServiceContract.Model.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Libs\*.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

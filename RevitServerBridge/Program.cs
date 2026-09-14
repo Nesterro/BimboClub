@@ -1,9 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using System.Web.Script.Serialization;
+using Autodesk.RevitServer.Enterprise.Common.ClientServer.DataContract.SessionToken;
+using Autodesk.RevitServer.Enterprise.Common.ClientServer.Proxy;
+using Autodesk.RevitServer.Enterprise.Common.ClientServer.ServiceContract.Model;
 
 namespace RevitServerBridge
 {
@@ -13,66 +14,120 @@ namespace RevitServerBridge
         {
             if (args.Length < 1)
             {
-                Console.WriteLine("{\"Success\":false,\"Error\":\"Usage: RSBridge.exe <ServerHost> [FolderPath] [RevitVersion]\"}");
+                Console.WriteLine("{\"Success\":false,\"Error\":\"Usage: RSBridge.exe <ServerHost> [FolderPath]\"}");
                 return 1;
             }
 
             string serverHost = args[0].Trim().Replace("http://", "").Replace("https://", "").Trim('/');
             string folderPath = args.Length > 1 ? args[1] : "|";
-            string preferredVer = args.Length > 2 ? args[2] : "2022";
-
-            if (string.IsNullOrWhiteSpace(folderPath))
-            {
-                folderPath = "|";
-            }
-
-            string[] possibleYears = new string[]
-            {
-                preferredVer,
-                "2022", "2021", "2020", "2023", "2024", "2025", "2026", "2019", "2018"
-            };
-
-            string rstDir = null;
-            foreach (string y in possibleYears)
-            {
-                string d = @"C:\Program Files\Autodesk\Revit " + y + @"\RevitServerToolCommand";
-                if (Directory.Exists(d) && File.Exists(Path.Combine(d, "RS.Enterprise.Common.ClientServer.Proxy.dll")))
-                {
-                    rstDir = d;
-                    break;
-                }
-            }
-
-            if (rstDir == null)
-            {
-                Console.WriteLine("{\"Success\":false,\"Error\":\"Директория RevitServerToolCommand не найдена ни для одной версии Revit.\"}");
-                return 2;
-            }
-
-            AppDomain.CurrentDomain.AssemblyResolve += delegate(object s, ResolveEventArgs ev)
-            {
-                string dllName = new AssemblyName(ev.Name).Name + ".dll";
-                string fullPath = Path.Combine(rstDir, dllName);
-                if (File.Exists(fullPath))
-                {
-                    return Assembly.LoadFrom(fullPath);
-                }
-                return null;
-            };
+            if (string.IsNullOrWhiteSpace(folderPath)) folderPath = "|";
 
             try
             {
-                // Preload required assemblies
-                LoadIfExists(Path.Combine(rstDir, "Castle.Core.dll"));
-                LoadIfExists(Path.Combine(rstDir, "Castle.Windsor.dll"));
-                LoadIfExists(Path.Combine(rstDir, "RS.Enterprise.Common.ClientServer.Helper.dll"));
-                LoadIfExists(Path.Combine(rstDir, "RS.Enterprise.Common.ClientServer.DataContract.dll"));
-                LoadIfExists(Path.Combine(rstDir, "RS.Enterprise.Common.ClientServer.ServiceContract.Model.dll"));
-                LoadIfExists(Path.Combine(rstDir, "RS.Enterprise.Common.ClientServer.Proxy.dll"));
+                var proxyProvider = ProxyProvider.Instance;
+                var proxy = proxyProvider.GetBufferedProxy<IModelService>(serverHost);
 
-                object result = QueryServer(serverHost, folderPath);
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
-                Console.WriteLine(serializer.Serialize(result));
+                var token = new ServiceSessionToken(
+                    Environment.UserName,
+                    Environment.UserName,
+                    Environment.MachineName,
+                    Guid.NewGuid().ToString()
+                );
+
+                var folders = new List<string>();
+                var models = new List<Dictionary<string, object>>();
+
+                ArrayList subFolders = null;
+                ArrayList modelList = null;
+
+                bool querySuccess = false;
+                try
+                {
+                    querySuccess = proxy.Proxy.ListSubFoldersAndModels(token, folderPath, out subFolders, out modelList);
+                }
+                catch { }
+
+                if (subFolders != null)
+                {
+                    foreach (var f in subFolders)
+                    {
+                        if (f != null)
+                        {
+                            string fName = f.ToString().Trim();
+                            if (!string.IsNullOrEmpty(fName)) folders.Add(fName);
+                        }
+                    }
+                }
+
+                if (modelList != null)
+                {
+                    foreach (var m in modelList)
+                    {
+                        if (m != null)
+                        {
+                            string mName = m.ToString().Trim();
+                            if (!string.IsNullOrEmpty(mName))
+                            {
+                                models.Add(new Dictionary<string, object>
+                                {
+                                    { "Name", mName },
+                                    { "Size", 0L }
+                                });
+                            }
+                        }
+                    }
+                }
+
+                // Fallback to GetListOfModelFilesAndFolders if nothing returned
+                if (folders.Count == 0 && models.Count == 0)
+                {
+                    try
+                    {
+                        List<string> filesOut = null;
+                        List<string> foldersOut = null;
+                        var valStatus = proxy.Proxy.GetListOfModelFilesAndFolders(token, folderPath, out filesOut, out foldersOut);
+
+                        if (foldersOut != null)
+                        {
+                            foreach (var f in foldersOut)
+                            {
+                                if (!string.IsNullOrWhiteSpace(f) && !folders.Contains(f.Trim()))
+                                {
+                                    folders.Add(f.Trim());
+                                }
+                            }
+                        }
+
+                        if (filesOut != null)
+                        {
+                            foreach (var f in filesOut)
+                            {
+                                if (!string.IsNullOrWhiteSpace(f))
+                                {
+                                    string fName = f.Trim();
+                                    models.Add(new Dictionary<string, object>
+                                    {
+                                        { "Name", fName },
+                                        { "Size", 0L }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+                var res = new Dictionary<string, object>
+                {
+                    { "Success", true },
+                    { "Host", serverHost },
+                    { "Path", folderPath },
+                    { "Folders", folders },
+                    { "Models", models }
+                };
+
+                var serializer = new JavaScriptSerializer();
+                Console.WriteLine(serializer.Serialize(res));
                 return 0;
             }
             catch (Exception ex)
@@ -84,131 +139,10 @@ namespace RevitServerBridge
                     { "Error", errMsg },
                     { "Details", ex.ToString() }
                 };
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                var serializer = new JavaScriptSerializer();
                 Console.WriteLine(serializer.Serialize(errObj));
                 return 3;
             }
-        }
-
-        static void LoadIfExists(string path)
-        {
-            if (File.Exists(path))
-            {
-                Assembly.LoadFrom(path);
-            }
-        }
-
-        static object QueryServer(string serverHost, string folderPath)
-        {
-            Type proxyProviderType = Type.GetType("Autodesk.RevitServer.Enterprise.Common.ClientServer.Proxy.ProxyProvider, RS.Enterprise.Common.ClientServer.Proxy");
-            PropertyInfo propInstance = proxyProviderType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
-            object proxyProvider = propInstance.GetValue(null, null);
-
-            Type modelServiceType = Type.GetType("Autodesk.RevitServer.Enterprise.Common.ClientServer.ServiceContract.Model.IModelService, RS.Enterprise.Common.ClientServer.ServiceContract.Model");
-
-            MethodInfo getBufferedProxyMethod = null;
-            foreach (MethodInfo m in proxyProviderType.GetMethods())
-            {
-                if (m.Name == "GetBufferedProxy" && m.IsGenericMethod && m.GetParameters().Length == 1)
-                {
-                    getBufferedProxyMethod = m;
-                    break;
-                }
-            }
-
-            MethodInfo genericMethod = getBufferedProxyMethod.MakeGenericMethod(modelServiceType);
-            object proxy = genericMethod.Invoke(proxyProvider, new object[] { serverHost });
-
-            PropertyInfo propService = proxy.GetType().GetProperty("Service");
-            object service = propService.GetValue(proxy, null);
-
-            // 1. Try ListSubFoldersAndModels
-            object listResult = null;
-            try
-            {
-                MethodInfo methodList = modelServiceType.GetMethod("ListSubFoldersAndModels", new Type[] { typeof(string) });
-                if (methodList != null)
-                {
-                    listResult = methodList.Invoke(service, new object[] { folderPath });
-                }
-            }
-            catch { }
-
-            // 2. Fallback to GetListOfModelFilesAndFolders
-            if (listResult == null)
-            {
-                try
-                {
-                    MethodInfo methodGetList = modelServiceType.GetMethod("GetListOfModelFilesAndFolders", new Type[] { typeof(string) });
-                    if (methodGetList != null)
-                    {
-                        listResult = methodGetList.Invoke(service, new object[] { folderPath });
-                    }
-                }
-                catch { }
-            }
-
-            List<string> folders = new List<string>();
-            List<Dictionary<string, object>> models = new List<Dictionary<string, object>>();
-
-            if (listResult != null)
-            {
-                PropertyInfo propFolders = listResult.GetType().GetProperty("Folders");
-                if (propFolders != null)
-                {
-                    IEnumerable fList = propFolders.GetValue(listResult, null) as IEnumerable;
-                    if (fList != null)
-                    {
-                        foreach (object f in fList)
-                        {
-                            if (f != null)
-                            {
-                                string fName = f.ToString();
-                                if (!string.IsNullOrWhiteSpace(fName))
-                                {
-                                    folders.Add(fName);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                PropertyInfo propModels = listResult.GetType().GetProperty("Models");
-                if (propModels != null)
-                {
-                    IEnumerable mList = propModels.GetValue(listResult, null) as IEnumerable;
-                    if (mList != null)
-                    {
-                        foreach (object m in mList)
-                        {
-                            if (m == null) continue;
-                            Dictionary<string, object> modelDict = new Dictionary<string, object>();
-                            PropertyInfo pName = m.GetType().GetProperty("ModelName") ?? m.GetType().GetProperty("Name");
-                            string name = pName != null ? (pName.GetValue(m, null) ?? "").ToString() : m.ToString();
-
-                            long size = 0;
-                            PropertyInfo pSize = m.GetType().GetProperty("ModelSize") ?? m.GetType().GetProperty("Size");
-                            if (pSize != null)
-                            {
-                                object sVal = pSize.GetValue(m, null);
-                                if (sVal != null) long.TryParse(sVal.ToString(), out size);
-                            }
-
-                            modelDict["Name"] = name;
-                            modelDict["Size"] = size;
-                            models.Add(modelDict);
-                        }
-                    }
-                }
-            }
-
-            Dictionary<string, object> res = new Dictionary<string, object>();
-            res["Success"] = true;
-            res["Host"] = serverHost;
-            res["Path"] = folderPath;
-            res["Folders"] = folders;
-            res["Models"] = models;
-            return res;
         }
     }
 }

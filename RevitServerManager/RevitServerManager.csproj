@@ -18,7 +18,7 @@
     <ProjectReference Include="..\RevitServerBridge\RevitServerBridge.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <EmbeddedResource Include="..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe" Link="RSBridge.exe" Condition="Exists('..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe')" />
-    <None Include="..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe" Link="RSBridge.exe" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe')" />
+    <EmbeddedResource Include="..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe" Link="Bridge\RSBridge.exe" Condition="Exists('..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe')" />
+    <EmbeddedResource Include="..\RevitServerBridge\bin\$(Configuration)\net48\*.dll" Link="Bridge\%(Filename)%(Extension)" Condition="Exists('..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe')" />
   </ItemGroup>
 </Project>

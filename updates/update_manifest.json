@@ -1,13 +1,12 @@
 ﻿{
-    "latestVersion":  "2.4.0",
+    "latestVersion":  "2.4.1",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Встроен нативный WCF/NetTcp мост Revit Server RSBridge",
-                      "100% совместимость при отображении папок и моделей в корпоративной сети и VPN",
-                      "Автоматический выбор протокола RSBridge/REST"
+                      "Исправлен и интегрирован полнофункциональный WCF-мост Revit Server (RSBridge) с оригинальными библиотеками Autodesk",
+                      "100% совместимость со структурой серверов и моделей Revit Server в корпоративной сети и VPN"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.1/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.1/bimboclub_net8.zip"
                  }
 }
