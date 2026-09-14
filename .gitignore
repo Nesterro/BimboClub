@@ -8,3 +8,6 @@ obj/
 BimboClubManager_Release/
 UpdateServerMock/packages/
 BimboClubManager.exe
+RevitServerManager.exe
+RevitServerManager_Setup.exe
+RevitServerManagerInstaller/Payload/

@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuctSystemParamCopy", "Duct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BimboClubManager", "BimboClubManager\BimboClubManager.csproj", "{83895DEA-90F6-4352-82F5-17864AE52E37}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitServerManager", "RevitServerManager\RevitServerManager.csproj", "{17047F4F-5959-40BB-82D1-5685585EC93B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitServerManagerInstaller", "RevitServerManagerInstaller\RevitServerManagerInstaller.csproj", "{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +61,30 @@ Global
 		{83895DEA-90F6-4352-82F5-17864AE52E37}.Release|x64.Build.0 = Release|Any CPU
 		{83895DEA-90F6-4352-82F5-17864AE52E37}.Release|x86.ActiveCfg = Release|Any CPU
 		{83895DEA-90F6-4352-82F5-17864AE52E37}.Release|x86.Build.0 = Release|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Debug|x64.Build.0 = Debug|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Debug|x86.Build.0 = Debug|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Release|x64.ActiveCfg = Release|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Release|x64.Build.0 = Release|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Release|x86.ActiveCfg = Release|Any CPU
+		{17047F4F-5959-40BB-82D1-5685585EC93B}.Release|x86.Build.0 = Release|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Debug|x64.Build.0 = Debug|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Debug|x86.Build.0 = Debug|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Release|x64.ActiveCfg = Release|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Release|x64.Build.0 = Release|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Release|x86.ActiveCfg = Release|Any CPU
+		{E9745489-3DC2-4FFB-AC07-EEA5BF15D554}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

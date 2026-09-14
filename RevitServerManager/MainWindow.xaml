@@ -1,0 +1,276 @@
+<Window x:Class="RevitServerManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:RevitServerManager.Models"
+        mc:Ignorable="d"
+        Title="BimboClub - Revit Server Manager" 
+        Height="780" Width="1100"
+        MinHeight="600" MinWidth="850"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource DarkWindowStyle}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/> <!-- Header -->
+            <RowDefinition Height="55"/> <!-- Server Connection Bar -->
+            <RowDefinition Height="*"/>  <!-- Main Content (Tree + Models List) -->
+            <RowDefinition Height="Auto"/> <!-- Download Settings -->
+            <RowDefinition Height="65"/> <!-- Footer Action Bar -->
+        </Grid.RowDefinitions>
+
+        <!-- 1. Header -->
+        <Border Grid.Row="0" Background="#181820" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,0,0,1" Padding="20,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                    <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource AccentScarletBrush}" Margin="0,0,12,0">
+                        <TextBlock Text="RS" FontWeight="Bold" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="REVIT SERVER MANAGER" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextWhiteBrush}"/>
+                        <TextBlock Text="Автономный клиент для загрузки моделей с Revit Server" FontSize="11" Foreground="{StaticResource TextMutedBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="2">
+                    <Border x:Name="StatusBadge" Background="#282834" CornerRadius="12" Padding="10,4" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse x:Name="StatusIndicator" Width="8" Height="8" Fill="{StaticResource WarningYellowBrush}" Margin="0,0,6,0"/>
+                            <TextBlock x:Name="StatusBadgeText" Text="Не подключено" FontSize="11.5" Foreground="{StaticResource TextWhiteBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 2. Connection Bar -->
+        <Border Grid.Row="1" Background="{StaticResource PanelDarkBrush}" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,0,0,1" Padding="15,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="15"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Сервер:" Foreground="{StaticResource TextWhiteBrush}" VerticalAlignment="Center" Margin="0,0,8,0" Grid.Column="0"/>
+                <ComboBox x:Name="ServerAddressComboBox" IsEditable="True" Height="30" Grid.Column="1" VerticalContentAlignment="Center"/>
+
+                <TextBlock Text="Версия:" Foreground="{StaticResource TextWhiteBrush}" VerticalAlignment="Center" Margin="0,0,8,0" Grid.Column="3"/>
+                <ComboBox x:Name="ServerVersionComboBox" Height="30" Grid.Column="4">
+                    <ComboBoxItem Content="2026"/>
+                    <ComboBoxItem Content="2025"/>
+                    <ComboBoxItem Content="2024" IsSelected="True"/>
+                    <ComboBoxItem Content="2023"/>
+                    <ComboBoxItem Content="2022"/>
+                    <ComboBoxItem Content="2021"/>
+                    <ComboBoxItem Content="2020"/>
+                    <ComboBoxItem Content="2019"/>
+                </ComboBox>
+
+                <Button x:Name="ConnectButton" Content="⚡ Подключиться" Style="{StaticResource ScarletButtonStyle}" Height="30" Grid.Column="6" Click="ConnectButton_Click"/>
+            </Grid>
+        </Border>
+
+        <!-- 3. Main Content: Folders Tree + Models List -->
+        <Grid Grid.Row="2" Margin="15,12,15,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320" MinWidth="220"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*" MinWidth="350"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Folder Tree Card -->
+            <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <TextBlock Text="📁 КАТАЛОГИ СЕРВЕРА" FontWeight="Bold" FontSize="12" Foreground="{StaticResource AccentScarletActiveBrush}" VerticalAlignment="Center"/>
+                        <Button x:Name="RefreshFoldersButton" Content="🔄" Style="{StaticResource SecondaryButtonStyle}" Width="28" Height="24" Padding="0" HorizontalAlignment="Right" ToolTip="Обновить каталоги" Click="RefreshFoldersButton_Click"/>
+                    </Grid>
+
+                    <TreeView x:Name="FoldersTreeView" Grid.Row="1" Style="{StaticResource DarkTreeViewStyle}"
+                              SelectedItemChanged="FoldersTreeView_SelectedItemChanged">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource DarkTreeViewItemStyle}">
+                                <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type models:FolderViewModel}" ItemsSource="{Binding SubFolders}">
+                                <StackPanel Orientation="Horizontal" Margin="2,2">
+                                    <TextBlock Text="📁 " FontSize="12"/>
+                                    <TextBlock Text="{Binding Name}" Foreground="{StaticResource TextWhiteBrush}"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
+                </Grid>
+            </Border>
+
+            <!-- Grid Splitter -->
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent"/>
+
+            <!-- Right: Models List Card -->
+            <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Top Bar: Current Path + Search -->
+                    <Grid Grid.Row="0" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="220"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                            <TextBlock Text="МОДЕЛИ В ПАПКЕ: " FontWeight="Bold" FontSize="12" Foreground="{StaticResource AccentScarletActiveBrush}"/>
+                            <TextBlock x:Name="CurrentPathTextBlock" Text="Не выбрана" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource TextWhiteBrush}"/>
+                        </StackPanel>
+
+                        <TextBox x:Name="SearchModelsTextBox" Style="{StaticResource DarkTextBoxStyle}" Height="26" Grid.Column="1"
+                                 Text="Поиск модели..." Foreground="{StaticResource TextMutedBrush}"
+                                 GotFocus="SearchModelsTextBox_GotFocus" LostFocus="SearchModelsTextBox_LostFocus"
+                                 TextChanged="SearchModelsTextBox_TextChanged"/>
+                    </Grid>
+
+                    <!-- Selection Helpers -->
+                    <Grid Grid.Row="1" Margin="0,0,0,6">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Выбрать все" Style="{StaticResource SecondaryButtonStyle}" Height="22" FontSize="11" Padding="8,2" Margin="0,0,6,0" Click="SelectAllModels_Click"/>
+                            <Button Content="Снять все" Style="{StaticResource SecondaryButtonStyle}" Height="22" FontSize="11" Padding="8,2" Margin="0,0,6,0" Click="SelectNoneModels_Click"/>
+                            <Button Content="Инвертировать" Style="{StaticResource SecondaryButtonStyle}" Height="22" FontSize="11" Padding="8,2" Click="InvertModelsSelection_Click"/>
+                        </StackPanel>
+
+                        <TextBlock x:Name="ModelsCountTextBlock" Text="Моделей: 0" HorizontalAlignment="Right" VerticalAlignment="Center" FontSize="11.5" Foreground="{StaticResource TextMutedBrush}"/>
+                    </Grid>
+
+                    <!-- Models ListView -->
+                    <ListView x:Name="ModelsListView" Grid.Row="2" Background="Transparent" BorderThickness="0"
+                              ItemContainerStyle="{StaticResource DarkListViewItem}">
+                        <ListView.View>
+                            <GridView ColumnHeaderContainerStyle="{StaticResource DarkGridViewColumnHeader}">
+                                <GridViewColumn Width="38">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsSelected}" Style="{StaticResource DarkCheckBoxStyle}" Click="ModelCheckBox_Click"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Имя файла модели" Width="300">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="📄 " FontSize="12"/>
+                                                <TextBlock Text="{Binding Name}" FontWeight="Medium" Foreground="{StaticResource TextWhiteBrush}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Размер" DisplayMemberBinding="{Binding FormattedSize}" Width="90"/>
+
+                                <GridViewColumn Header="Статус" Width="140">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Status}" Foreground="{StaticResource TextMutedBrush}" FontSize="11.5"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- 4. Download Settings Panel -->
+        <Border Grid.Row="3" Background="{StaticResource PanelDarkBrush}" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,1,0,0" Padding="15,8" Margin="0,4,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Row 1: Destination Folder -->
+                <Grid Grid.Row="0" Margin="0,0,0,6">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="130"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="90"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Папка сохранения:" Foreground="{StaticResource TextWhiteBrush}" VerticalAlignment="Center" Grid.Column="0"/>
+                    <TextBox x:Name="DestinationFolderTextBox" Style="{StaticResource DarkTextBoxStyle}" Height="26" Grid.Column="1" Margin="0,0,6,0"/>
+                    <Button Content="Обзор..." Style="{StaticResource SecondaryButtonStyle}" Height="26" Grid.Column="2" Click="BrowseDestinationFolder_Click"/>
+                </Grid>
+
+                <!-- Row 2: Options + RevitServerTool Path -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
+                        <CheckBox x:Name="OverwriteCheckBox" Content="Перезаписывать файлы" Style="{StaticResource DarkCheckBoxStyle}" IsChecked="True" Margin="0,0,16,0"/>
+                        <CheckBox x:Name="PreserveSubfoldersCheckBox" Content="Сохранять структуру папок" Style="{StaticResource DarkCheckBoxStyle}" IsChecked="True" Margin="0,0,16,0"/>
+                        <CheckBox x:Name="OpenFolderCheckBox" Content="Открыть папку после загрузки" Style="{StaticResource DarkCheckBoxStyle}" IsChecked="True"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="2">
+                        <TextBlock Text="Утилита RevitServerTool:" FontSize="11" Foreground="{StaticResource TextMutedBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock x:Name="RevitToolStatusTextBlock" Text="Автоопределена" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SuccessGreenBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <Button Content="⚙️" Style="{StaticResource SecondaryButtonStyle}" Width="24" Height="22" Padding="0" ToolTip="Выбрать путь к RevitServerTool.exe вручную" Click="ConfigureToolPath_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- 5. Footer Action Bar -->
+        <Border Grid.Row="4" Background="#181820" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,1,0,0" Padding="15,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Progress & Stats -->
+                <StackPanel VerticalAlignment="Center" Grid.Column="0" Margin="0,0,15,0">
+                    <Grid Margin="0,0,0,4">
+                        <TextBlock x:Name="ProgressStatusTextBlock" Text="Готово к работе" FontSize="12" Foreground="{StaticResource TextWhiteBrush}"/>
+                        <TextBlock x:Name="SelectedSummaryTextBlock" Text="Выбрано: 0 моделей (0 Б)" HorizontalAlignment="Right" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource AccentScarletActiveBrush}"/>
+                    </Grid>
+                    <ProgressBar x:Name="DownloadProgressBar" Height="8" Background="{StaticResource ControlDarkBrush}" Foreground="{StaticResource AccentScarletActiveBrush}" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="1"/>
+                </StackPanel>
+
+                <!-- Actions -->
+                <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
+                    <Button x:Name="CancelDownloadButton" Content="Отмена" Style="{StaticResource SecondaryButtonStyle}" Height="36" Width="90" Margin="0,0,10,0" Visibility="Collapsed" Click="CancelDownloadButton_Click"/>
+                    <Button x:Name="DownloadButton" Content="⬇️ Скачать выбранные модели" Style="{StaticResource ScarletButtonStyle}" Height="36" Padding="18,0" IsEnabled="False" Click="DownloadButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

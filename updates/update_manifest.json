@@ -1,13 +1,14 @@
 ﻿{
-    "latestVersion":  "2.2.8",
-    "releaseDate":  "2026-09-02",
+    "latestVersion":  "2.3.0",
+    "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Added new module: Batch Family Parameter Remover (Удаление параметров из семейств)",
-                      "Support for filtering families by category and search keyword",
-                      "Batch scanning of family parameters and safe deletion via FamilyManager with auto-reload"
+                      "Added standalone Revit Server Client application (RevitServerManager.exe)",
+                      "Added dedicated Windows Installer (RevitServerManager_Setup.exe) with desktop and start menu shortcuts",
+                      "Support for browsing Revit Server 2019-2026 folders and models via REST API",
+                      "Batch downloading models with automatic RevitServerTool detection, subfolder preservation, and progress tracking"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.8/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.2.8/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.0/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.0/bimboclub_net8.zip"
                  }
 }

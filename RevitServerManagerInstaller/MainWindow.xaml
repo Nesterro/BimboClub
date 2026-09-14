@@ -1,0 +1,82 @@
+<Window x:Class="RevitServerManagerInstaller.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Установка BimboClub Revit Server Manager" 
+        Height="440" Width="560"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="{StaticResource BgDarkBrush}"
+        Foreground="{StaticResource TextWhiteBrush}"
+        FontFamily="Segoe UI, sans-serif" FontSize="13">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="75"/>  <!-- Header -->
+            <RowDefinition Height="*"/>   <!-- Options -->
+            <RowDefinition Height="65"/>  <!-- Footer -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#181820" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,0,0,1" Padding="20,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Width="42" Height="42" CornerRadius="8" Background="{StaticResource AccentScarletBrush}" Margin="0,0,15,0" Grid.Column="0">
+                    <TextBlock Text="RS" FontWeight="Bold" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel VerticalAlignment="Center" Grid.Column="1">
+                    <TextBlock Text="BimboClub Revit Server Manager" FontWeight="Bold" FontSize="16" Foreground="{StaticResource TextWhiteBrush}"/>
+                    <TextBlock Text="Мастер установки автономного клиента Revit Server" FontSize="12" Foreground="{StaticResource TextMutedBrush}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Body -->
+        <StackPanel Grid.Row="1" Margin="25,18,25,15">
+            <TextBlock Text="Папка для установки:" FontWeight="SemiBold" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,0,6"/>
+            
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox x:Name="InstallPathTextBox" Background="{StaticResource ControlDarkBrush}" Foreground="{StaticResource TextWhiteBrush}"
+                         BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="1" Padding="8,6" Height="32" Grid.Column="0" Margin="0,0,8,0"
+                         VerticalContentAlignment="Center"/>
+                <Button Content="Обзор..." Background="{StaticResource ControlDarkBrush}" Foreground="{StaticResource TextWhiteBrush}"
+                        BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="1" Height="32" Grid.Column="1" Cursor="Hand"
+                        Click="BrowseButton_Click"/>
+            </Grid>
+
+            <TextBlock Text="Дополнительные действия:" FontWeight="SemiBold" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,0,8"/>
+
+            <CheckBox x:Name="DesktopShortcutCheckBox" Content="Создать ярлык на Рабочем столе" IsChecked="True" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,0,8" Cursor="Hand"/>
+            <CheckBox x:Name="StartMenuShortcutCheckBox" Content="Создать ярлык в меню «Пуск»" IsChecked="True" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,0,8" Cursor="Hand"/>
+            <CheckBox x:Name="LaunchAfterInstallCheckBox" Content="Запустить Revit Server Manager после установки" IsChecked="True" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,0,15" Cursor="Hand"/>
+
+            <!-- Progress section -->
+            <StackPanel x:Name="ProgressSection" Visibility="Collapsed">
+                <TextBlock x:Name="StatusTextBlock" Text="Копирование файлов..." FontSize="11.5" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,0,4"/>
+                <ProgressBar x:Name="InstallProgressBar" Height="8" Background="{StaticResource ControlDarkBrush}" Foreground="{StaticResource AccentScarletActiveBrush}" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="1"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="#181820" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,1,0,0" Padding="20,12">
+            <Grid>
+                <Button x:Name="CancelButton" Content="Отмена" Background="{StaticResource ControlDarkBrush}" Foreground="{StaticResource TextWhiteBrush}"
+                        BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="1" Width="90" Height="34" HorizontalAlignment="Left" Cursor="Hand"
+                        Click="CancelButton_Click"/>
+
+                <Button x:Name="InstallButton" Content="Установить" Background="{StaticResource AccentScarletBrush}" Foreground="White"
+                        FontWeight="SemiBold" Width="130" Height="34" HorizontalAlignment="Right" Cursor="Hand"
+                        Click="InstallButton_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

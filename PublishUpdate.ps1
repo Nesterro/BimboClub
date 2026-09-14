@@ -66,8 +66,35 @@ if (-not $NoManager) {
     Stop-Process -Name "BimboClubManager" -ErrorAction SilentlyContinue
     Start-Sleep -Seconds 1
     Copy-Item $singleExe -Destination "$yandexFolder\BimboClubManager.exe" -Force
+
+    # Publish RevitServerManager.exe
+    Write-Host "--- 3.1 Publishing standalone single-file RevitServerManager.exe ---" -ForegroundColor Cyan
+    dotnet publish RevitServerManager\RevitServerManager.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -p:Version=$Version
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "RevitServerManager publish failed!"
+        exit 1
+    }
+    $singleServerExe = "RevitServerManager\bin\Release\net8.0-windows\win-x64\publish\RevitServerManager.exe"
+    Copy-Item $singleServerExe -Destination "RevitServerManager.exe" -Force
+    Copy-Item $singleServerExe -Destination "$yandexFolder\RevitServerManager.exe" -Force
+
+    # Prepare payload for installer
+    $payloadDir = "RevitServerManagerInstaller\Payload"
+    if (-not (Test-Path $payloadDir)) { $null = New-Item -ItemType Directory -Path $payloadDir -Force }
+    Copy-Item $singleServerExe -Destination "$payloadDir\RevitServerManager.exe" -Force
+
+    # Publish RevitServerManager_Setup.exe
+    Write-Host "--- 3.2 Publishing installer RevitServerManager_Setup.exe ---" -ForegroundColor Cyan
+    dotnet publish RevitServerManagerInstaller\RevitServerManagerInstaller.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -p:Version=$Version
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "RevitServerManagerInstaller publish failed!"
+        exit 1
+    }
+    $setupExe = "RevitServerManagerInstaller\bin\Release\net8.0-windows\win-x64\publish\RevitServerManager_Setup.exe"
+    Copy-Item $setupExe -Destination "RevitServerManager_Setup.exe" -Force
+    Copy-Item $setupExe -Destination "$yandexFolder\RevitServerManager_Setup.exe" -Force
 } else {
-    Write-Host "--- 3. Skipping BimboClubManager compile (-NoManager set) ---" -ForegroundColor Yellow
+    Write-Host "--- 3. Skipping standalone apps compile (-NoManager set) ---" -ForegroundColor Yellow
 }
 
 # 4. Update manifest and push to Git
@@ -86,7 +113,7 @@ $manifest = [ordered]@{
 $json = ConvertTo-Json $manifest -Depth 4
 [System.IO.File]::WriteAllText((Resolve-Path $manifestPath), $json, [System.Text.Encoding]::UTF8)
 
-# Git push (BimboClubManager.exe is gitignored and will NOT be committed to git repo)
+# Git push
 git add .
 git commit -m "Release version v$Version"
 git push origin main
@@ -101,7 +128,7 @@ $notes = "BimboClub Tools version $Version released on $date`n`nChanges:`n" + ((
 if ($NoManager) {
     & $ghPath release create "v$Version" "UpdateServerMock\packages\bimboclub_net48.zip" "UpdateServerMock\packages\bimboclub_net8.zip" --title "BimboClub Tools v$Version" --notes $notes
 } else {
-    & $ghPath release create "v$Version" "BimboClubManager.exe" "UpdateServerMock\packages\bimboclub_net48.zip" "UpdateServerMock\packages\bimboclub_net8.zip" --title "BimboClub Tools v$Version" --notes $notes
+    & $ghPath release create "v$Version" "BimboClubManager.exe" "RevitServerManager.exe" "RevitServerManager_Setup.exe" "UpdateServerMock\packages\bimboclub_net48.zip" "UpdateServerMock\packages\bimboclub_net8.zip" --title "BimboClub Tools v$Version" --notes $notes
 }
 
 Write-Host ""

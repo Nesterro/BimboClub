@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>icon_setup.ico</ApplicationIcon>
+    <AssemblyName>RevitServerManager_Setup</AssemblyName>
+    <RootNamespace>RevitServerManagerInstaller</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="icon_setup.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <EmbeddedResource Include="Payload\RevitServerManager.exe" Condition="Exists('Payload\RevitServerManager.exe')" />
+  </ItemGroup>
+
+</Project>
