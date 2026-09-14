@@ -62,9 +62,9 @@ namespace RevitServerManager.Services
         public async Task<FolderContents> GetContentsAsync(string serverRelativePath)
         {
             string formattedPath;
-            if (string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath == "|")
+            if (string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|")
             {
-                formattedPath = "%20";
+                formattedPath = "%7C";
             }
             else
             {
@@ -72,12 +72,26 @@ namespace RevitServerManager.Services
                 string[] escapedParts = new string[parts.Length];
                 for (int i = 0; i < parts.Length; i++)
                 {
-                    escapedParts[i] = Uri.EscapeDataString(parts[i]);
+                    escapedParts[i] = Uri.EscapeDataString(parts[i].Trim());
                 }
                 formattedPath = string.Join("%7C", escapedParts);
             }
 
-            return await GetAsync<FolderContents>($"{formattedPath}/contents");
+            try
+            {
+                return await GetAsync<FolderContents>($"{formattedPath}/contents");
+            }
+            catch (Exception) when (string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|")
+            {
+                try
+                {
+                    return await GetAsync<FolderContents>("|/contents");
+                }
+                catch
+                {
+                    return await GetAsync<FolderContents>("contents");
+                }
+            }
         }
 
         public void Dispose()

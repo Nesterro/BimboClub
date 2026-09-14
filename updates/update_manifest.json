@@ -1,15 +1,12 @@
 ﻿{
-    "latestVersion":  "2.3.1",
+    "latestVersion":  "2.3.2",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Full auto-detection and parsing of RSN.ini configuration for all Revit versions (2019-2026)",
-                      "Multi-server network tree view: display all RSN.ini servers simultaneously in the left tree with live status",
-                      "Auto-updating server dropdown and tree when changing Revit version (e.g. 2022 -\u003e arch-srv, revit2022, revit-gloraks, revit_prokshino, jmskumbc8q8g, 172.16.12.12)",
-                      "Added direct Open/Edit RSN.ini button in the interface",
-                      "Updated installer and standalone binaries on GitHub Releases"
+                      "Fixed HTTP 400 invalid path error on Revit Server 2022+ (replaced %20 space encoding with %7C pipe delimiter and fallback for root contents)",
+                      "Ensured safe trimming of URI parameters when connecting to remote Revit Server instances"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.1/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.1/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.2/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.2/bimboclub_net8.zip"
                  }
 }

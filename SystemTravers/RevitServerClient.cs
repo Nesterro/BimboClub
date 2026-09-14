@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
@@ -75,25 +75,36 @@ namespace BimboClub
         public async Task<FolderContents> GetContentsAsync(string serverRelativePath)
         {
             string formattedPath;
-            if (string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath == "|")
+            if (string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|")
             {
-                // Root is represented as a space character (URL encoded as %20)
-                formattedPath = "%20";
+                formattedPath = "%7C";
             }
             else
             {
-                // Escape URL path, keeping the pipe characters or replacing them with %7C.
-                // We split by '|' to escape folder names individually, then join with "%7C"
                 string[] parts = serverRelativePath.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
                 string[] escapedParts = new string[parts.Length];
                 for (int i = 0; i < parts.Length; i++)
                 {
-                    escapedParts[i] = Uri.EscapeDataString(parts[i]);
+                    escapedParts[i] = Uri.EscapeDataString(parts[i].Trim());
                 }
                 formattedPath = string.Join("%7C", escapedParts);
             }
 
-            return await GetAsync<FolderContents>($"{formattedPath}/contents");
+            try
+            {
+                return await GetAsync<FolderContents>($"{formattedPath}/contents");
+            }
+            catch (Exception) when (string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|")
+            {
+                try
+                {
+                    return await GetAsync<FolderContents>("|/contents");
+                }
+                catch
+                {
+                    return await GetAsync<FolderContents>("contents");
+                }
+            }
         }
 
         public void Dispose()
