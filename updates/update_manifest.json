@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.3.6",
+    "latestVersion":  "2.3.7",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Очистка кэша сборки инсталлятора для гарантированного обновления исполняемого файла",
-                      "Отображение номера версии в заголовке окна Revit Server Manager",
-                      "Полная поддержка ModelDataRESTService и Windows Authentication"
+                      "Удалены порты 808/8080 для предотвращения TCP connection timeout на корпоративном файрволе",
+                      "Добавлены обязательные заголовки Accept: application/json и Client-Version",
+                      "Оптимизирован быстрый поиск первого рабочего эндпоинта Revit Server"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.6/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.6/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.7/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.7/bimboclub_net8.zip"
                  }
 }

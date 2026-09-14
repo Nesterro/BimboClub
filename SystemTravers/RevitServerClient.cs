@@ -61,31 +61,21 @@ namespace BimboClub
             list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminService.svc");
             list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/RESTService.svc");
             list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/AdminRESTService.svc");
-            list.Add($"http://{host}/RevitServerCentralRESTService{preferredVersion}/CentralRESTService.svc");
-            list.Add($"http://{host}/RevitServerLocalRESTService{preferredVersion}/LocalRESTService.svc");
 
             // 2. Unversioned variants
             list.Add($"http://{host}/RevitServerAdminRESTService/AdminRESTService.svc");
             list.Add($"http://{host}/RevitServerModelDataRESTService/ModelDataRESTService.svc");
             list.Add($"http://{host}/RevitServerAdminRESTService/AdminRestService.svc");
-            list.Add($"http://{host}/RevitServerAdminRESTService/AdminService.svc");
             list.Add($"http://{host}/RevitServerRESTService/RESTService.svc");
 
             // 3. Fallback versions
-            string[] otherVersions = { "2024", "2022", "2023", "2025", "2026", "2021", "2020", "2019" };
+            string[] otherVersions = { "2022", "2024", "2023", "2025", "2026", "2021", "2020", "2019" };
             foreach (var ver in otherVersions)
             {
                 if (ver == preferredVersion) continue;
                 list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRESTService.svc");
                 list.Add($"http://{host}/RevitServerModelDataRESTService{ver}/ModelDataRESTService.svc");
-                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRestService.svc");
             }
-
-            // 4. Alternate ports
-            list.Add($"http://{host}:808/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
-            list.Add($"http://{host}:808/RevitServerModelDataRESTService{preferredVersion}/ModelDataRESTService.svc");
-            list.Add($"http://{host}:8080/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
-            list.Add($"http://{host}:8080/RevitServerModelDataRESTService{preferredVersion}/ModelDataRESTService.svc");
 
             return list.Distinct().ToList();
         }
@@ -97,29 +87,36 @@ namespace BimboClub
             return string.IsNullOrWhiteSpace(ascii) ? fallback : ascii;
         }
 
+        private HttpRequestMessage CreateRequest(HttpMethod method, string url)
+        {
+            var req = new HttpRequestMessage(method, url);
+            req.Headers.TryAddWithoutValidation("User-Name", _userName);
+            req.Headers.TryAddWithoutValidation("User-Machine-Name", _machineName);
+            req.Headers.TryAddWithoutValidation("Operation-GUID", Guid.NewGuid().ToString());
+            req.Headers.TryAddWithoutValidation("Client-Version", Version);
+            req.Headers.TryAddWithoutValidation("Accept", "application/json");
+            return req;
+        }
+
         private async Task EnsureActiveBaseUrlAsync()
         {
             if (_activeBaseUrl != null) return;
 
             var candidates = _candidateBaseUrls.ToList();
-            int batchSize = 6;
+            int batchSize = 4;
             for (int i = 0; i < candidates.Count; i += batchSize)
             {
                 var batch = candidates.Skip(i).Take(batchSize).ToList();
                 var tasks = batch.Select(async baseUrl =>
                 {
-                    string[] testEndpoints = { "%7C/contents", "serverProperties", "|/contents", "contents" };
+                    string[] testEndpoints = { "contents", "%7C/contents", "serverProperties", "|/contents" };
                     foreach (var ep in testEndpoints)
                     {
                         try
                         {
-                            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(6)))
-                            using (var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/{ep}"))
+                            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
+                            using (var req = CreateRequest(HttpMethod.Get, $"{baseUrl}/{ep}"))
                             {
-                                req.Headers.TryAddWithoutValidation("User-Name", _userName);
-                                req.Headers.TryAddWithoutValidation("User-Machine-Name", _machineName);
-                                req.Headers.TryAddWithoutValidation("Operation-GUID", Guid.NewGuid().ToString());
-
                                 using (var resp = await _httpClient.SendAsync(req, cts.Token))
                                 {
                                     if (resp.IsSuccessStatusCode)
@@ -183,12 +180,8 @@ namespace BimboClub
 
                 try
                 {
-                    using (var request = new HttpRequestMessage(HttpMethod.Get, url))
+                    using (var request = CreateRequest(HttpMethod.Get, url))
                     {
-                        request.Headers.TryAddWithoutValidation("User-Name", _userName);
-                        request.Headers.TryAddWithoutValidation("User-Machine-Name", _machineName);
-                        request.Headers.TryAddWithoutValidation("Operation-GUID", Guid.NewGuid().ToString());
-
                         using (var response = await _httpClient.SendAsync(request))
                         {
                             response.EnsureSuccessStatusCode();
