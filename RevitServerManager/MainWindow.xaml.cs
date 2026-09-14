@@ -210,6 +210,7 @@ namespace RevitServerManager
             {
                 var client = GetClientFor(host, ver);
                 var props = await client.CheckConnectionAsync();
+                string actualVer = client.DiscoveredVersion;
 
                 StatusBadgeText.Text = $"{props.ServerName} ({props.ServerVersion})";
                 StatusIndicator.Fill = (SolidColorBrush)FindResource("SuccessGreenBrush");
@@ -222,7 +223,7 @@ namespace RevitServerManager
                     foreach (var folder in rootContents.Folders)
                     {
                         bool hasSub = folder.FolderCount > 0;
-                        RootTreeItems.Add(new FolderViewModel(folder.Name, folder.Name, host, ver, hasSub));
+                        RootTreeItems.Add(new FolderViewModel(folder.Name, folder.Name, host, actualVer, hasSub));
                     }
                 }
 
@@ -233,7 +234,11 @@ namespace RevitServerManager
                 StatusBadgeText.Text = "Ошибка подключения";
                 StatusIndicator.Fill = (SolidColorBrush)FindResource("ErrorRedBrush");
                 ProgressStatusTextBlock.Text = $"Ошибка подключения к {host}";
-                MessageBox.Show(this, $"Не удалось подключиться к Revit Server ({host}, {ver}):\n\n{ex.Message}", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this, 
+                    $"Не удалось подключиться к Revit Server ({host}, {ver}):\n\n{ex.Message}\n\nВозможные причины:\n 1. Проверьте подключение к корпоративной сети (VPN).\n 2. Убедитесь, что версия ({ver}) совпадает с установленной версией Revit Server на данном хосте.\n 3. Проверьте конфигурацию серверов по кнопке «📝 Открыть RSN.ini».", 
+                    "Ошибка подключения", 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Error);
             }
             finally
             {

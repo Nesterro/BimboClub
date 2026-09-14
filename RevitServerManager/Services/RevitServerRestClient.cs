@@ -19,6 +19,7 @@ namespace RevitServerManager.Services
 
         public string Host { get; }
         public string Version { get; }
+        public string DiscoveredVersion { get; private set; }
 
         public RevitServerRestClient(string host, string version)
         {
@@ -27,28 +28,54 @@ namespace RevitServerManager.Services
 
             Host = host.Replace("http://", "").Replace("https://", "").Trim().Trim('/');
             Version = version.Trim();
+            DiscoveredVersion = Version;
 
-            _candidateBaseUrls = new List<string>
-            {
-                $"http://{Host}/RevitServerAdminRESTService{Version}/AdminRESTService.svc",
-                $"http://{Host}/RevitServerAdminRESTService{Version}/AdminRestService.svc",
-                $"http://{Host}/RevitServerAdminRESTService/AdminRESTService.svc",
-                $"http://{Host}/RevitServerAdminRESTService/AdminRestService.svc"
-            };
-
+            _candidateBaseUrls = GenerateCandidateUrls(Host, Version);
             _activeBaseUrl = _candidateBaseUrls[0];
 
             _userName = SanitizeHeader(Environment.UserName, "BCCUser");
             _machineName = SanitizeHeader(Environment.MachineName, "BCCMachine");
 
             _httpClient = new HttpClient();
-            _httpClient.Timeout = TimeSpan.FromSeconds(15);
+            _httpClient.Timeout = TimeSpan.FromSeconds(10);
+        }
+
+        private static List<string> GenerateCandidateUrls(string host, string preferredVersion)
+        {
+            var list = new List<string>();
+
+            // 1. Primary requested version variants
+            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminRestService.svc");
+            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminService.svc");
+            list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/RESTService.svc");
+            list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/AdminRESTService.svc");
+
+            // 2. Unversioned variants
+            list.Add($"http://{host}/RevitServerAdminRESTService/AdminRESTService.svc");
+            list.Add($"http://{host}/RevitServerAdminRESTService/AdminRestService.svc");
+            list.Add($"http://{host}/RevitServerAdminRESTService/AdminService.svc");
+            list.Add($"http://{host}/RevitServerRESTService/RESTService.svc");
+
+            // 3. Fallback versions (in case host runs a different year version of Revit Server)
+            string[] otherVersions = { "2024", "2022", "2023", "2025", "2026", "2021", "2020", "2019" };
+            foreach (var ver in otherVersions)
+            {
+                if (ver == preferredVersion) continue;
+                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRESTService.svc");
+                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRestService.svc");
+            }
+
+            // 4. Alternate ports (808, 8080)
+            list.Add($"http://{host}:808/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+            list.Add($"http://{host}:8080/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+
+            return list.Distinct().ToList();
         }
 
         private static string SanitizeHeader(string? value, string fallback)
         {
             if (string.IsNullOrWhiteSpace(value)) return fallback;
-            // Clean non-ASCII characters that can break IIS HTTP header parsing
             string ascii = new string(value.Where(c => c >= 32 && c <= 126).ToArray());
             return string.IsNullOrWhiteSpace(ascii) ? fallback : ascii;
         }
@@ -57,7 +84,6 @@ namespace RevitServerManager.Services
         {
             Exception? lastEx = null;
 
-            // Try active base URL first, then fallback to other candidates if 404/405 occurs
             var urlsToTry = new List<string> { _activeBaseUrl };
             foreach (var b in _candidateBaseUrls)
             {
@@ -85,17 +111,39 @@ namespace RevitServerManager.Services
                     var result = (T)serializer.ReadObject(ms)!;
 
                     _activeBaseUrl = baseUrl;
+                    ExtractDiscoveredVersion(baseUrl);
                     return result;
                 }
                 catch (HttpRequestException ex)
                 {
                     lastEx = ex;
-                    // If method not allowed or not found on base url, try next candidate
+                    continue;
+                }
+                catch (Exception ex)
+                {
+                    lastEx = ex;
                     continue;
                 }
             }
 
-            throw lastEx ?? new InvalidOperationException($"Не удалось выполнить запрос к Revit Server {Host}");
+            throw lastEx ?? new InvalidOperationException($"Не удалось выполнить запрос к Revit Server {Host} ({relativeUrl})");
+        }
+
+        private void ExtractDiscoveredVersion(string workingUrl)
+        {
+            try
+            {
+                string[] years = { "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019" };
+                foreach (var y in years)
+                {
+                    if (workingUrl.Contains(y))
+                    {
+                        DiscoveredVersion = y;
+                        break;
+                    }
+                }
+            }
+            catch { }
         }
 
         public async Task<ServerProperties> CheckConnectionAsync()
@@ -103,14 +151,24 @@ namespace RevitServerManager.Services
             // 1. Try serverProperties
             try
             {
-                return await GetAsync<ServerProperties>("serverProperties");
+                var props = await GetAsync<ServerProperties>("serverProperties");
+                if (!string.IsNullOrEmpty(props.ServerVersion))
+                {
+                    DiscoveredVersion = props.ServerVersion;
+                }
+                return props;
             }
             catch
             {
                 // 2. Try serverproperties (lowercase)
                 try
                 {
-                    return await GetAsync<ServerProperties>("serverproperties");
+                    var props = await GetAsync<ServerProperties>("serverproperties");
+                    if (!string.IsNullOrEmpty(props.ServerVersion))
+                    {
+                        DiscoveredVersion = props.ServerVersion;
+                    }
+                    return props;
                 }
                 catch
                 {
@@ -121,7 +179,7 @@ namespace RevitServerManager.Services
                         return new ServerProperties
                         {
                             ServerName = Host,
-                            ServerVersion = Version
+                            ServerVersion = DiscoveredVersion
                         };
                     }
 

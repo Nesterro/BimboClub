@@ -18,6 +18,7 @@ namespace BimboClub
 
         public string Host { get; }
         public string Version { get; }
+        public string DiscoveredVersion { get; private set; }
 
         public RevitServerClient(string host, string version)
         {
@@ -26,22 +27,49 @@ namespace BimboClub
 
             Host = host.Replace("http://", "").Replace("https://", "").Trim().Trim('/');
             Version = version.Trim();
+            DiscoveredVersion = Version;
 
-            _candidateBaseUrls = new List<string>
-            {
-                $"http://{Host}/RevitServerAdminRESTService{Version}/AdminRESTService.svc",
-                $"http://{Host}/RevitServerAdminRESTService{Version}/AdminRestService.svc",
-                $"http://{Host}/RevitServerAdminRESTService/AdminRESTService.svc",
-                $"http://{Host}/RevitServerAdminRESTService/AdminRestService.svc"
-            };
-
+            _candidateBaseUrls = GenerateCandidateUrls(Host, Version);
             _activeBaseUrl = _candidateBaseUrls[0];
 
             _userName = SanitizeHeader(Environment.UserName, "BCCUser");
             _machineName = SanitizeHeader(Environment.MachineName, "BCCMachine");
 
             _httpClient = new HttpClient();
-            _httpClient.Timeout = TimeSpan.FromSeconds(15);
+            _httpClient.Timeout = TimeSpan.FromSeconds(10);
+        }
+
+        private static List<string> GenerateCandidateUrls(string host, string preferredVersion)
+        {
+            var list = new List<string>();
+
+            // 1. Primary requested version variants
+            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminRestService.svc");
+            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminService.svc");
+            list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/RESTService.svc");
+            list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/AdminRESTService.svc");
+
+            // 2. Unversioned variants
+            list.Add($"http://{host}/RevitServerAdminRESTService/AdminRESTService.svc");
+            list.Add($"http://{host}/RevitServerAdminRESTService/AdminRestService.svc");
+            list.Add($"http://{host}/RevitServerAdminRESTService/AdminService.svc");
+            list.Add($"http://{host}/RevitServerRESTService/RESTService.svc");
+
+            // 3. Fallback versions
+            string[] otherVersions = { "2024", "2022", "2023", "2025", "2026", "2021", "2020", "2019" };
+            foreach (var ver in otherVersions)
+            {
+                if (ver == preferredVersion) continue;
+                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRESTService.svc");
+                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRestService.svc");
+            }
+
+            // 4. Alternate ports
+            list.Add($"http://{host}:808/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+            list.Add($"http://{host}:8080/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+
+            return list.Distinct().ToList();
         }
 
         private static string SanitizeHeader(string value, string fallback)
@@ -95,9 +123,14 @@ namespace BimboClub
                     lastEx = ex;
                     continue;
                 }
+                catch (Exception ex)
+                {
+                    lastEx = ex;
+                    continue;
+                }
             }
 
-            throw lastEx ?? new InvalidOperationException($"Не удалось выполнить запрос к Revit Server {Host}");
+            throw lastEx ?? new InvalidOperationException($"Не удалось выполнить запрос к Revit Server {Host} ({relativeUrl})");
         }
 
         public async Task<ServerProperties> CheckConnectionAsync()
@@ -120,7 +153,7 @@ namespace BimboClub
                         return new ServerProperties
                         {
                             ServerName = Host,
-                            ServerVersion = Version
+                            ServerVersion = DiscoveredVersion
                         };
                     }
 
