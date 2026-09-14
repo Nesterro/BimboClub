@@ -34,6 +34,12 @@ namespace RevitServerManager
         {
             InitializeComponent();
 
+            var ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            if (ver != null)
+            {
+                Title = $"BimboClub - Revit Server Manager v{ver.Major}.{ver.Minor}.{ver.Build}";
+            }
+
             _settings = AppSettings.Load();
             ApplySettingsToUi();
 
