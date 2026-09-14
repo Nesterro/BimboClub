@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using RevitServerManager.Models;
 
@@ -12,7 +14,7 @@ namespace RevitServerManager.Services
     public class RevitServerRestClient : IDisposable
     {
         private readonly HttpClient _httpClient;
-        private string _activeBaseUrl;
+        private string? _activeBaseUrl;
         private readonly List<string> _candidateBaseUrls;
         private readonly string _userName;
         private readonly string _machineName;
@@ -31,28 +33,41 @@ namespace RevitServerManager.Services
             DiscoveredVersion = Version;
 
             _candidateBaseUrls = GenerateCandidateUrls(Host, Version);
-            _activeBaseUrl = _candidateBaseUrls[0];
 
             _userName = SanitizeHeader(Environment.UserName, "BCCUser");
             _machineName = SanitizeHeader(Environment.MachineName, "BCCMachine");
 
-            _httpClient = new HttpClient();
-            _httpClient.Timeout = TimeSpan.FromSeconds(10);
+            var handler = new HttpClientHandler
+            {
+                UseDefaultCredentials = true,
+                PreAuthenticate = true,
+                UseProxy = true,
+                DefaultProxyCredentials = CredentialCache.DefaultCredentials
+            };
+
+            _httpClient = new HttpClient(handler)
+            {
+                Timeout = TimeSpan.FromSeconds(25)
+            };
         }
 
         private static List<string> GenerateCandidateUrls(string host, string preferredVersion)
         {
             var list = new List<string>();
 
-            // 1. Primary requested version variants
+            // 1. Primary requested version variants - Admin & ModelData (Revit default)
             list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+            list.Add($"http://{host}/RevitServerModelDataRESTService{preferredVersion}/ModelDataRESTService.svc");
             list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminRestService.svc");
             list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminService.svc");
             list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/RESTService.svc");
             list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/AdminRESTService.svc");
+            list.Add($"http://{host}/RevitServerCentralRESTService{preferredVersion}/CentralRESTService.svc");
+            list.Add($"http://{host}/RevitServerLocalRESTService{preferredVersion}/LocalRESTService.svc");
 
             // 2. Unversioned variants
             list.Add($"http://{host}/RevitServerAdminRESTService/AdminRESTService.svc");
+            list.Add($"http://{host}/RevitServerModelDataRESTService/ModelDataRESTService.svc");
             list.Add($"http://{host}/RevitServerAdminRESTService/AdminRestService.svc");
             list.Add($"http://{host}/RevitServerAdminRESTService/AdminService.svc");
             list.Add($"http://{host}/RevitServerRESTService/RESTService.svc");
@@ -63,12 +78,15 @@ namespace RevitServerManager.Services
             {
                 if (ver == preferredVersion) continue;
                 list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRESTService.svc");
+                list.Add($"http://{host}/RevitServerModelDataRESTService{ver}/ModelDataRESTService.svc");
                 list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRestService.svc");
             }
 
             // 4. Alternate ports (808, 8080)
             list.Add($"http://{host}:808/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+            list.Add($"http://{host}:808/RevitServerModelDataRESTService{preferredVersion}/ModelDataRESTService.svc");
             list.Add($"http://{host}:8080/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
+            list.Add($"http://{host}:8080/RevitServerModelDataRESTService{preferredVersion}/ModelDataRESTService.svc");
 
             return list.Distinct().ToList();
         }
@@ -80,11 +98,61 @@ namespace RevitServerManager.Services
             return string.IsNullOrWhiteSpace(ascii) ? fallback : ascii;
         }
 
+        private async Task EnsureActiveBaseUrlAsync()
+        {
+            if (_activeBaseUrl != null) return;
+
+            // Probe candidate URLs in parallel to quickly find the responsive endpoint
+            var candidates = _candidateBaseUrls.ToList();
+            int batchSize = 6;
+            for (int i = 0; i < candidates.Count; i += batchSize)
+            {
+                var batch = candidates.Skip(i).Take(batchSize).ToList();
+                var tasks = batch.Select(async baseUrl =>
+                {
+                    string[] testEndpoints = { "%7C/contents", "serverProperties", "|/contents", "contents" };
+                    foreach (var ep in testEndpoints)
+                    {
+                        try
+                        {
+                            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(6));
+                            using var req = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/{ep}");
+                            req.Headers.TryAddWithoutValidation("User-Name", _userName);
+                            req.Headers.TryAddWithoutValidation("User-Machine-Name", _machineName);
+                            req.Headers.TryAddWithoutValidation("Operation-GUID", Guid.NewGuid().ToString());
+
+                            using var resp = await _httpClient.SendAsync(req, cts.Token);
+                            if (resp.IsSuccessStatusCode)
+                            {
+                                return baseUrl;
+                            }
+                        }
+                        catch { }
+                    }
+                    return (string?)null;
+                }).ToList();
+
+                var results = await Task.WhenAll(tasks);
+                var found = results.FirstOrDefault(r => r != null);
+                if (found != null)
+                {
+                    _activeBaseUrl = found;
+                    ExtractDiscoveredVersion(found);
+                    return;
+                }
+            }
+
+            _activeBaseUrl = _candidateBaseUrls[0];
+        }
+
         private async Task<T> GetAsync<T>(string relativeUrl)
         {
+            await EnsureActiveBaseUrlAsync();
+
             Exception? lastEx = null;
 
-            var urlsToTry = new List<string> { _activeBaseUrl };
+            var urlsToTry = new List<string>();
+            if (_activeBaseUrl != null) urlsToTry.Add(_activeBaseUrl);
             foreach (var b in _candidateBaseUrls)
             {
                 if (!urlsToTry.Contains(b)) urlsToTry.Add(b);
@@ -148,6 +216,8 @@ namespace RevitServerManager.Services
 
         public async Task<ServerProperties> CheckConnectionAsync()
         {
+            await EnsureActiveBaseUrlAsync();
+
             // 1. Try serverProperties
             try
             {
@@ -160,31 +230,18 @@ namespace RevitServerManager.Services
             }
             catch
             {
-                // 2. Try serverproperties (lowercase)
-                try
+                // 2. Fallback: query root contents directly. If root contents succeeds, the server is online!
+                var rootContents = await GetContentsAsync("|");
+                if (rootContents != null)
                 {
-                    var props = await GetAsync<ServerProperties>("serverproperties");
-                    if (!string.IsNullOrEmpty(props.ServerVersion))
+                    return new ServerProperties
                     {
-                        DiscoveredVersion = props.ServerVersion;
-                    }
-                    return props;
+                        ServerName = Host,
+                        ServerVersion = DiscoveredVersion
+                    };
                 }
-                catch
-                {
-                    // 3. Fallback: query root contents directly. If root contents succeeds, the server is online!
-                    var rootContents = await GetContentsAsync("|");
-                    if (rootContents != null)
-                    {
-                        return new ServerProperties
-                        {
-                            ServerName = Host,
-                            ServerVersion = DiscoveredVersion
-                        };
-                    }
 
-                    throw;
-                }
+                throw;
             }
         }
 

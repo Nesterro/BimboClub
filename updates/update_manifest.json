@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.3.4",
+    "latestVersion":  "2.3.5",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Auto-probe Revit Server REST endpoints and fallbacks",
-                      "Fix 405 Method Not Allowed and 404 Not Found on corporate servers",
-                      "Improve RSN.ini multi-version discovery"
+                      "Добавлена поддержка ModelDataRESTService (используется Revit по умолчанию)",
+                      "Включена передача учетных данных Windows Authentication (NTLM/Kerberos)",
+                      "Увеличен таймаут до 25 секунд и добавлен быстрый параллельный опрос эндпоинтов"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.4/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.4/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.5/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.5/bimboclub_net8.zip"
                  }
 }
