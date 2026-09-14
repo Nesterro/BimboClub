@@ -204,9 +204,24 @@ namespace RevitServerManager.Services
 
         public async Task<ServerProperties> CheckConnectionAsync()
         {
+            // 1. Try native Revit Server Bridge first
+            try
+            {
+                var bridgeResult = await RevitServerBridgeClient.QueryViaBridgeAsync(Host, "|", DiscoveredVersion ?? Version);
+                if (bridgeResult != null)
+                {
+                    return new ServerProperties
+                    {
+                        ServerName = Host,
+                        ServerVersion = DiscoveredVersion ?? Version
+                    };
+                }
+            }
+            catch { }
+
             await EnsureActiveBaseUrlAsync();
 
-            // 1. Try serverProperties
+            // 2. Try REST serverProperties
             try
             {
                 var props = await GetAsync<ServerProperties>("serverProperties");
@@ -218,7 +233,7 @@ namespace RevitServerManager.Services
             }
             catch
             {
-                // 2. Fallback: query root contents directly. If root contents succeeds, the server is online!
+                // 3. Fallback: query root contents via REST directly
                 var rootContents = await GetContentsAsync("|");
                 if (rootContents != null)
                 {
@@ -235,6 +250,18 @@ namespace RevitServerManager.Services
 
         public async Task<FolderContents> GetContentsAsync(string serverRelativePath)
         {
+            // 1. Try native Revit Server Bridge first (100% parity with Autodesk Revit)
+            try
+            {
+                var bridgeResult = await RevitServerBridgeClient.QueryViaBridgeAsync(Host, serverRelativePath, DiscoveredVersion ?? Version);
+                if (bridgeResult != null)
+                {
+                    return bridgeResult;
+                }
+            }
+            catch { }
+
+            // 2. Fallback to REST API
             string path = string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|"
                 ? "%7C"
                 : string.Join("%7C", serverRelativePath.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries).Select(p => Uri.EscapeDataString(p.Trim())));

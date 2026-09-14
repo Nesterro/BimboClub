@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.3.8",
+    "latestVersion":  "2.4.0",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Исправлена отправка заголовка Client-Version (теперь соответствует опрашиваемой версии сервера)",
-                      "Реализован параллельный опрос всех версий Revit Server (2020-2026)",
-                      "Исправлен 404 при несовпадении версии в заголовке Client-Version"
+                      "Встроен нативный WCF/NetTcp мост Revit Server RSBridge",
+                      "100% совместимость при отображении папок и моделей в корпоративной сети и VPN",
+                      "Автоматический выбор протокола RSBridge/REST"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.8/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.8/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.0/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.0/bimboclub_net8.zip"
                  }
 }

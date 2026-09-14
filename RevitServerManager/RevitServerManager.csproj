@@ -15,6 +15,10 @@
     <None Include="icon_server.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <ProjectReference Include="..\RevitServerBridge\RevitServerBridge.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <EmbeddedResource Include="..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe" Link="RSBridge.exe" Condition="Exists('..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe')" />
+    <None Include="..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe" Link="RSBridge.exe" CopyToOutputDirectory="PreserveNewest" Condition="Exists('..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe')" />
   </ItemGroup>
-
 </Project>

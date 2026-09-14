@@ -73,6 +73,10 @@ if (-not $NoManager) {
     Remove-Item "RevitServerManagerInstaller\bin" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item "RevitServerManagerInstaller\obj" -Recurse -Force -ErrorAction SilentlyContinue
 
+    # Build RevitServerBridge first
+    Write-Host "--- 3.0 Building RevitServerBridge native proxy ---" -ForegroundColor Cyan
+    dotnet build RevitServerBridge\RevitServerBridge.csproj -c Release -p:Version=$Version
+
     # Publish RevitServerManager.exe
     Write-Host "--- 3.1 Publishing standalone single-file RevitServerManager.exe ---" -ForegroundColor Cyan
     dotnet publish RevitServerManager\RevitServerManager.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -p:Version=$Version

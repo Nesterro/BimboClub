@@ -209,6 +209,17 @@ namespace BimboClub
 
         public async Task<ServerProperties> CheckConnectionAsync()
         {
+            // 1. Try Revit internal proxy first (when running in Revit)
+            var proxyResult = QueryViaRevitProxy("|");
+            if (proxyResult != null)
+            {
+                return new ServerProperties
+                {
+                    ServerName = Host,
+                    ServerVersion = DiscoveredVersion ?? Version
+                };
+            }
+
             await EnsureActiveBaseUrlAsync();
 
             try
@@ -238,6 +249,14 @@ namespace BimboClub
 
         public async Task<FolderContents> GetContentsAsync(string serverRelativePath)
         {
+            // 1. Try Revit internal proxy first (when running in Revit)
+            var proxyResult = QueryViaRevitProxy(serverRelativePath);
+            if (proxyResult != null)
+            {
+                return proxyResult;
+            }
+
+            // 2. Fallback to REST
             string path = string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|"
                 ? "%7C"
                 : string.Join("%7C", serverRelativePath.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries).Select(p => Uri.EscapeDataString(p.Trim())));
@@ -260,6 +279,121 @@ namespace BimboClub
                     }
                 }
                 throw;
+            }
+        }
+
+        private FolderContents QueryViaRevitProxy(string serverRelativePath)
+        {
+            try
+            {
+                Type proxyProviderType = Type.GetType("Autodesk.RevitServer.Enterprise.Common.ClientServer.Proxy.ProxyProvider, RS.Enterprise.Common.ClientServer.Proxy");
+                if (proxyProviderType == null) return null;
+
+                System.Reflection.PropertyInfo propInstance = proxyProviderType.GetProperty("Instance", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                if (propInstance == null) return null;
+                object proxyProvider = propInstance.GetValue(null, null);
+                if (proxyProvider == null) return null;
+
+                Type modelServiceType = Type.GetType("Autodesk.RevitServer.Enterprise.Common.ClientServer.ServiceContract.Model.IModelService, RS.Enterprise.Common.ClientServer.ServiceContract.Model");
+                if (modelServiceType == null) return null;
+
+                System.Reflection.MethodInfo getBufferedProxyMethod = null;
+                foreach (System.Reflection.MethodInfo m in proxyProviderType.GetMethods())
+                {
+                    if (m.Name == "GetBufferedProxy" && m.IsGenericMethod && m.GetParameters().Length == 1)
+                    {
+                        getBufferedProxyMethod = m;
+                        break;
+                    }
+                }
+                if (getBufferedProxyMethod == null) return null;
+
+                System.Reflection.MethodInfo genericMethod = getBufferedProxyMethod.MakeGenericMethod(modelServiceType);
+                object proxy = genericMethod.Invoke(proxyProvider, new object[] { Host });
+                if (proxy == null) return null;
+
+                System.Reflection.PropertyInfo propService = proxy.GetType().GetProperty("Service");
+                object service = propService != null ? propService.GetValue(proxy, null) : null;
+                if (service == null) return null;
+
+                string folderPath = string.IsNullOrWhiteSpace(serverRelativePath) ? "|" : serverRelativePath;
+
+                object listResult = null;
+                try
+                {
+                    System.Reflection.MethodInfo methodList = modelServiceType.GetMethod("ListSubFoldersAndModels", new Type[] { typeof(string) });
+                    if (methodList != null) listResult = methodList.Invoke(service, new object[] { folderPath });
+                }
+                catch { }
+
+                if (listResult == null)
+                {
+                    try
+                    {
+                        System.Reflection.MethodInfo methodGetList = modelServiceType.GetMethod("GetListOfModelFilesAndFolders", new Type[] { typeof(string) });
+                        if (methodGetList != null) listResult = methodGetList.Invoke(service, new object[] { folderPath });
+                    }
+                    catch { }
+                }
+
+                if (listResult == null) return null;
+
+                var result = new FolderContents
+                {
+                    Folders = new List<ServerFolder>(),
+                    Models = new List<ServerModel>()
+                };
+
+                System.Reflection.PropertyInfo propFolders = listResult.GetType().GetProperty("Folders");
+                if (propFolders != null)
+                {
+                    var fList = propFolders.GetValue(listResult, null) as System.Collections.IEnumerable;
+                    if (fList != null)
+                    {
+                        foreach (object f in fList)
+                        {
+                            if (f != null)
+                            {
+                                string fName = f.ToString();
+                                if (!string.IsNullOrWhiteSpace(fName))
+                                {
+                                    result.Folders.Add(new ServerFolder { Name = fName, FolderCount = 1 });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                System.Reflection.PropertyInfo propModels = listResult.GetType().GetProperty("Models");
+                if (propModels != null)
+                {
+                    var mList = propModels.GetValue(listResult, null) as System.Collections.IEnumerable;
+                    if (mList != null)
+                    {
+                        foreach (object m in mList)
+                        {
+                            if (m == null) continue;
+                            System.Reflection.PropertyInfo pName = m.GetType().GetProperty("ModelName") ?? m.GetType().GetProperty("Name");
+                            string name = pName != null ? (pName.GetValue(m, null) ?? "").ToString() : m.ToString();
+
+                            long size = 0;
+                            System.Reflection.PropertyInfo pSize = m.GetType().GetProperty("ModelSize") ?? m.GetType().GetProperty("Size");
+                            if (pSize != null)
+                            {
+                                object sVal = pSize.GetValue(m, null);
+                                if (sVal != null) long.TryParse(sVal.ToString(), out size);
+                            }
+
+                            result.Models.Add(new ServerModel { Name = name, Size = size });
+                        }
+                    }
+                }
+
+                return result;
+            }
+            catch
+            {
+                return null;
             }
         }
 
