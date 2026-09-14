@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.2",
+    "latestVersion":  "2.4.3",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Fix WCF Windows auth for Revit Server,Fix ReadingUpgradeRecord error,Try all security modes and years"
+                      "Fix root folder path for Revit Server WCF (try empty string first),Fix ArrayList item extraction via reflection,Try multiple root path formats automatically"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.2/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.2/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.3/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.3/bimboclub_net8.zip"
                  }
 }

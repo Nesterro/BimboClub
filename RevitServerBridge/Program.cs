@@ -12,6 +12,9 @@ namespace RevitServerBridge
     {
         static readonly string[] YearOrder = { "2022", "2021", "2023", "2020", "2024", "2019", "2018", "2025" };
 
+        // Root folder path candidates: empty string is the most likely for Revit Server root
+        static readonly string[] RootPathCandidates = { "", "|", "/", "\\" };
+
         static int Main(string[] args)
         {
             if (args.Length < 1)
@@ -21,9 +24,11 @@ namespace RevitServerBridge
             }
 
             string serverHost = args[0].Trim().Replace("http://", "").Replace("https://", "").Trim('/');
-            string folderPath = args.Length > 1 ? args[1] : "|";
-            if (string.IsNullOrWhiteSpace(folderPath)) folderPath = "|";
+            string folderPath = args.Length > 1 ? args[1] : "";
             string preferredYear = args.Length > 2 ? args[2].Trim() : "2022";
+
+            // For root requests, try all root path candidates
+            bool isRootRequest = folderPath == "|" || folderPath == "" || folderPath == "/";
 
             var years = new List<string> { preferredYear };
             foreach (var y in YearOrder)
@@ -33,37 +38,67 @@ namespace RevitServerBridge
 
             foreach (var year in years)
             {
-                try
+                // Determine which paths to try for this request
+                var pathsToTry = isRootRequest
+                    ? RootPathCandidates
+                    : new[] { folderPath };
+
+                foreach (var pathCandidate in pathsToTry)
                 {
-                    var result = TryConnect(serverHost, folderPath, year);
-                    if (result != null)
+                    try
                     {
-                        Console.WriteLine(new JavaScriptSerializer().Serialize(result));
-                        return 0;
+                        var result = TryConnect(serverHost, pathCandidate, year);
+                        if (result != null)
+                        {
+                            // Only accept root result if it has content OR all candidates are exhausted
+                            bool hasContent = result.ContainsKey("Folders") &&
+                                             ((List<string>)result["Folders"]).Count > 0;
+                            bool hasModels = result.ContainsKey("Models") &&
+                                            ((List<Dictionary<string, object>>)result["Models"]).Count > 0;
+
+                            if (!isRootRequest || hasContent || hasModels || pathCandidate == pathsToTry[pathsToTry.Length - 1])
+                            {
+                                // Convert to serializable format
+                                var output = new Dictionary<string, object>
+                                {
+                                    { "Success", true },
+                                    { "Host", serverHost },
+                                    { "Path", pathCandidate },
+                                    { "Year", year },
+                                    { "Endpoint", result["Endpoint"] },
+                                    { "Auth", result["Auth"] },
+                                    { "Folders", result["Folders"] },
+                                    { "Models", result["Models"] }
+                                };
+                                Console.WriteLine(new JavaScriptSerializer().Serialize(output));
+                                return 0;
+                            }
+                            // Root returned empty - try next path candidate
+                        }
                     }
-                }
-                catch (EndpointNotFoundException)
-                {
-                    continue;
-                }
-                catch (CommunicationException ex) when (
-                    ex.Message.Contains("404") ||
-                    ex.Message.Contains("not found") ||
-                    ex.Message.Contains("rejected") ||
-                    ex.Message.Contains("ReadingUpgradeRecord"))
-                {
-                    lastEx = ex;
-                    continue;
-                }
-                catch (Exception ex)
-                {
-                    lastEx = ex;
-                    // DNS / socket errors - no point trying other years
-                    if (IsDnsOrSocketError(ex)) break;
-                    continue;
+                    catch (EndpointNotFoundException)
+                    {
+                        break; // This year doesn't have an endpoint - skip all paths, try next year
+                    }
+                    catch (CommunicationException ex) when (
+                        ex.Message.Contains("404") ||
+                        ex.Message.Contains("not found") ||
+                        ex.Message.Contains("rejected") ||
+                        ex.Message.Contains("ReadingUpgradeRecord"))
+                    {
+                        lastEx = ex;
+                        break; // Try next year
+                    }
+                    catch (Exception ex)
+                    {
+                        lastEx = ex;
+                        if (IsDnsOrSocketError(ex)) goto done;
+                        break;
+                    }
                 }
             }
 
+            done:
             string errMsg = lastEx?.InnerException?.Message ?? lastEx?.Message ?? "Failed to connect to Revit Server";
             Console.WriteLine(new JavaScriptSerializer().Serialize(new Dictionary<string, object>
             {
@@ -84,9 +119,7 @@ namespace RevitServerBridge
 
         static Dictionary<string, object> TryConnect(string serverHost, string folderPath, string year)
         {
-            // Suffix order: tcpbuffer is the standard Revit Server NetTcp binding
             string[] bindingSuffixes = { "tcpbuffer", "tcpstreamed", "" };
-            // Windows auth first (Revit Server requires it), then anonymous fallback
             bool[] authModes = { true, false };
 
             foreach (var useWindowsAuth in authModes)
@@ -120,26 +153,32 @@ namespace RevitServerBridge
                             var models = new List<Dictionary<string, object>>();
 
                             // Method 1: ListSubFoldersAndModels
+                            // relativeFolderPath: "" for root, or subfolder path
                             ArrayList subFolders = null;
                             ArrayList modelList = null;
-                            try { channel.ListSubFoldersAndModels(token, folderPath, out subFolders, out modelList); }
+                            try
+                            {
+                                channel.ListSubFoldersAndModels(token, folderPath, out subFolders, out modelList);
+                            }
                             catch { }
 
                             if (subFolders != null)
                                 foreach (var f in subFolders)
                                 {
-                                    string fn = f?.ToString().Trim();
-                                    if (!string.IsNullOrEmpty(fn)) folders.Add(fn);
+                                    string fn = ExtractName(f);
+                                    if (!string.IsNullOrEmpty(fn) && !folders.Contains(fn))
+                                        folders.Add(fn);
                                 }
                             if (modelList != null)
                                 foreach (var m in modelList)
                                 {
-                                    string mn = m?.ToString().Trim();
+                                    string mn = ExtractName(m);
                                     if (!string.IsNullOrEmpty(mn))
                                         models.Add(new Dictionary<string, object> { { "Name", mn }, { "Size", 0L } });
                                 }
 
-                            // Method 2: GetListOfModelFilesAndFolders (fallback)
+                            // Method 2: GetListOfModelFilesAndFolders (uses List<string>)
+                            // Only use as fallback if Method 1 returned nothing
                             if (folders.Count == 0 && models.Count == 0)
                             {
                                 try
@@ -151,7 +190,8 @@ namespace RevitServerBridge
                                         foreach (var f in foldersOut)
                                         {
                                             string fn = f?.Trim();
-                                            if (!string.IsNullOrWhiteSpace(fn) && !folders.Contains(fn)) folders.Add(fn);
+                                            if (!string.IsNullOrWhiteSpace(fn) && !folders.Contains(fn))
+                                                folders.Add(fn);
                                         }
                                     if (filesOut != null)
                                         foreach (var f in filesOut)
@@ -188,7 +228,6 @@ namespace RevitServerBridge
                         ex.Message.Contains("rejected") ||
                         ex.Message.Contains("404"))
                     {
-                        // Wrong suffix or security mode - try next combination
                         continue;
                     }
                     catch (CommunicationException) { throw; }
@@ -197,6 +236,28 @@ namespace RevitServerBridge
             }
 
             return null;
+        }
+
+        static string ExtractName(object item)
+        {
+            if (item == null) return null;
+            if (item is string s) return s.Trim();
+
+            // Try to get Name property via reflection (for data contract objects)
+            var type = item.GetType();
+            var nameProp = type.GetProperty("Name") ?? type.GetProperty("FolderName")
+                ?? type.GetProperty("ModelName") ?? type.GetProperty("Path")
+                ?? type.GetProperty("RelativePath");
+            if (nameProp != null)
+            {
+                var val = nameProp.GetValue(item)?.ToString()?.Trim();
+                if (!string.IsNullOrEmpty(val)) return val;
+            }
+
+            // Last resort: ToString() but skip type names
+            string str = item.ToString();
+            if (str.Contains(".") && str.Contains("Common")) return null; // Looks like a type name
+            return str.Trim();
         }
 
         static NetTcpBinding CreateBinding(bool windowsAuth = false)
