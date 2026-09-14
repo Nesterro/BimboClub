@@ -6,7 +6,7 @@
         xmlns:models="clr-namespace:RevitServerManager.Models"
         mc:Ignorable="d"
         Title="BimboClub - Revit Server Manager" 
-        Height="780" Width="1100"
+        Height="780" Width="1120"
         MinHeight="600" MinWidth="850"
         WindowStartupLocation="CenterScreen"
         Style="{StaticResource DarkWindowStyle}">
@@ -35,7 +35,7 @@
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="REVIT SERVER MANAGER" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextWhiteBrush}"/>
-                        <TextBlock Text="Автономный клиент для загрузки моделей с Revit Server" FontSize="11" Foreground="{StaticResource TextMutedBrush}"/>
+                        <TextBlock Text="Автономный клиент для загрузки моделей с серверов Revit Server (RSN.ini)" FontSize="11" Foreground="{StaticResource TextMutedBrush}"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -55,38 +55,50 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="220"/>
-                    <ColumnDefinition Width="20"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="100"/>
                     <ColumnDefinition Width="15"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="230"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Сервер:" Foreground="{StaticResource TextWhiteBrush}" VerticalAlignment="Center" Margin="0,0,8,0" Grid.Column="0"/>
-                <ComboBox x:Name="ServerAddressComboBox" IsEditable="True" Height="30" Grid.Column="1" VerticalContentAlignment="Center"/>
-
-                <TextBlock Text="Версия:" Foreground="{StaticResource TextWhiteBrush}" VerticalAlignment="Center" Margin="0,0,8,0" Grid.Column="3"/>
-                <ComboBox x:Name="ServerVersionComboBox" Height="30" Grid.Column="4">
+                <!-- Version selector -->
+                <TextBlock Text="Версия Revit:" Foreground="{StaticResource TextWhiteBrush}" VerticalAlignment="Center" Margin="0,0,8,0" Grid.Column="0"/>
+                <ComboBox x:Name="ServerVersionComboBox" Height="30" Grid.Column="1" SelectionChanged="ServerVersionComboBox_SelectionChanged">
                     <ComboBoxItem Content="2026"/>
                     <ComboBoxItem Content="2025"/>
-                    <ComboBoxItem Content="2024" IsSelected="True"/>
+                    <ComboBoxItem Content="2024"/>
                     <ComboBoxItem Content="2023"/>
-                    <ComboBoxItem Content="2022"/>
+                    <ComboBoxItem Content="2022" IsSelected="True"/>
                     <ComboBoxItem Content="2021"/>
                     <ComboBoxItem Content="2020"/>
                     <ComboBoxItem Content="2019"/>
                 </ComboBox>
 
-                <Button x:Name="ConnectButton" Content="⚡ Подключиться" Style="{StaticResource ScarletButtonStyle}" Height="30" Grid.Column="6" Click="ConnectButton_Click"/>
+                <!-- Server Address selector -->
+                <TextBlock Text="Сервер:" Foreground="{StaticResource TextWhiteBrush}" VerticalAlignment="Center" Margin="0,0,8,0" Grid.Column="3"/>
+                <ComboBox x:Name="ServerAddressComboBox" IsEditable="True" Height="30" Grid.Column="4" VerticalContentAlignment="Center"/>
+
+                <!-- Single Server Connect Button -->
+                <Button x:Name="ConnectButton" Content="⚡ Подключить" Style="{StaticResource ScarletButtonStyle}" Height="30" Grid.Column="6" Click="ConnectButton_Click"/>
+
+                <!-- Load all RSN servers button -->
+                <Button x:Name="ConnectAllRsnButton" Content="🌐 Все серверы RSN.ini" Style="{StaticResource SecondaryButtonStyle}" Height="30" Grid.Column="8" Click="ConnectAllRsnButton_Click"/>
+
+                <!-- Open RSN.ini file button -->
+                <Button x:Name="OpenRsnFileButton" Content="📝 Открыть RSN.ini" Style="{StaticResource SecondaryButtonStyle}" Height="30" Grid.Column="10" ToolTip="Открыть файл конфигурации RSN.ini для выбранной версии" Click="OpenRsnFileButton_Click"/>
             </Grid>
         </Border>
 
         <!-- 3. Main Content: Folders Tree + Models List -->
         <Grid Grid.Row="2" Margin="15,12,15,8">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320" MinWidth="220"/>
+                <ColumnDefinition Width="340" MinWidth="220"/>
                 <ColumnDefinition Width="8"/>
                 <ColumnDefinition Width="*" MinWidth="350"/>
             </Grid.ColumnDefinitions>
@@ -100,7 +112,7 @@
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Margin="0,0,0,8">
-                        <TextBlock Text="📁 КАТАЛОГИ СЕРВЕРА" FontWeight="Bold" FontSize="12" Foreground="{StaticResource AccentScarletActiveBrush}" VerticalAlignment="Center"/>
+                        <TextBlock Text="📁 СЕТЬ REVIT SERVER" FontWeight="Bold" FontSize="12" Foreground="{StaticResource AccentScarletActiveBrush}" VerticalAlignment="Center"/>
                         <Button x:Name="RefreshFoldersButton" Content="🔄" Style="{StaticResource SecondaryButtonStyle}" Width="28" Height="24" Padding="0" HorizontalAlignment="Right" ToolTip="Обновить каталоги" Click="RefreshFoldersButton_Click"/>
                     </Grid>
 
@@ -111,14 +123,24 @@
                                 <EventSetter Event="Expanded" Handler="TreeViewItem_Expanded"/>
                             </Style>
                         </TreeView.ItemContainerStyle>
-                        <TreeView.ItemTemplate>
+                        <TreeView.Resources>
+                            <!-- Server Node Template -->
+                            <HierarchicalDataTemplate DataType="{x:Type models:ServerNodeViewModel}" ItemsSource="{Binding SubFolders}">
+                                <StackPanel Orientation="Horizontal" Margin="2,3">
+                                    <TextBlock Text="🖥️ " FontSize="12"/>
+                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" Foreground="{StaticResource TextWhiteBrush}"/>
+                                    <TextBlock Text="{Binding StatusText, StringFormat='  ({0})'}" FontSize="11" Foreground="{StaticResource TextMutedBrush}"/>
+                                </StackPanel>
+                            </HierarchicalDataTemplate>
+
+                            <!-- Folder Node Template -->
                             <HierarchicalDataTemplate DataType="{x:Type models:FolderViewModel}" ItemsSource="{Binding SubFolders}">
                                 <StackPanel Orientation="Horizontal" Margin="2,2">
                                     <TextBlock Text="📁 " FontSize="12"/>
                                     <TextBlock Text="{Binding Name}" Foreground="{StaticResource TextWhiteBrush}"/>
                                 </StackPanel>
                             </HierarchicalDataTemplate>
-                        </TreeView.ItemTemplate>
+                        </TreeView.Resources>
                     </TreeView>
                 </Grid>
             </Border>
@@ -143,8 +165,8 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="0">
-                            <TextBlock Text="МОДЕЛИ В ПАПКЕ: " FontWeight="Bold" FontSize="12" Foreground="{StaticResource AccentScarletActiveBrush}"/>
-                            <TextBlock x:Name="CurrentPathTextBlock" Text="Не выбрана" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource TextWhiteBrush}"/>
+                            <TextBlock Text="МОДЕЛИ: " FontWeight="Bold" FontSize="12" Foreground="{StaticResource AccentScarletActiveBrush}"/>
+                            <TextBlock x:Name="CurrentPathTextBlock" Text="Не выбрана папка" FontWeight="SemiBold" FontSize="12" Foreground="{StaticResource TextWhiteBrush}"/>
                         </StackPanel>
 
                         <TextBox x:Name="SearchModelsTextBox" Style="{StaticResource DarkTextBoxStyle}" Height="26" Grid.Column="1"
@@ -177,7 +199,7 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Имя файла модели" Width="300">
+                                <GridViewColumn Header="Имя файла модели" Width="260">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <StackPanel Orientation="Horizontal">
@@ -188,9 +210,11 @@
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
 
+                                <GridViewColumn Header="Сервер" DisplayMemberBinding="{Binding ServerAddress}" Width="160"/>
+
                                 <GridViewColumn Header="Размер" DisplayMemberBinding="{Binding FormattedSize}" Width="90"/>
 
-                                <GridViewColumn Header="Статус" Width="140">
+                                <GridViewColumn Header="Статус" Width="130">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Status}" Foreground="{StaticResource TextMutedBrush}" FontSize="11.5"/>

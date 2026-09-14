@@ -43,6 +43,59 @@ namespace BimboClub
             // Load saved destination path from temporary user settings if any, or default to Documents
             string defaultPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BimboClub_Downloads");
             DestinationFolderTextBox.Text = defaultPath;
+
+            AutoDetectRsnServers();
+        }
+
+        private void AutoDetectRsnServers()
+        {
+            try
+            {
+                string ver = _revitApp?.VersionNumber ?? "2024";
+                foreach (ComboBoxItem item in ServerVersionComboBox.Items)
+                {
+                    if (item.Content?.ToString() == ver)
+                    {
+                        ServerVersionComboBox.SelectedItem = item;
+                        break;
+                    }
+                }
+
+                string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                string[] candidatePaths = new[]
+                {
+                    Path.Combine(programData, "Autodesk", $"Revit Server {ver}", "Config", "RSN.ini"),
+                    Path.Combine(programData, "Autodesk", $"Revit Server {ver}", "Config", "rsn.ini"),
+                    Path.Combine(programData, "Autodesk", $"RevitServer{ver}", "Config", "RSN.ini"),
+                    Path.Combine(programData, "Autodesk", $"RevitServer{ver}", "Config", "rsn.ini"),
+                    Path.Combine(programData, "Autodesk", $"RVT {ver}", "RSN.ini"),
+                    Path.Combine(programData, "Autodesk", $"RVT {ver}", "rsn.ini"),
+                    Path.Combine(programData, "Autodesk", $"Revit {ver}", "RSN.ini"),
+                    Path.Combine(programData, "Autodesk", $"Revit {ver}", "Config", "RSN.ini")
+                };
+
+                foreach (var path in candidatePaths)
+                {
+                    if (File.Exists(path))
+                    {
+                        var lines = File.ReadAllLines(path);
+                        foreach (var rawLine in lines)
+                        {
+                            string line = rawLine.Trim();
+                            if (string.IsNullOrWhiteSpace(line)) continue;
+                            if (line.StartsWith("#") || line.StartsWith(";") || line.StartsWith("//")) continue;
+
+                            string cleanHost = line.Replace("http://", "").Replace("https://", "").Trim('/');
+                            if (!string.IsNullOrWhiteSpace(cleanHost))
+                            {
+                                ServerAddressTextBox.Text = cleanHost;
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
         }
 
         private void SetWindowIcon()

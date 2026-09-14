@@ -19,16 +19,16 @@ namespace RevitServerManager
     public partial class MainWindow : Window
     {
         private AppSettings _settings;
-        private RevitServerRestClient? _client;
         private string? _detectedToolPath;
         private CancellationTokenSource? _downloadCts;
 
-        public ObservableCollection<FolderViewModel> RootFolders { get; } = new();
+        // Tree items can be ServerNodeViewModel or FolderViewModel
+        public ObservableCollection<object> RootTreeItems { get; } = new();
         public ObservableCollection<ModelFileViewModel> CurrentFolderModels { get; } = new();
         private readonly Dictionary<string, ModelFileViewModel> _selectedModels = new(StringComparer.OrdinalIgnoreCase);
 
         private ICollectionView? _modelsView;
-        private FolderViewModel? _currentSelectedFolder;
+        private readonly Dictionary<string, RevitServerRestClient> _clientsCache = new(StringComparer.OrdinalIgnoreCase);
 
         public MainWindow()
         {
@@ -37,24 +37,23 @@ namespace RevitServerManager
             _settings = AppSettings.Load();
             ApplySettingsToUi();
 
-            FoldersTreeView.ItemsSource = RootFolders;
+            FoldersTreeView.ItemsSource = RootTreeItems;
             ModelsListView.ItemsSource = CurrentFolderModels;
 
             _modelsView = CollectionViewSource.GetDefaultView(CurrentFolderModels);
             _modelsView.Filter = FilterModelItem;
 
             CheckRevitToolAvailability();
+            LoadRsnServersForSelectedVersion(autoConnectAll: true);
+        }
+
+        private string GetSelectedVersion()
+        {
+            return (ServerVersionComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "2024";
         }
 
         private void ApplySettingsToUi()
         {
-            ServerAddressComboBox.Items.Clear();
-            foreach (var srv in _settings.RecentServers)
-            {
-                ServerAddressComboBox.Items.Add(srv);
-            }
-            ServerAddressComboBox.Text = _settings.ServerAddress;
-
             foreach (ComboBoxItem item in ServerVersionComboBox.Items)
             {
                 if (item.Content?.ToString() == _settings.ServerVersion)
@@ -73,10 +72,7 @@ namespace RevitServerManager
         private void SaveUiSettings()
         {
             _settings.ServerAddress = ServerAddressComboBox.Text.Trim();
-            if (ServerVersionComboBox.SelectedItem is ComboBoxItem item)
-            {
-                _settings.ServerVersion = item.Content?.ToString() ?? "2024";
-            }
+            _settings.ServerVersion = GetSelectedVersion();
             _settings.DestinationFolder = DestinationFolderTextBox.Text.Trim();
             _settings.OverwriteExisting = OverwriteCheckBox.IsChecked == true;
             _settings.PreserveSubfolders = PreserveSubfoldersCheckBox.IsChecked == true;
@@ -86,7 +82,7 @@ namespace RevitServerManager
 
         private void CheckRevitToolAvailability()
         {
-            string? preferredVer = (ServerVersionComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            string preferredVer = GetSelectedVersion();
             
             if (!string.IsNullOrWhiteSpace(_settings.CustomRevitServerToolPath) && File.Exists(_settings.CustomRevitServerToolPath))
             {
@@ -111,61 +107,132 @@ namespace RevitServerManager
             }
         }
 
+        private void ServerVersionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!IsLoaded) return;
+            CheckRevitToolAvailability();
+            LoadRsnServersForSelectedVersion(autoConnectAll: true);
+        }
+
+        private void LoadRsnServersForSelectedVersion(bool autoConnectAll = false)
+        {
+            string version = GetSelectedVersion();
+            List<string> rsnServers = RsnConfigService.ReadServersForVersion(version);
+
+            ServerAddressComboBox.Items.Clear();
+
+            // Add RSN servers first
+            foreach (var srv in rsnServers)
+            {
+                ServerAddressComboBox.Items.Add(srv);
+            }
+
+            // Add user history servers if not present
+            foreach (var srv in _settings.RecentServers)
+            {
+                if (!rsnServers.Contains(srv, StringComparer.OrdinalIgnoreCase))
+                {
+                    ServerAddressComboBox.Items.Add(srv);
+                }
+            }
+
+            if (ServerAddressComboBox.Items.Count > 0)
+            {
+                if (!string.IsNullOrWhiteSpace(_settings.ServerAddress) && ServerAddressComboBox.Items.Contains(_settings.ServerAddress))
+                {
+                    ServerAddressComboBox.SelectedItem = _settings.ServerAddress;
+                }
+                else
+                {
+                    ServerAddressComboBox.SelectedIndex = 0;
+                }
+            }
+
+            if (autoConnectAll && rsnServers.Count > 0)
+            {
+                BuildMultiServerTree(rsnServers, version);
+            }
+        }
+
+        private void BuildMultiServerTree(List<string> servers, string version)
+        {
+            RootTreeItems.Clear();
+            CurrentFolderModels.Clear();
+            _selectedModels.Clear();
+            UpdateSummaryText();
+
+            foreach (var srv in servers)
+            {
+                var serverNode = new ServerNodeViewModel(srv, version);
+                RootTreeItems.Add(serverNode);
+            }
+
+            StatusBadgeText.Text = $"RSN.ini ({version}): {servers.Count} серверов";
+            StatusIndicator.Fill = (SolidColorBrush)FindResource("SuccessGreenBrush");
+            ProgressStatusTextBlock.Text = $"Загружен список из {servers.Count} серверов из конфигурации RSN.ini ({version}).";
+        }
+
+        private RevitServerRestClient GetClientFor(string host, string version)
+        {
+            string key = $"{host}_{version}";
+            if (!_clientsCache.TryGetValue(key, out var client))
+            {
+                client = new RevitServerRestClient(host, version);
+                _clientsCache[key] = client;
+            }
+            return client;
+        }
+
         private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             string host = ServerAddressComboBox.Text.Trim();
-            string ver = (ServerVersionComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "2024";
+            string ver = GetSelectedVersion();
 
             if (string.IsNullOrWhiteSpace(host))
             {
-                MessageBox.Show(this, "Пожалуйста, введите адрес сервера.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(this, "Пожалуйста, выберите или введите адрес сервера.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             SaveUiSettings();
-            CheckRevitToolAvailability();
 
             ConnectButton.IsEnabled = false;
             StatusBadgeText.Text = "Подключение...";
             StatusIndicator.Fill = (SolidColorBrush)FindResource("WarningYellowBrush");
-            ProgressStatusTextBlock.Text = $"Подключение к http://{host}:{ver}...";
+            ProgressStatusTextBlock.Text = $"Подключение к {host} ({ver})...";
 
-            RootFolders.Clear();
+            RootTreeItems.Clear();
             CurrentFolderModels.Clear();
             _selectedModels.Clear();
             UpdateSummaryText();
 
             try
             {
-                _client?.Dispose();
-                _client = new RevitServerRestClient(host, ver);
-
-                var props = await _client.CheckConnectionAsync();
+                var client = GetClientFor(host, ver);
+                var props = await client.CheckConnectionAsync();
 
                 StatusBadgeText.Text = $"{props.ServerName} ({props.ServerVersion})";
                 StatusIndicator.Fill = (SolidColorBrush)FindResource("SuccessGreenBrush");
 
-                ProgressStatusTextBlock.Text = "Загрузка дерева каталогов...";
-                var rootContents = await _client.GetContentsAsync("|");
+                ProgressStatusTextBlock.Text = $"Загрузка структуры каталогов {props.ServerName}...";
+                var rootContents = await client.GetContentsAsync("|");
 
                 if (rootContents?.Folders != null)
                 {
                     foreach (var folder in rootContents.Folders)
                     {
-                        bool hasSubfolders = folder.FolderCount > 0;
-                        RootFolders.Add(new FolderViewModel(folder.Name, folder.Name, hasSubfolders));
+                        bool hasSub = folder.FolderCount > 0;
+                        RootTreeItems.Add(new FolderViewModel(folder.Name, folder.Name, host, ver, hasSub));
                     }
                 }
 
-                ProgressStatusTextBlock.Text = $"Подключено к {props.ServerName}. Доступно папок: {RootFolders.Count}";
+                ProgressStatusTextBlock.Text = $"Подключено к {props.ServerName}. Корневых папок: {RootTreeItems.Count}";
             }
             catch (Exception ex)
             {
-                _client?.Dispose();
-                _client = null;
                 StatusBadgeText.Text = "Ошибка подключения";
                 StatusIndicator.Fill = (SolidColorBrush)FindResource("ErrorRedBrush");
-                ProgressStatusTextBlock.Text = "Ошибка подключения к Revit Server";
+                ProgressStatusTextBlock.Text = $"Ошибка подключения к {host}";
                 MessageBox.Show(this, $"Не удалось подключиться к Revit Server ({host}, {ver}):\n\n{ex.Message}", "Ошибка подключения", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
@@ -174,63 +241,183 @@ namespace RevitServerManager
             }
         }
 
+        private void ConnectAllRsnButton_Click(object sender, RoutedEventArgs e)
+        {
+            string version = GetSelectedVersion();
+            List<string> rsnServers = RsnConfigService.ReadServersForVersion(version);
+
+            if (rsnServers.Count == 0)
+            {
+                MessageBox.Show(this, $"В файле конфигурации RSN.ini для Revit {version} не найдено серверов.\n\nВы можете открыть и отредактировать RSN.ini по кнопке «📝 Открыть RSN.ini».", "RSN.ini пуст", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            BuildMultiServerTree(rsnServers, version);
+        }
+
+        private void OpenRsnFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            string version = GetSelectedVersion();
+            string? rsnFile = RsnConfigService.FindExistingRsnFile(version);
+
+            if (rsnFile != null && File.Exists(rsnFile))
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "notepad.exe",
+                        Arguments = $"\"{rsnFile}\"",
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Не удалось открыть файл:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                // Create default RSN.ini file in ProgramData
+                string defaultPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                    "Autodesk",
+                    $"Revit Server {version}",
+                    "Config",
+                    "RSN.ini");
+
+                try
+                {
+                    string dir = Path.GetDirectoryName(defaultPath)!;
+                    if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                    if (!File.Exists(defaultPath))
+                    {
+                        File.WriteAllText(defaultPath, "# Revit Server Network (RSN.ini)\n# Введите адреса серверов по одному на строку, например:\n# 192.168.1.100\n# revit-server.company.local\n");
+                    }
+
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "notepad.exe",
+                        Arguments = $"\"{defaultPath}\"",
+                        UseShellExecute = true
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(this, $"Не удалось создать файл RSN.ini:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
         private void RefreshFoldersButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_client != null)
-            {
-                ConnectButton_Click(sender, e);
-            }
+            LoadRsnServersForSelectedVersion(autoConnectAll: true);
         }
 
         private async void TreeViewItem_Expanded(object sender, RoutedEventArgs e)
         {
-            if (e.OriginalSource is not TreeViewItem treeViewItem || treeViewItem.Header is not FolderViewModel folder) return;
-            if (folder.IsLoaded || _client == null) return;
+            if (e.OriginalSource is not TreeViewItem treeViewItem) return;
 
-            try
+            // 1. If expanding a Server node (🖥️)
+            if (treeViewItem.Header is ServerNodeViewModel serverNode)
             {
-                ProgressStatusTextBlock.Text = $"Загрузка подпапок для {folder.Name}...";
-                var contents = await _client.GetContentsAsync(folder.ServerRelativePath);
+                if (serverNode.IsLoaded) return;
 
-                folder.SubFolders.Clear();
-                if (contents?.Folders != null)
+                try
                 {
-                    foreach (var sub in contents.Folders)
-                    {
-                        bool hasSub = sub.FolderCount > 0;
-                        string relPath = $"{folder.ServerRelativePath}|{sub.Name}";
-                        folder.SubFolders.Add(new FolderViewModel(sub.Name, relPath, hasSub));
-                    }
-                }
+                    serverNode.StatusText = "Подключение...";
+                    ProgressStatusTextBlock.Text = $"Загрузка каталогов с {serverNode.ServerAddress}...";
 
-                folder.IsLoaded = true;
-                ProgressStatusTextBlock.Text = "Каталог обновлен";
+                    var client = GetClientFor(serverNode.ServerAddress, serverNode.Version);
+                    var rootContents = await client.GetContentsAsync("|");
+
+                    serverNode.SubFolders.Clear();
+                    if (rootContents?.Folders != null)
+                    {
+                        foreach (var f in rootContents.Folders)
+                        {
+                            bool hasSub = f.FolderCount > 0;
+                            serverNode.SubFolders.Add(new FolderViewModel(f.Name, f.Name, serverNode.ServerAddress, serverNode.Version, hasSub));
+                        }
+                    }
+
+                    serverNode.IsLoaded = true;
+                    serverNode.StatusText = $"{serverNode.SubFolders.Count} папок";
+                    ProgressStatusTextBlock.Text = $"Сервер {serverNode.ServerAddress} загружен ({serverNode.SubFolders.Count} папок).";
+                }
+                catch (Exception ex)
+                {
+                    serverNode.StatusText = "Ошибка";
+                    serverNode.IsOnline = false;
+                    ProgressStatusTextBlock.Text = $"Ошибка подключения к {serverNode.ServerAddress}: {ex.Message}";
+                }
+                return;
             }
-            catch (Exception ex)
+
+            // 2. If expanding a Folder node (📁)
+            if (treeViewItem.Header is FolderViewModel folder)
             {
-                if (folder.SubFolders.Count == 0) folder.SubFolders.Add(null);
-                MessageBox.Show(this, $"Не удалось загрузить подпапки:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (folder.IsLoaded) return;
+
+                try
+                {
+                    ProgressStatusTextBlock.Text = $"Загрузка подпапок {folder.Name} с {folder.ServerAddress}...";
+                    var client = GetClientFor(folder.ServerAddress, folder.ServerVersion);
+                    var contents = await client.GetContentsAsync(folder.ServerRelativePath);
+
+                    folder.SubFolders.Clear();
+                    if (contents?.Folders != null)
+                    {
+                        foreach (var sub in contents.Folders)
+                        {
+                            bool hasSub = sub.FolderCount > 0;
+                            string relPath = $"{folder.ServerRelativePath}|{sub.Name}";
+                            folder.SubFolders.Add(new FolderViewModel(sub.Name, relPath, folder.ServerAddress, folder.ServerVersion, hasSub));
+                        }
+                    }
+
+                    folder.IsLoaded = true;
+                    ProgressStatusTextBlock.Text = "Каталог обновлен";
+                }
+                catch (Exception ex)
+                {
+                    if (folder.SubFolders.Count == 0) folder.SubFolders.Add(null);
+                    MessageBox.Show(this, $"Не удалось загрузить подпапки:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
         private async void FoldersTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            if (FoldersTreeView.SelectedItem is not FolderViewModel selectedFolder || _client == null)
+            // Case 1: Folder selected
+            if (FoldersTreeView.SelectedItem is FolderViewModel selectedFolder)
             {
-                _currentSelectedFolder = null;
-                CurrentPathTextBlock.Text = "Не выбрана";
-                CurrentFolderModels.Clear();
-                ModelsCountTextBlock.Text = "Моделей: 0";
+                CurrentPathTextBlock.Text = $"{selectedFolder.ServerAddress} / {selectedFolder.ServerRelativePath.Replace("|", " / ")}";
+                await LoadModelsAsync(selectedFolder.ServerAddress, selectedFolder.ServerVersion, selectedFolder.ServerRelativePath);
                 return;
             }
 
-            _currentSelectedFolder = selectedFolder;
-            CurrentPathTextBlock.Text = selectedFolder.ServerRelativePath.Replace("|", " / ");
+            // Case 2: Server node selected
+            if (FoldersTreeView.SelectedItem is ServerNodeViewModel selectedServer)
+            {
+                CurrentPathTextBlock.Text = $"{selectedServer.ServerAddress} (Корень)";
+                await LoadModelsAsync(selectedServer.ServerAddress, selectedServer.Version, "|");
+                return;
+            }
 
+            CurrentPathTextBlock.Text = "Не выбрана папка";
+            CurrentFolderModels.Clear();
+            ModelsCountTextBlock.Text = "Моделей: 0";
+        }
+
+        private async Task LoadModelsAsync(string serverAddress, string serverVersion, string folderPath)
+        {
             try
             {
-                ProgressStatusTextBlock.Text = $"Получение списка моделей из {selectedFolder.Name}...";
-                var contents = await _client.GetContentsAsync(selectedFolder.ServerRelativePath);
+                ProgressStatusTextBlock.Text = $"Получение списка моделей из {serverAddress}...";
+                var client = GetClientFor(serverAddress, serverVersion);
+                var contents = await client.GetContentsAsync(folderPath);
 
                 CurrentFolderModels.Clear();
 
@@ -238,8 +425,14 @@ namespace RevitServerManager
                 {
                     foreach (var m in contents.Models)
                     {
-                        var modelVm = new ModelFileViewModel(m.Name, selectedFolder.ServerRelativePath, m.Size);
-                        string key = modelVm.ServerRelativeModelPath;
+                        var modelVm = new ModelFileViewModel(
+                            m.Name,
+                            folderPath == "|" ? "" : folderPath,
+                            m.Size,
+                            serverAddress,
+                            serverVersion);
+
+                        string key = $"{serverAddress}_{modelVm.ServerRelativeModelPath}";
 
                         if (_selectedModels.ContainsKey(key))
                         {
@@ -256,7 +449,9 @@ namespace RevitServerManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show(this, $"Ошибка загрузки моделей:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                CurrentFolderModels.Clear();
+                ModelsCountTextBlock.Text = "Моделей: 0";
+                ProgressStatusTextBlock.Text = $"Ошибка загрузки моделей с {serverAddress}: {ex.Message}";
             }
         }
 
@@ -267,7 +462,8 @@ namespace RevitServerManager
             string query = SearchModelsTextBox.Text?.Trim() ?? "";
             if (string.IsNullOrEmpty(query) || query == "Поиск модели...") return true;
 
-            return model.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
+            return model.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                   model.ServerAddress.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         private void SearchModelsTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -297,7 +493,7 @@ namespace RevitServerManager
         {
             if (sender is CheckBox chk && chk.DataContext is ModelFileViewModel modelVm)
             {
-                string key = modelVm.ServerRelativeModelPath;
+                string key = $"{modelVm.ServerAddress}_{modelVm.ServerRelativeModelPath}";
                 if (modelVm.IsSelected)
                 {
                     _selectedModels[key] = modelVm;
@@ -317,7 +513,8 @@ namespace RevitServerManager
                 if (FilterModelItem(model))
                 {
                     model.IsSelected = true;
-                    _selectedModels[model.ServerRelativeModelPath] = model;
+                    string key = $"{model.ServerAddress}_{model.ServerRelativeModelPath}";
+                    _selectedModels[key] = model;
                 }
             }
             UpdateSummaryText();
@@ -330,7 +527,8 @@ namespace RevitServerManager
                 if (FilterModelItem(model))
                 {
                     model.IsSelected = false;
-                    _selectedModels.Remove(model.ServerRelativeModelPath);
+                    string key = $"{model.ServerAddress}_{model.ServerRelativeModelPath}";
+                    _selectedModels.Remove(key);
                 }
             }
             UpdateSummaryText();
@@ -343,7 +541,7 @@ namespace RevitServerManager
                 if (FilterModelItem(model))
                 {
                     model.IsSelected = !model.IsSelected;
-                    string key = model.ServerRelativeModelPath;
+                    string key = $"{model.ServerAddress}_{model.ServerRelativeModelPath}";
                     if (model.IsSelected) _selectedModels[key] = model;
                     else _selectedModels.Remove(key);
                 }
@@ -417,7 +615,6 @@ namespace RevitServerManager
 
             SaveUiSettings();
 
-            string host = _client?.Host ?? ServerAddressComboBox.Text.Trim();
             bool overwrite = OverwriteCheckBox.IsChecked == true;
             bool preserveSub = PreserveSubfoldersCheckBox.IsChecked == true;
             bool openFolder = OpenFolderCheckBox.IsChecked == true;
@@ -441,7 +638,8 @@ namespace RevitServerManager
                 if (_downloadCts.Token.IsCancellationRequested) break;
 
                 var model = modelsToDownload[i];
-                ProgressStatusTextBlock.Text = $"Загрузка ({i + 1}/{total}): {model.Name}...";
+                string host = !string.IsNullOrWhiteSpace(model.ServerAddress) ? model.ServerAddress : ServerAddressComboBox.Text.Trim();
+                ProgressStatusTextBlock.Text = $"Загрузка ({i + 1}/{total}): [{host}] {model.Name}...";
 
                 var itemResult = await Task.Run(() => RevitServerDownloader.DownloadModelAsync(
                     _detectedToolPath,
@@ -463,7 +661,7 @@ namespace RevitServerManager
                     failCount++;
                     if (!string.IsNullOrEmpty(itemResult.ErrorMessage))
                     {
-                        errorDetails.Add($"{model.Name}: {itemResult.ErrorMessage}");
+                        errorDetails.Add($"[{host}] {model.Name}: {itemResult.ErrorMessage}");
                     }
                 }
 
@@ -512,6 +710,7 @@ namespace RevitServerManager
         private void SetUiBusy(bool isBusy)
         {
             ConnectButton.IsEnabled = !isBusy;
+            ConnectAllRsnButton.IsEnabled = !isBusy;
             ServerAddressComboBox.IsEnabled = !isBusy;
             ServerVersionComboBox.IsEnabled = !isBusy;
             FoldersTreeView.IsEnabled = !isBusy;
@@ -538,7 +737,10 @@ namespace RevitServerManager
         protected override void OnClosed(EventArgs e)
         {
             SaveUiSettings();
-            _client?.Dispose();
+            foreach (var client in _clientsCache.Values)
+            {
+                client.Dispose();
+            }
             base.OnClosed(e);
         }
     }

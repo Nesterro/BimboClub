@@ -1,14 +1,15 @@
 ﻿{
-    "latestVersion":  "2.3.0",
+    "latestVersion":  "2.3.1",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Added standalone Revit Server Client application (RevitServerManager.exe)",
-                      "Added dedicated Windows Installer (RevitServerManager_Setup.exe) with desktop and start menu shortcuts",
-                      "Support for browsing Revit Server 2019-2026 folders and models via REST API",
-                      "Batch downloading models with automatic RevitServerTool detection, subfolder preservation, and progress tracking"
+                      "Full auto-detection and parsing of RSN.ini configuration for all Revit versions (2019-2026)",
+                      "Multi-server network tree view: display all RSN.ini servers simultaneously in the left tree with live status",
+                      "Auto-updating server dropdown and tree when changing Revit version (e.g. 2022 -\u003e arch-srv, revit2022, revit-gloraks, revit_prokshino, jmskumbc8q8g, 172.16.12.12)",
+                      "Added direct Open/Edit RSN.ini button in the interface",
+                      "Updated installer and standalone binaries on GitHub Releases"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.0/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.0/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.1/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.1/bimboclub_net8.zip"
                  }
 }

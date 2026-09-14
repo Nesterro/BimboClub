@@ -100,17 +100,73 @@ namespace RevitServerManager.Models
         public long SupportSize { get; set; }
     }
 
+    public class ServerNodeViewModel : INotifyPropertyChanged
+    {
+        private bool _isOnline = true;
+        private string _statusText = "Готов к подключению";
+
+        public string ServerAddress { get; set; }
+        public string Version { get; set; }
+        public string DisplayName => ServerAddress;
+        public bool IsLoaded { get; set; }
+
+        public bool IsOnline
+        {
+            get => _isOnline;
+            set
+            {
+                if (_isOnline != value)
+                {
+                    _isOnline = value;
+                    OnPropertyChanged(nameof(IsOnline));
+                }
+            }
+        }
+
+        public string StatusText
+        {
+            get => _statusText;
+            set
+            {
+                if (_statusText != value)
+                {
+                    _statusText = value;
+                    OnPropertyChanged(nameof(StatusText));
+                }
+            }
+        }
+
+        public ObservableCollection<FolderViewModel?> SubFolders { get; }
+
+        public ServerNodeViewModel(string serverAddress, string version)
+        {
+            ServerAddress = serverAddress;
+            Version = version;
+            SubFolders = new ObservableCollection<FolderViewModel?>
+            {
+                null // Dummy item for expander
+            };
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        protected void OnPropertyChanged(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+    }
+
     public class FolderViewModel : INotifyPropertyChanged
     {
         public string Name { get; set; }
+        public string ServerAddress { get; set; }
+        public string ServerVersion { get; set; }
         public string ServerRelativePath { get; set; }
         public bool IsLoaded { get; set; }
         public ObservableCollection<FolderViewModel?> SubFolders { get; }
 
-        public FolderViewModel(string name, string serverRelativePath, bool hasSubfolders = false)
+        public FolderViewModel(string name, string serverRelativePath, string serverAddress = "", string serverVersion = "", bool hasSubfolders = false)
         {
             Name = name;
             ServerRelativePath = serverRelativePath;
+            ServerAddress = serverAddress;
+            ServerVersion = serverVersion;
             SubFolders = new ObservableCollection<FolderViewModel?>();
             
             if (hasSubfolders)
@@ -132,10 +188,12 @@ namespace RevitServerManager.Models
 
         public string Name { get; set; }
         public string FolderPath { get; set; }
+        public string ServerAddress { get; set; }
+        public string ServerVersion { get; set; }
         public long SizeBytes { get; set; }
         public string FormattedSize => FormatSize(SizeBytes);
         public string ServerRelativeModelPath => string.IsNullOrWhiteSpace(FolderPath) ? Name : $"{FolderPath}|{Name}";
-        public string DisplayRsnPath => $"RSN://.../{ServerRelativeModelPath.Replace('|', '/')}";
+        public string DisplayRsnPath => $"RSN://{ServerAddress}/{ServerRelativeModelPath.Replace('|', '/')}";
 
         public bool IsSelected
         {
@@ -176,11 +234,13 @@ namespace RevitServerManager.Models
             }
         }
 
-        public ModelFileViewModel(string name, string folderPath, long sizeBytes)
+        public ModelFileViewModel(string name, string folderPath, long sizeBytes, string serverAddress = "", string serverVersion = "")
         {
             Name = name;
             FolderPath = folderPath;
             SizeBytes = sizeBytes;
+            ServerAddress = serverAddress;
+            ServerVersion = serverVersion;
         }
 
         private static string FormatSize(long bytes)
