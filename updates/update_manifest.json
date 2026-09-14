@@ -1,12 +1,14 @@
 ﻿{
-    "latestVersion":  "2.3.2",
+    "latestVersion":  "2.3.3",
     "releaseDate":  "2026-09-14",
     "changelog":  [
-                      "Fixed HTTP 400 invalid path error on Revit Server 2022+ (replaced %20 space encoding with %7C pipe delimiter and fallback for root contents)",
-                      "Ensured safe trimming of URI parameters when connecting to remote Revit Server instances"
+                      "Fixed HTTP 405 Method Not Allowed error on remote Revit Server endpoints",
+                      "Added multi-URL endpoint fallback (AdminRESTService and lowercase adminrestservice variants)",
+                      "Sanitized custom HTTP header values to prevent IIS rejection",
+                      "Direct connection fallback via root contents check if serverProperties is disabled on server"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.2/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.2/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.3/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.3.3/bimboclub_net8.zip"
                  }
 }
