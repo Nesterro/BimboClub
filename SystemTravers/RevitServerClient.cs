@@ -54,28 +54,24 @@ namespace BimboClub
         {
             var list = new List<string>();
 
-            // 1. Primary requested version variants - Admin & ModelData
-            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminRESTService.svc");
-            list.Add($"http://{host}/RevitServerModelDataRESTService{preferredVersion}/ModelDataRESTService.svc");
-            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminRestService.svc");
-            list.Add($"http://{host}/RevitServerAdminRESTService{preferredVersion}/AdminService.svc");
-            list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/RESTService.svc");
-            list.Add($"http://{host}/RevitServerRESTService{preferredVersion}/AdminRESTService.svc");
+            var orderedYears = new List<string> { preferredVersion, "2022", "2020", "2021", "2024", "2023", "2019", "2018", "2025", "2026" }.Distinct();
 
-            // 2. Unversioned variants
+            foreach (var ver in orderedYears)
+            {
+                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRESTService.svc");
+                list.Add($"http://{host}/RevitServerModelDataRESTService{ver}/ModelDataRESTService.svc");
+                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRestService.svc");
+                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminService.svc");
+                list.Add($"http://{host}/RevitServerRESTService{ver}/RESTService.svc");
+                list.Add($"http://{host}/RevitServerRESTService{ver}/AdminRESTService.svc");
+                list.Add($"http://{host}/revitserveradminrestservice{ver}/adminrestservice.svc");
+            }
+
+            // Unversioned variants
             list.Add($"http://{host}/RevitServerAdminRESTService/AdminRESTService.svc");
             list.Add($"http://{host}/RevitServerModelDataRESTService/ModelDataRESTService.svc");
             list.Add($"http://{host}/RevitServerAdminRESTService/AdminRestService.svc");
             list.Add($"http://{host}/RevitServerRESTService/RESTService.svc");
-
-            // 3. Fallback versions
-            string[] otherVersions = { "2022", "2024", "2023", "2025", "2026", "2021", "2020", "2019" };
-            foreach (var ver in otherVersions)
-            {
-                if (ver == preferredVersion) continue;
-                list.Add($"http://{host}/RevitServerAdminRESTService{ver}/AdminRESTService.svc");
-                list.Add($"http://{host}/RevitServerModelDataRESTService{ver}/ModelDataRESTService.svc");
-            }
 
             return list.Distinct().ToList();
         }
@@ -87,15 +83,30 @@ namespace BimboClub
             return string.IsNullOrWhiteSpace(ascii) ? fallback : ascii;
         }
 
-        private HttpRequestMessage CreateRequest(HttpMethod method, string url)
+        private HttpRequestMessage CreateRequest(HttpMethod method, string url, string clientVersion = null)
         {
             var req = new HttpRequestMessage(method, url);
             req.Headers.TryAddWithoutValidation("User-Name", _userName);
             req.Headers.TryAddWithoutValidation("User-Machine-Name", _machineName);
             req.Headers.TryAddWithoutValidation("Operation-GUID", Guid.NewGuid().ToString());
-            req.Headers.TryAddWithoutValidation("Client-Version", Version);
+
+            string verToSend = clientVersion ?? DiscoveredVersion ?? Version;
+            if (!string.IsNullOrEmpty(verToSend))
+            {
+                req.Headers.TryAddWithoutValidation("Client-Version", verToSend);
+            }
             req.Headers.TryAddWithoutValidation("Accept", "application/json");
             return req;
+        }
+
+        private static string ExtractVersionFromUrl(string url)
+        {
+            string[] years = { "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018" };
+            foreach (var y in years)
+            {
+                if (url.Contains(y)) return y;
+            }
+            return null;
         }
 
         private async Task EnsureActiveBaseUrlAsync()
@@ -103,62 +114,42 @@ namespace BimboClub
             if (_activeBaseUrl != null) return;
 
             var candidates = _candidateBaseUrls.ToList();
-            int batchSize = 4;
-            for (int i = 0; i < candidates.Count; i += batchSize)
+            var tasks = candidates.Select(async baseUrl =>
             {
-                var batch = candidates.Skip(i).Take(batchSize).ToList();
-                var tasks = batch.Select(async baseUrl =>
+                string urlVersion = ExtractVersionFromUrl(baseUrl) ?? Version;
+                string[] testEndpoints = { "serverProperties", "%7C/contents", "|/contents" };
+
+                foreach (var ep in testEndpoints)
                 {
-                    string[] testEndpoints = { "contents", "%7C/contents", "serverProperties", "|/contents" };
-                    foreach (var ep in testEndpoints)
+                    try
                     {
-                        try
+                        using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(4)))
+                        using (var req = CreateRequest(HttpMethod.Get, $"{baseUrl}/{ep}", urlVersion))
                         {
-                            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5)))
-                            using (var req = CreateRequest(HttpMethod.Get, $"{baseUrl}/{ep}"))
+                            using (var resp = await _httpClient.SendAsync(req, cts.Token))
                             {
-                                using (var resp = await _httpClient.SendAsync(req, cts.Token))
+                                if (resp.IsSuccessStatusCode)
                                 {
-                                    if (resp.IsSuccessStatusCode)
-                                    {
-                                        return baseUrl;
-                                    }
+                                    return (BaseUrl: baseUrl, Version: urlVersion);
                                 }
                             }
                         }
-                        catch { }
                     }
-                    return (string)null;
-                }).ToList();
-
-                var results = await Task.WhenAll(tasks);
-                var found = results.FirstOrDefault(r => r != null);
-                if (found != null)
-                {
-                    _activeBaseUrl = found;
-                    ExtractDiscoveredVersion(found);
-                    return;
+                    catch { }
                 }
+                return (BaseUrl: (string)null, Version: (string)null);
+            }).ToList();
+
+            var results = await Task.WhenAll(tasks);
+            var match = results.FirstOrDefault(r => r.BaseUrl != null);
+            if (match.BaseUrl != null)
+            {
+                _activeBaseUrl = match.BaseUrl;
+                DiscoveredVersion = match.Version ?? DiscoveredVersion;
+                return;
             }
 
             _activeBaseUrl = _candidateBaseUrls[0];
-        }
-
-        private void ExtractDiscoveredVersion(string workingUrl)
-        {
-            try
-            {
-                string[] years = { "2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019" };
-                foreach (var y in years)
-                {
-                    if (workingUrl.Contains(y))
-                    {
-                        DiscoveredVersion = y;
-                        break;
-                    }
-                }
-            }
-            catch { }
         }
 
         private async Task<T> GetAsync<T>(string relativeUrl)
@@ -177,10 +168,11 @@ namespace BimboClub
             foreach (var baseUrl in urlsToTry)
             {
                 string url = $"{baseUrl}/{relativeUrl.TrimStart('/')}";
+                string urlVersion = ExtractVersionFromUrl(baseUrl) ?? DiscoveredVersion ?? Version;
 
                 try
                 {
-                    using (var request = CreateRequest(HttpMethod.Get, url))
+                    using (var request = CreateRequest(HttpMethod.Get, url, urlVersion))
                     {
                         using (var response = await _httpClient.SendAsync(request))
                         {
@@ -194,7 +186,7 @@ namespace BimboClub
                                 var result = (T)serializer.ReadObject(ms);
 
                                 _activeBaseUrl = baseUrl;
-                                ExtractDiscoveredVersion(baseUrl);
+                                DiscoveredVersion = urlVersion;
                                 return result;
                             }
                         }
@@ -246,36 +238,28 @@ namespace BimboClub
 
         public async Task<FolderContents> GetContentsAsync(string serverRelativePath)
         {
-            string formattedPath;
-            if (string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|")
-            {
-                formattedPath = "%7C";
-            }
-            else
-            {
-                string[] parts = serverRelativePath.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-                string[] escapedParts = new string[parts.Length];
-                for (int i = 0; i < parts.Length; i++)
-                {
-                    escapedParts[i] = Uri.EscapeDataString(parts[i].Trim());
-                }
-                formattedPath = string.Join("%7C", escapedParts);
-            }
+            string path = string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|"
+                ? "%7C"
+                : string.Join("%7C", serverRelativePath.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries).Select(p => Uri.EscapeDataString(p.Trim())));
 
             try
             {
-                return await GetAsync<FolderContents>($"{formattedPath}/contents");
+                return await GetAsync<FolderContents>($"{path}/contents");
             }
-            catch (Exception) when (string.IsNullOrWhiteSpace(serverRelativePath) || serverRelativePath.Trim() == "|")
+            catch
             {
-                try
+                if (path == "%7C")
                 {
-                    return await GetAsync<FolderContents>("|/contents");
+                    try
+                    {
+                        return await GetAsync<FolderContents>("|/contents");
+                    }
+                    catch
+                    {
+                        return await GetAsync<FolderContents>("root/contents");
+                    }
                 }
-                catch
-                {
-                    return await GetAsync<FolderContents>("contents");
-                }
+                throw;
             }
         }
 
