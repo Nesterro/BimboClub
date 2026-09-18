@@ -215,6 +215,11 @@ namespace BimboClub
 				ToolTip = "Устанавливает область подрезки вида вокруг выбранных элементов с заданным отступом."
 			};
 
+			PushButtonData pushButtonDataExtraSchedule = new PushButtonData("cmdExtraSchedule", "Допы в\nспеку", text4, "BimboClub.ExtraScheduleItems.ExtraScheduleItemsCommand")
+			{
+				ToolTip = "Добавление немоделируемых элементов (крепеж, герметики, изоляция, кабели, краска и др.) в спецификации Revit (ADSK) без создания 3D геометрии."
+			};
+
 			// Загрузка иконок
 			BitmapSource bitmapSource3D = LoadImage(System.IO.Path.Combine(text, "icon_3d.png"));
 			BitmapSource bitmapSource3D16 = LoadImage(System.IO.Path.Combine(text, "icon_3d_16.png"));
@@ -370,6 +375,11 @@ namespace BimboClub
 				pushButtonDataRevitServerBcc.Image = bitmapSourceParam16;
 			}
 
+			BitmapSource bitmapSourceSpecs = LoadImage(System.IO.Path.Combine(text, "icon_specs.png"));
+			BitmapSource bitmapSourceSpecs16 = LoadImage(System.IO.Path.Combine(text, "icon_specs_16.png"));
+			if (bitmapSourceSpecs != null) pushButtonDataExtraSchedule.LargeImage = bitmapSourceSpecs;
+			if (bitmapSourceSpecs16 != null) pushButtonDataExtraSchedule.Image = bitmapSourceSpecs16;
+
 			// --- Pulldown: Схемы и Виды ---
 			try
 			{
@@ -480,6 +490,7 @@ namespace BimboClub
 				{
 					pd.LargeImage = bitmapSourceExcel;
 					pd.Image = bitmapSourceExcel16;
+					pd.AddPushButton(pushButtonDataExtraSchedule);
 					pd.AddPushButton(pushButtonDataPrint);
 					pd.AddPushButton(pushButtonDataSchedulePackBcc);
 					pd.AddPushButton(pushButtonDataJson);
@@ -489,6 +500,13 @@ namespace BimboClub
 				}
 			}
 			catch (Exception ex) { Logger.LogError("Ошибка добавления Импорт/Экспорт", ex); }
+
+			// 3. Отдельная крупная кнопка "Допы в спеку"
+			try
+			{
+				ribbonPanel.AddItem(pushButtonDataExtraSchedule);
+			}
+			catch (Exception ex) { Logger.LogError("Ошибка добавления Допы в спеку", ex); }
 
 			// 2. Отдельная крупная кнопка "Инфо v2.0.1" с прямо отображаемой версией
 			try

@@ -1,11 +1,13 @@
 ﻿{
-    "latestVersion":  "2.4.7",
-    "releaseDate":  "2026-09-14",
+    "latestVersion":  "2.4.8",
+    "releaseDate":  "2026-09-18",
     "changelog":  [
-                      "Fix: Show server root models immediately on connect,Fix: Add Server root node to tree in single-server connect mode,Fix: Call GetListOfModelFilesAndFolders if models are empty even when folders exist,Fix: Support all folder path styles in RSBridge (backslash, leading backslash, pipe),Fix: Robust reflection-based extraction of model name and size in RSBridge,Fix: Use createLocalRVT and proper backslash paths for model downloads via RevitServerTool"
+                      "New: Инструмент Допы в спеку - немоделируемые элементы в спецификации Revit без 3D геометрии",
+                      "New: Библиотека типовых расходников и крепежа с возможностью пополнения",
+                      "New: Импорт и экспорт в Excel через буфер обмена"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.7/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.7/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.8/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.8/bimboclub_net8.zip"
                  }
 }
