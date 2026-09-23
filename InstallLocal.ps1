@@ -10,10 +10,14 @@ foreach ($ver in $versions) {
     $null = New-Item -ItemType Directory -Path $targetDir -Force
 
     if ([int]$ver -le 2024) {
-        $sourceDll = Join-Path $baseDir "SystemTravers\bin\Release\net48\BimboClub.dll"
+        $sourceDll = Join-Path $baseDir "SystemTravers\bin\x64\Release\net48\BimboClub.dll"
+        if (-not (Test-Path $sourceDll)) { $sourceDll = Join-Path $baseDir "SystemTravers\bin\Release\net48\BimboClub.dll" }
+        if (-not (Test-Path $sourceDll)) { $sourceDll = Join-Path $baseDir "SystemTravers\bin\x64\Debug\net48\BimboClub.dll" }
         if (-not (Test-Path $sourceDll)) { $sourceDll = Join-Path $baseDir "SystemTravers\bin\Debug\net48\BimboClub.dll" }
     } else {
-        $sourceDll = Join-Path $baseDir "SystemTravers\bin\Release\net8.0-windows\BimboClub.dll"
+        $sourceDll = Join-Path $baseDir "SystemTravers\bin\x64\Release\net8.0-windows\BimboClub.dll"
+        if (-not (Test-Path $sourceDll)) { $sourceDll = Join-Path $baseDir "SystemTravers\bin\Release\net8.0-windows\BimboClub.dll" }
+        if (-not (Test-Path $sourceDll)) { $sourceDll = Join-Path $baseDir "SystemTravers\bin\x64\Debug\net8.0-windows\BimboClub.dll" }
         if (-not (Test-Path $sourceDll)) { $sourceDll = Join-Path $baseDir "SystemTravers\bin\Debug\net8.0-windows\BimboClub.dll" }
     }
 

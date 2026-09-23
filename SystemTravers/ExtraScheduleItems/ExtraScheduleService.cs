@@ -185,15 +185,29 @@ namespace BimboClub.ExtraScheduleItems
                     {
                         // Создание нового экземпляра
                         XYZ location = new XYZ(baseX + index * 0.1, baseY, baseZ);
-                        FamilyInstance instance;
-                        if (level != null)
+                        FamilyInstance instance = null;
+                        try
                         {
-                            instance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+                            if (level != null)
+                            {
+                                instance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+                            }
                         }
-                        else
+                        catch { }
+
+                        if (instance == null)
                         {
-                            instance = doc.Create.NewFamilyInstance(location, symbol, StructuralType.NonStructural);
+                            try
+                            {
+                                instance = doc.Create.NewFamilyInstance(location, symbol, StructuralType.NonStructural);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.LogError("Ошибка размещения экземпляра немоделируемого элемента", ex);
+                            }
                         }
+
+                        if (instance == null) continue;
 
                         // Установка метки плагина в Comments
                         var commentParam = instance.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS);
@@ -243,9 +257,23 @@ namespace BimboClub.ExtraScheduleItems
                 .OfClass(typeof(FamilySymbol))
                 .OfCategory(BuiltInCategory.OST_GenericModel)
                 .Cast<FamilySymbol>()
-                .FirstOrDefault(s => s.Family.Name.Equals(FamilyName, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(s => s.Family != null && string.Equals(s.Family.Name, FamilyName, StringComparison.OrdinalIgnoreCase));
 
             if (symbol != null) return symbol;
+
+            // 1.1 Поиск семейства по имени среди всех семейств проекта
+            var family = new FilteredElementCollector(doc)
+                .OfClass(typeof(Family))
+                .Cast<Family>()
+                .FirstOrDefault(f => f != null && string.Equals(f.Name, FamilyName, StringComparison.OrdinalIgnoreCase));
+            if (family != null)
+            {
+                var symId = family.GetFamilySymbolIds().FirstOrDefault();
+                if (symId != null && doc.GetElement(symId) is FamilySymbol fs)
+                {
+                    return fs;
+                }
+            }
 
             // 2. Попытка загрузить семейство из шаблона или временного файла
             string rfaPath = EnsureFamilyFile(doc.Application);

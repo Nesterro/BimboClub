@@ -1,13 +1,12 @@
 ﻿{
-    "latestVersion":  "2.4.8",
-    "releaseDate":  "2026-09-18",
+    "latestVersion":  "2.4.9",
+    "releaseDate":  "2026-09-23",
     "changelog":  [
-                      "New: Инструмент Допы в спеку - немоделируемые элементы в спецификации Revit без 3D геометрии",
-                      "New: Библиотека типовых расходников и крепежа с возможностью пополнения",
-                      "New: Импорт и экспорт в Excel через буфер обмена"
+                      "Fix: Исправлена ошибка NRE (Ссылка на объект...) при открытии модуля Допы в спеку",
+                      "Fix: Повышена надежность поиска и создания семейства немоделируемых элементов в Revit"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.8/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.8/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.9/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.9/bimboclub_net8.zip"
                  }
 }

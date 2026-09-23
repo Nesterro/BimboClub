@@ -66,17 +66,21 @@ namespace BimboClub.ExtraScheduleItems
 
         private void LoadCatalogTree(string search = null)
         {
-            _catalog = ExtraScheduleCatalogManager.LoadCatalog();
+            if (CatalogTreeView == null) return;
+
+            _catalog = ExtraScheduleCatalogManager.LoadCatalog() ?? new ObservableCollection<ExtraScheduleCatalogCategory>();
             CatalogTreeView.Items.Clear();
 
             string q = search?.Trim().ToLowerInvariant() ?? "";
 
             foreach (var cat in _catalog)
             {
+                if (cat == null) continue;
+                var items = cat.Items ?? new ObservableCollection<ExtraScheduleCatalogItem>();
                 var matchingItems = string.IsNullOrEmpty(q)
-                    ? cat.Items
+                    ? items
                     : new ObservableCollection<ExtraScheduleCatalogItem>(
-                        cat.Items.Where(i => (i.Name + " " + i.Mark + " " + i.Code).ToLowerInvariant().Contains(q)));
+                        items.Where(i => i != null && ((i.Name ?? "") + " " + (i.Mark ?? "") + " " + (i.Code ?? "")).ToLowerInvariant().Contains(q)));
 
                 if (matchingItems.Count == 0 && !string.IsNullOrEmpty(q))
                 {
@@ -92,6 +96,7 @@ namespace BimboClub.ExtraScheduleItems
 
                 foreach (var it in matchingItems)
                 {
+                    if (it == null) continue;
                     var leaf = new TreeViewItem
                     {
                         Header = $"{it.Name} {(string.IsNullOrEmpty(it.Mark) ? "" : $"[{it.Mark}]")}",
@@ -228,6 +233,7 @@ namespace BimboClub.ExtraScheduleItems
 
         private void CatalogSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            if (CatalogTreeView == null || CatalogSearchBox == null) return;
             string txt = CatalogSearchBox.Text?.Trim() ?? "";
             if (txt == "Поиск в библиотеке...") txt = "";
             LoadCatalogTree(txt);

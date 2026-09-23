@@ -8,6 +8,8 @@ param (
     [switch]$NoManager
 )
 
+$env:Path = "C:\Users\user\MinGit\cmd;" + $env:Path
+
 # 1. Compile BimboClub plugin
 Write-Host "--- 1. Compiling solution in Release configuration ---" -ForegroundColor Cyan
 dotnet build BimboClub.sln -c Release -p:Version=$Version
@@ -63,9 +65,11 @@ if (-not $NoManager) {
 
     # Copy to Yandex.Disk
     $yandexFolder = "D:\Yandex.Disk\Revit\Plugins"
-    Stop-Process -Name "BimboClubManager" -ErrorAction SilentlyContinue
-    Start-Sleep -Seconds 1
-    Copy-Item $singleExe -Destination "$yandexFolder\BimboClubManager.exe" -Force
+    if (Test-Path $yandexFolder) {
+        Stop-Process -Name "BimboClubManager" -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 1
+        Copy-Item $singleExe -Destination "$yandexFolder\BimboClubManager.exe" -Force
+    }
 
     # Clean directories for clean embed
     Remove-Item "RevitServerManager\bin" -Recurse -Force -ErrorAction SilentlyContinue
@@ -86,7 +90,9 @@ if (-not $NoManager) {
     }
     $singleServerExe = "RevitServerManager\bin\Release\net8.0-windows\win-x64\publish\RevitServerManager.exe"
     Copy-Item $singleServerExe -Destination "RevitServerManager.exe" -Force
-    Copy-Item $singleServerExe -Destination "$yandexFolder\RevitServerManager.exe" -Force
+    if (Test-Path $yandexFolder) {
+        Copy-Item $singleServerExe -Destination "$yandexFolder\RevitServerManager.exe" -Force
+    }
 
     # Prepare payload for installer
     $payloadDir = "RevitServerManagerInstaller\Payload"
@@ -102,7 +108,9 @@ if (-not $NoManager) {
     }
     $setupExe = "RevitServerManagerInstaller\bin\Release\net8.0-windows\win-x64\publish\RevitServerManager_Setup.exe"
     Copy-Item $setupExe -Destination "RevitServerManager_Setup.exe" -Force
-    Copy-Item $setupExe -Destination "$yandexFolder\RevitServerManager_Setup.exe" -Force
+    if (Test-Path $yandexFolder) {
+        Copy-Item $setupExe -Destination "$yandexFolder\RevitServerManager_Setup.exe" -Force
+    }
 } else {
     Write-Host "--- 3. Skipping standalone apps compile (-NoManager set) ---" -ForegroundColor Yellow
 }
