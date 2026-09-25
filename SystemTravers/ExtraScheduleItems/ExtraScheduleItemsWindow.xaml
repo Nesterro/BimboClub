@@ -234,8 +234,9 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <!-- Search & Section filter -->
-                    <ColumnDefinition Width="280"/>
-                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="240"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                     <!-- Action buttons -->
@@ -251,10 +252,17 @@
                 <ComboBox x:Name="SectionFilterComboBox" Grid.Column="1" Style="{StaticResource DarkComboBoxStyle}" Margin="0,0,8,0"
                           SelectionChanged="SectionFilterComboBox_SelectionChanged"/>
 
-                <Button Content="Сбросить фильтры" Style="{StaticResource SecondaryButtonStyle}" Grid.Column="2" Click="ResetFilters_Click"/>
+                <Button Content="Сбросить фильтры" Style="{StaticResource SecondaryButtonStyle}" Grid.Column="2" Margin="0,0,12,0" Click="ResetFilters_Click"/>
+
+                <!-- Default Category for new items -->
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                    <TextBlock Text="Категория:" VerticalAlignment="Center" Foreground="{StaticResource TextMutedBrush}" Margin="0,0,6,0" FontSize="12"/>
+                    <ComboBox x:Name="DefaultCategoryComboBox" Width="180" Style="{StaticResource DarkComboBoxStyle}"
+                              ToolTip="Категория Revit по умолчанию для создаваемых элементов"/>
+                </StackPanel>
 
                 <!-- Right Table Actions -->
-                <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Grid.Column="5" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="➕ Новая строка" Style="{StaticResource SecondaryButtonStyle}" Click="AddRow_Click"/>
                     <Button Content="📋 Дублировать" Style="{StaticResource SecondaryButtonStyle}" Click="DuplicateRow_Click"/>
                     <Button Content="🗑️ Удалить" Style="{StaticResource DangerButtonStyle}" Click="DeleteRow_Click"/>
@@ -269,7 +277,7 @@
         <Grid Grid.Row="2" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <!-- Catalog Drawer (Left) -->
-                <ColumnDefinition x:Name="CatalogColumn" Width="320" MinWidth="240" MaxWidth="500"/>
+                <ColumnDefinition x:Name="CatalogColumn" Width="330" MinWidth="240" MaxWidth="500"/>
                 <ColumnDefinition Width="8"/>
                 <!-- Main Schedule DataGrid (Right) -->
                 <ColumnDefinition Width="*"/>
@@ -298,7 +306,14 @@
                             <Style TargetType="TreeViewItem">
                                 <Setter Property="IsExpanded" Value="True"/>
                                 <Setter Property="Padding" Value="4,3"/>
-                                <Setter Property="Foreground" Value="{StaticResource TextWhiteBrush}"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Style.Resources>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#3E3E66"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFFFFF"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#2E2E48"/>
+                                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#FFFFFF"/>
+                                </Style.Resources>
                             </Style>
                         </TreeView.ItemContainerStyle>
                     </TreeView>
@@ -324,31 +339,47 @@
                     <DataGrid.Columns>
                         <!-- Section / Group -->
                         <DataGridTextColumn Header="Раздел (Групп.)" Binding="{Binding Group, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
-                        
+
+                        <!-- Revit Category -->
+                        <DataGridTemplateColumn Header="Категория Revit" Width="170">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding CategoryName}" Foreground="{StaticResource TextWhiteBrush}" VerticalAlignment="Center" Margin="6,0"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <ComboBox SelectedItem="{Binding CategoryName, UpdateSourceTrigger=PropertyChanged}"
+                                              ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=AvailableCategories}"
+                                              Style="{StaticResource DarkComboBoxStyle}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+
                         <!-- Position -->
                         <DataGridTextColumn Header="Поз." Binding="{Binding Position, UpdateSourceTrigger=PropertyChanged}" Width="55"/>
-                        
+
                         <!-- Name -->
                         <DataGridTextColumn Header="Наименование (ADSK_Наименование)" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
-                        
+
                         <!-- Mark -->
                         <DataGridTextColumn Header="Марка / Обозначение" Binding="{Binding Mark, UpdateSourceTrigger=PropertyChanged}" Width="140"/>
-                        
+
                         <!-- Code -->
                         <DataGridTextColumn Header="Код изделия" Binding="{Binding Code, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
-                        
+
                         <!-- Manufacturer -->
                         <DataGridTextColumn Header="Завод-изготовитель" Binding="{Binding Manufacturer, UpdateSourceTrigger=PropertyChanged}" Width="130"/>
-                        
+
                         <!-- Unit -->
                         <DataGridTextColumn Header="Ед." Binding="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" Width="55"/>
-                        
+
                         <!-- Count -->
                         <DataGridTextColumn Header="Кол-во" Binding="{Binding Count, StringFormat={}{0:0.##}, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
-                        
+
                         <!-- Weight -->
                         <DataGridTextColumn Header="Масса, кг" Binding="{Binding Weight, StringFormat={}{0:0.###}, UpdateSourceTrigger=PropertyChanged}" Width="75"/>
-                        
+
                         <!-- Note -->
                         <DataGridTextColumn Header="Примечание" Binding="{Binding Note, UpdateSourceTrigger=PropertyChanged}" Width="130"/>
                     </DataGrid.Columns>

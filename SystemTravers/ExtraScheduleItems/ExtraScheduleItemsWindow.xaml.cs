@@ -22,10 +22,21 @@ namespace BimboClub.ExtraScheduleItems
         private ObservableCollection<ExtraScheduleCatalogCategory> _catalog;
         private ICollectionView _itemsView;
 
+        public List<string> AvailableCategories => ExtraScheduleService.SupportedCategories.Keys.ToList();
+
         public ExtraScheduleItemsWindow(Document doc)
         {
             InitializeComponent();
             _doc = doc;
+
+            try
+            {
+                UiThemeHelper.ApplyDarkTheme(this);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"ApplyDarkTheme warning: {ex.Message}", "WARN");
+            }
 
             DocInfoTextBlock.Text = $"Документ: {_doc?.Title ?? "Без имени"}";
 
@@ -36,6 +47,10 @@ namespace BimboClub.ExtraScheduleItems
         {
             try
             {
+                // Инициализация выбора категории по умолчанию
+                DefaultCategoryComboBox.ItemsSource = AvailableCategories;
+                DefaultCategoryComboBox.SelectedItem = "Обобщенные модели";
+
                 // 1. Загрузка элементов из проекта Revit
                 var existing = ExtraScheduleService.ScanExistingItems(_doc);
                 _allItems.Clear();
@@ -91,17 +106,65 @@ namespace BimboClub.ExtraScheduleItems
                 {
                     Header = $"{cat.Icon}  {cat.Title} ({matchingItems.Count})",
                     FontWeight = FontWeights.Bold,
+                    Foreground = Brushes.White,
                     IsExpanded = true
                 };
 
                 foreach (var it in matchingItems)
                 {
                     if (it == null) continue;
+
+                    var sp = new StackPanel
+                    {
+                        Orientation = Orientation.Horizontal,
+                        Margin = new Thickness(0, 2, 0, 2)
+                    };
+
+                    var nameBlock = new TextBlock
+                    {
+                        Text = it.Name ?? "Элемент",
+                        Foreground = Brushes.White,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        TextTrimming = TextTrimming.CharacterEllipsis,
+                        MaxWidth = 210
+                    };
+                    sp.Children.Add(nameBlock);
+
+                    if (!string.IsNullOrEmpty(it.Mark))
+                    {
+                        var markBorder = new Border
+                        {
+                            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(55, 30, 40)),
+                            CornerRadius = new CornerRadius(3),
+                            Padding = new Thickness(4, 1, 4, 1),
+                            Margin = new Thickness(6, 0, 0, 0),
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        markBorder.Child = new TextBlock
+                        {
+                            Text = it.Mark,
+                            Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 158, 170)),
+                            FontSize = 10,
+                            FontWeight = FontWeights.SemiBold
+                        };
+                        sp.Children.Add(markBorder);
+                    }
+
+                    string tip = $"{it.Name}";
+                    if (!string.IsNullOrEmpty(it.Mark)) tip += $"\nМарка: {it.Mark}";
+                    if (!string.IsNullOrEmpty(it.DefaultCategory)) tip += $"\nКатегория Revit: {it.DefaultCategory}";
+                    if (!string.IsNullOrEmpty(it.Unit)) tip += $"\nЕд.изм.: {it.Unit}";
+                    if (it.Weight > 0) tip += $"\nМасса: {it.Weight} кг";
+                    if (!string.IsNullOrEmpty(it.Manufacturer)) tip += $"\nЗавод: {it.Manufacturer}";
+                    if (!string.IsNullOrEmpty(it.Note)) tip += $"\nПримечание: {it.Note}";
+
                     var leaf = new TreeViewItem
                     {
-                        Header = $"{it.Name} {(string.IsNullOrEmpty(it.Mark) ? "" : $"[{it.Mark}]")}",
+                        Header = sp,
                         FontWeight = FontWeights.Normal,
-                        Tag = it
+                        Foreground = Brushes.White,
+                        Tag = it,
+                        ToolTip = tip
                     };
                     leaf.MouseDoubleClick += (s, e) =>
                     {
@@ -249,11 +312,14 @@ namespace BimboClub.ExtraScheduleItems
                 ? SectionFilterComboBox.SelectedItem as string ?? ""
                 : (_allItems.LastOrDefault()?.Group ?? "ОВ1");
 
+            string category = DefaultCategoryComboBox?.SelectedItem as string ?? "Обобщенные модели";
+
             var newItem = new ExtraScheduleItem
             {
                 Id = -1,
                 IsNew = true,
                 Group = defaultGroup,
+                CategoryName = category,
                 Name = "Новый немоделируемый элемент",
                 Unit = "шт",
                 Count = 1.0
@@ -264,7 +330,7 @@ namespace BimboClub.ExtraScheduleItems
             ScheduleDataGrid.ScrollIntoView(newItem);
             UpdateCounters();
             UpdateSectionFilterOptions();
-            StatusMessageTextBlock.Text = "Добавлена новая строка в таблицу";
+            StatusMessageTextBlock.Text = $"Добавлена новая строка ({category})";
         }
 
         private void DuplicateRow_Click(object sender, RoutedEventArgs e)
@@ -345,14 +411,19 @@ namespace BimboClub.ExtraScheduleItems
                 ? SectionFilterComboBox.SelectedItem as string ?? ""
                 : (_allItems.LastOrDefault()?.Group ?? "ОВ1");
 
-            var item = catItem.ToScheduleItem(currentSection);
+            string defaultCat = DefaultCategoryComboBox?.SelectedItem as string ?? "Обобщенные модели";
+            string catToUse = !string.IsNullOrEmpty(catItem.DefaultCategory)
+                ? catItem.DefaultCategory
+                : defaultCat;
+
+            var item = catItem.ToScheduleItem(currentSection, catToUse);
             _allItems.Add(item);
             ScheduleDataGrid.SelectedItem = item;
             ScheduleDataGrid.ScrollIntoView(item);
             UpdateCounters();
             UpdateSectionFilterOptions();
 
-            StatusMessageTextBlock.Text = $"Элемент «{item.Name}» добавлен из библиотеки";
+            StatusMessageTextBlock.Text = $"Элемент «{item.Name}» ({item.CategoryName}) добавлен из библиотеки";
         }
 
         private void SaveCurrentToCatalog_Click(object sender, RoutedEventArgs e)
@@ -383,7 +454,8 @@ namespace BimboClub.ExtraScheduleItems
                     DefaultCount = selected.Count,
                     Weight = selected.Weight,
                     Note = selected.Note,
-                    DefaultGroup = selected.Group
+                    DefaultGroup = selected.Group,
+                    DefaultCategory = selected.CategoryName
                 };
 
                 userCat.Items.Add(catalogItem);
@@ -420,6 +492,7 @@ namespace BimboClub.ExtraScheduleItems
                 string currentGroup = (SectionFilterComboBox.SelectedItem as string != "Все разделы")
                     ? SectionFilterComboBox.SelectedItem as string ?? "ОВ1"
                     : "ОВ1";
+                string defaultCat = DefaultCategoryComboBox?.SelectedItem as string ?? "Обобщенные модели";
 
                 foreach (var line in lines)
                 {
@@ -430,7 +503,8 @@ namespace BimboClub.ExtraScheduleItems
                     {
                         Id = -1,
                         IsNew = true,
-                        Group = currentGroup
+                        Group = currentGroup,
+                        CategoryName = defaultCat
                     };
 
                     if (cols.Length == 1)

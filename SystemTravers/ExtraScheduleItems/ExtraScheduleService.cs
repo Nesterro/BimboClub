@@ -14,6 +14,41 @@ namespace BimboClub.ExtraScheduleItems
         public const string TypeName = "Немоделируемый элемент";
         public const string MarkerComment = "BCC_EXTRA_ITEM";
 
+        // Поддерживаемые категории Revit для немоделируемых элементов
+        public static readonly Dictionary<string, BuiltInCategory> SupportedCategories = new Dictionary<string, BuiltInCategory>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Обобщенные модели", BuiltInCategory.OST_GenericModel },
+            { "Арматура воздуховодов", BuiltInCategory.OST_DuctAccessory },
+            { "Арматура трубопроводов", BuiltInCategory.OST_PipeAccessory },
+            { "Механическое оборудование", BuiltInCategory.OST_MechanicalEquipment },
+            { "Сантехнические приборы", BuiltInCategory.OST_PlumbingFixtures },
+            { "Электрооборудование", BuiltInCategory.OST_ElectricalEquipment },
+            { "Электроприборы", BuiltInCategory.OST_ElectricalFixtures },
+            { "Оборудование связи", BuiltInCategory.OST_CommunicationDevices },
+            { "Пожарная сигнализация", BuiltInCategory.OST_FireAlarmDevices },
+            { "Осветительные приборы", BuiltInCategory.OST_LightingFixtures },
+            { "Специальное оборудование", BuiltInCategory.OST_SpecialityEquipment }
+        };
+
+        public static BuiltInCategory ResolveBuiltInCategory(string categoryName)
+        {
+            if (!string.IsNullOrWhiteSpace(categoryName) && SupportedCategories.TryGetValue(categoryName, out var bic))
+            {
+                return bic;
+            }
+            return BuiltInCategory.OST_GenericModel;
+        }
+
+        public static string GetFamilyNameForCategory(string categoryName)
+        {
+            if (string.IsNullOrWhiteSpace(categoryName) || categoryName.Equals("Обобщенные модели", StringComparison.OrdinalIgnoreCase))
+            {
+                return FamilyName;
+            }
+            string safeName = categoryName.Replace(" ", "_");
+            return $"BCC_Доп_{safeName}";
+        }
+
         // Стандартные имена параметров ADSK с альтернативами
         public static readonly string[] GroupParamNames = { "ADSK_Группирование", "ADSK_Раздел проекта", "Раздел проекта", "Группирование" };
         public static readonly string[] PositionParamNames = { "ADSK_Позиция", "Позиция", "Номер позиции" };
@@ -27,49 +62,68 @@ namespace BimboClub.ExtraScheduleItems
         public static readonly string[] NoteParamNames = { "ADSK_Примечание", "Примечание", "Примечания" };
 
         /// <summary>
-        /// Сканирование документа Revit на ранее созданные немоделируемые элементы
+        /// Сканирование документа Revit на ранее созданные немоделируемые элементы во всех поддерживаемых категориях
         /// </summary>
         public static List<ExtraScheduleItem> ScanExistingItems(Document doc)
         {
             var result = new List<ExtraScheduleItem>();
             try
             {
-                var collector = new FilteredElementCollector(doc)
-                    .OfCategory(BuiltInCategory.OST_GenericModel)
-                    .WhereElementIsNotElementType();
+                var seenIds = new HashSet<int>();
 
-                foreach (Element elem in collector)
+                foreach (var kvp in SupportedCategories)
                 {
-                    if (IsExtraScheduleElement(elem))
+                    FilteredElementCollector collector;
+                    try
                     {
-                        var item = new ExtraScheduleItem
-                        {
-                            Id = elem.Id.IntegerValue,
-                            IsNew = false,
-                            IsModified = false,
-                            Group = GetStringParam(elem, GroupParamNames),
-                            Position = GetStringParam(elem, PositionParamNames),
-                            Name = GetStringParam(elem, NameParamNames),
-                            Mark = GetStringParam(elem, MarkParamNames),
-                            Code = GetStringParam(elem, CodeParamNames),
-                            Manufacturer = GetStringParam(elem, ManufacturerParamNames),
-                            Unit = GetStringParam(elem, UnitParamNames, "шт"),
-                            Count = GetDoubleParam(elem, CountParamNames, 1.0),
-                            Weight = GetDoubleParam(elem, WeightParamNames, 0.0),
-                            Note = GetStringParam(elem, NoteParamNames)
-                        };
+                        collector = new FilteredElementCollector(doc)
+                            .OfCategory(kvp.Value)
+                            .WhereElementIsNotElementType();
+                    }
+                    catch
+                    {
+                        continue;
+                    }
 
-                        // Если имя пустое - попробуем взять из имени типа
-                        if (string.IsNullOrWhiteSpace(item.Name))
+                    foreach (Element elem in collector)
+                    {
+                        if (elem == null) continue;
+                        int idVal = elem.Id.IntegerValue;
+                        if (seenIds.Contains(idVal)) continue;
+
+                        if (IsExtraScheduleElement(elem))
                         {
-                            var typeElem = doc.GetElement(elem.GetTypeId());
-                            if (typeElem != null)
+                            seenIds.Add(idVal);
+                            var item = new ExtraScheduleItem
                             {
-                                item.Name = GetStringParam(typeElem, NameParamNames);
-                            }
-                        }
+                                Id = idVal,
+                                IsNew = false,
+                                IsModified = false,
+                                CategoryName = kvp.Key,
+                                Group = GetStringParam(elem, GroupParamNames),
+                                Position = GetStringParam(elem, PositionParamNames),
+                                Name = GetStringParam(elem, NameParamNames),
+                                Mark = GetStringParam(elem, MarkParamNames),
+                                Code = GetStringParam(elem, CodeParamNames),
+                                Manufacturer = GetStringParam(elem, ManufacturerParamNames),
+                                Unit = GetStringParam(elem, UnitParamNames, "шт"),
+                                Count = GetDoubleParam(elem, CountParamNames, 1.0),
+                                Weight = GetDoubleParam(elem, WeightParamNames, 0.0),
+                                Note = GetStringParam(elem, NoteParamNames)
+                            };
 
-                        result.Add(item);
+                            // Если имя пустое - попробуем взять из имени типа
+                            if (string.IsNullOrWhiteSpace(item.Name))
+                            {
+                                var typeElem = doc.GetElement(elem.GetTypeId());
+                                if (typeElem != null)
+                                {
+                                    item.Name = GetStringParam(typeElem, NameParamNames);
+                                }
+                            }
+
+                            result.Add(item);
+                        }
                     }
                 }
             }
@@ -96,7 +150,9 @@ namespace BimboClub.ExtraScheduleItems
             // 2. Проверка имени семейства
             if (elem is FamilyInstance fi && fi.Symbol?.Family != null)
             {
-                if (fi.Symbol.Family.Name.Equals(FamilyName, StringComparison.OrdinalIgnoreCase))
+                string famName = fi.Symbol.Family.Name ?? "";
+                if (famName.Equals(FamilyName, StringComparison.OrdinalIgnoreCase) ||
+                    famName.StartsWith("BCC_Доп", StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -139,18 +195,8 @@ namespace BimboClub.ExtraScheduleItems
                     }
                 }
 
-                // 2. Получение или создание типоразмера семейства
-                FamilySymbol symbol = GetOrCreateFamilySymbol(doc);
-                if (symbol == null)
-                {
-                    throw new InvalidOperationException("Не удалось найти или создать семейство для немоделируемых элементов.");
-                }
-
-                if (!symbol.IsActive)
-                {
-                    symbol.Activate();
-                    doc.Regenerate();
-                }
+                // 2. Кэш типоразмеров семейств по категориям
+                var symbolsCache = new Dictionary<string, FamilySymbol>(StringComparer.OrdinalIgnoreCase);
 
                 // Уровень для привязки (любой первый уровень)
                 Level level = new FilteredElementCollector(doc)
@@ -177,12 +223,58 @@ namespace BimboClub.ExtraScheduleItems
                         targetElem = doc.GetElement(new ElementId(item.Id));
                         if (targetElem != null)
                         {
-                            updated++;
+                            string catName = string.IsNullOrWhiteSpace(item.CategoryName) ? "Обобщенные модели" : item.CategoryName;
+                            BuiltInCategory expectedBic = ResolveBuiltInCategory(catName);
+                            if (targetElem.Category == null || targetElem.Category.Id.IntegerValue != (int)expectedBic)
+                            {
+                                doc.Delete(targetElem.Id);
+                                targetElem = null;
+                            }
+                            else
+                            {
+                                updated++;
+                            }
                         }
                     }
 
                     if (targetElem == null)
                     {
+                        // Определяем семейство под категорию элемента
+                        string catName = string.IsNullOrWhiteSpace(item.CategoryName) ? "Обобщенные модели" : item.CategoryName;
+                        if (!symbolsCache.TryGetValue(catName, out FamilySymbol symbol) || symbol == null)
+                        {
+                            symbol = GetOrCreateFamilySymbol(doc, catName);
+                            if (symbol != null)
+                            {
+                                if (!symbol.IsActive)
+                                {
+                                    symbol.Activate();
+                                    doc.Regenerate();
+                                }
+                                symbolsCache[catName] = symbol;
+                            }
+                        }
+
+                        if (symbol == null)
+                        {
+                            // Запасной вариант: Обобщенные модели
+                            if (!symbolsCache.TryGetValue("Обобщенные модели", out symbol) || symbol == null)
+                            {
+                                symbol = GetOrCreateFamilySymbol(doc, "Обобщенные модели");
+                                if (symbol != null && !symbol.IsActive)
+                                {
+                                    symbol.Activate();
+                                    doc.Regenerate();
+                                }
+                                if (symbol != null) symbolsCache["Обобщенные модели"] = symbol;
+                            }
+                        }
+
+                        if (symbol == null)
+                        {
+                            throw new InvalidOperationException($"Не удалось найти или создать семейство для категории '{catName}'.");
+                        }
+
                         // Создание нового экземпляра
                         XYZ location = new XYZ(baseX + index * 0.1, baseY, baseZ);
                         FamilyInstance instance = null;
@@ -250,14 +342,18 @@ namespace BimboClub.ExtraScheduleItems
             SetParam(elem, NoteParamNames, item.Note);
         }
 
-        public static FamilySymbol GetOrCreateFamilySymbol(Document doc)
+        public static FamilySymbol GetOrCreateFamilySymbol(Document doc, string categoryName = null)
         {
-            // 1. Поиск существующего семейства BCC_Дополнительный_элемент
+            string targetCatName = string.IsNullOrWhiteSpace(categoryName) ? "Обобщенные модели" : categoryName;
+            string famName = GetFamilyNameForCategory(targetCatName);
+            BuiltInCategory bic = ResolveBuiltInCategory(targetCatName);
+
+            // 1. Поиск существующего семейства по имени и категории
             var symbol = new FilteredElementCollector(doc)
                 .OfClass(typeof(FamilySymbol))
-                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .OfCategory(bic)
                 .Cast<FamilySymbol>()
-                .FirstOrDefault(s => s.Family != null && string.Equals(s.Family.Name, FamilyName, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(s => s.Family != null && string.Equals(s.Family.Name, famName, StringComparison.OrdinalIgnoreCase));
 
             if (symbol != null) return symbol;
 
@@ -265,7 +361,7 @@ namespace BimboClub.ExtraScheduleItems
             var family = new FilteredElementCollector(doc)
                 .OfClass(typeof(Family))
                 .Cast<Family>()
-                .FirstOrDefault(f => f != null && string.Equals(f.Name, FamilyName, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(f => f != null && string.Equals(f.Name, famName, StringComparison.OrdinalIgnoreCase));
             if (family != null)
             {
                 var symId = family.GetFamilySymbolIds().FirstOrDefault();
@@ -275,8 +371,8 @@ namespace BimboClub.ExtraScheduleItems
                 }
             }
 
-            // 2. Попытка загрузить семейство из шаблона или временного файла
-            string rfaPath = EnsureFamilyFile(doc.Application);
+            // 2. Попытка загрузить семейство из файла
+            string rfaPath = EnsureFamilyFile(doc.Application, famName, bic);
             if (!string.IsNullOrEmpty(rfaPath) && File.Exists(rfaPath))
             {
                 Family loadedFam = null;
@@ -290,16 +386,15 @@ namespace BimboClub.ExtraScheduleItems
                 }
             }
 
-            // 3. Fallback: если не удалось создать новое семейство, используем любой доступный FamilySymbol GenericModel
+            // 3. Fallback: поиск любого существующего FamilySymbol данной категории
             var fallbackSymbol = new FilteredElementCollector(doc)
                 .OfClass(typeof(FamilySymbol))
-                .OfCategory(BuiltInCategory.OST_GenericModel)
+                .OfCategory(bic)
                 .Cast<FamilySymbol>()
                 .FirstOrDefault();
 
             if (fallbackSymbol != null)
             {
-                // Дублируем тип, чтобы отделить служебные элементы
                 try
                 {
                     var newSymbol = fallbackSymbol.Duplicate(TypeName) as FamilySymbol;
@@ -309,10 +404,16 @@ namespace BimboClub.ExtraScheduleItems
                 return fallbackSymbol;
             }
 
+            // 4. Если категория специфическая и не удалось создать, откатываемся на Обобщенные модели
+            if (bic != BuiltInCategory.OST_GenericModel)
+            {
+                return GetOrCreateFamilySymbol(doc, "Обобщенные модели");
+            }
+
             return null;
         }
 
-        private static string EnsureFamilyFile(Autodesk.Revit.ApplicationServices.Application app)
+        private static string EnsureFamilyFile(Autodesk.Revit.ApplicationServices.Application app, string famName, BuiltInCategory bic)
         {
             string appData = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -321,7 +422,7 @@ namespace BimboClub.ExtraScheduleItems
             );
             if (!Directory.Exists(appData)) Directory.CreateDirectory(appData);
 
-            string targetPath = Path.Combine(appData, $"{FamilyName}.rfa");
+            string targetPath = Path.Combine(appData, $"{famName}.rfa");
             if (File.Exists(targetPath)) return targetPath;
 
             // Поиск шаблона Metric Generic Model.rft
@@ -333,6 +434,23 @@ namespace BimboClub.ExtraScheduleItems
                     Document famDoc = app.NewFamilyDocument(templatePath);
                     if (famDoc != null)
                     {
+                        // Если категория отличается от OST_GenericModel, меняем категорию семейства
+                        if (bic != BuiltInCategory.OST_GenericModel)
+                        {
+                            try
+                            {
+                                Category targetCat = famDoc.Settings.Categories.get_Item(bic);
+                                if (targetCat != null && famDoc.OwnerFamily != null)
+                                {
+                                    famDoc.OwnerFamily.FamilyCategory = targetCat;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Log($"Не удалось назначить категорию {bic} семейству {famName}: {ex.Message}", "WARN");
+                            }
+                        }
+
                         // Сохраняем пустое семейство (без геометрии)
                         SaveAsOptions opt = new SaveAsOptions { OverwriteExistingFile = true };
                         famDoc.SaveAs(targetPath, opt);
@@ -342,7 +460,7 @@ namespace BimboClub.ExtraScheduleItems
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("Ошибка генерации семейства " + FamilyName, ex);
+                    Logger.LogError("Ошибка генерации семейства " + famName, ex);
                 }
             }
 

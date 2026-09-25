@@ -20,6 +20,7 @@ namespace BimboClub.ExtraScheduleItems
         [DataMember] public double Weight { get; set; } = 0.0;
         [DataMember] public string Note { get; set; } = "";
         [DataMember] public string DefaultGroup { get; set; } = "";
+        [DataMember] public string DefaultCategory { get; set; } = "Обобщенные модели";
     }
 
     [DataContract]
@@ -81,7 +82,8 @@ namespace BimboClub.ExtraScheduleItems
                                             DefaultCount = itemDto.DefaultCount,
                                             Weight = itemDto.Weight,
                                             Note = itemDto.Note,
-                                            DefaultGroup = itemDto.DefaultGroup
+                                            DefaultGroup = itemDto.DefaultGroup,
+                                            DefaultCategory = string.IsNullOrWhiteSpace(itemDto.DefaultCategory) ? "Обобщенные модели" : itemDto.DefaultCategory
                                         });
                                     }
                                 }
@@ -132,7 +134,8 @@ namespace BimboClub.ExtraScheduleItems
                             DefaultCount = it.DefaultCount,
                             Weight = it.Weight,
                             Note = it.Note,
-                            DefaultGroup = it.DefaultGroup
+                            DefaultGroup = it.DefaultGroup,
+                            DefaultCategory = string.IsNullOrWhiteSpace(it.DefaultCategory) ? "Обобщенные модели" : it.DefaultCategory
                         });
                     }
                     root.Categories.Add(catDto);

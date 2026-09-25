@@ -8,6 +8,7 @@ namespace BimboClub.ExtraScheduleItems
     public class ExtraScheduleItem : INotifyPropertyChanged
     {
         private int _id;
+        private string _categoryName = "Обобщенные модели";
         private string _group = "";
         private string _position = "";
         private string _name = "";
@@ -29,6 +30,15 @@ namespace BimboClub.ExtraScheduleItems
         {
             get => _id;
             set { if (_id != value) { _id = value; OnPropertyChanged(); } }
+        }
+
+        /// <summary>
+        /// Категория Revit (Обобщенные модели, Арматура воздуховодов, Арматура трубопроводов и т.д.)
+        /// </summary>
+        public string CategoryName
+        {
+            get => _categoryName;
+            set { if (_categoryName != value) { _categoryName = value ?? "Обобщенные модели"; MarkModified(); OnPropertyChanged(); } }
         }
 
         /// <summary>
@@ -153,6 +163,7 @@ namespace BimboClub.ExtraScheduleItems
             {
                 Id = -1,
                 IsNew = true,
+                CategoryName = this.CategoryName,
                 Group = this.Group,
                 Position = this.Position,
                 Name = this.Name,
@@ -184,8 +195,9 @@ namespace BimboClub.ExtraScheduleItems
         public double Weight { get; set; } = 0.0;
         public string Note { get; set; } = "";
         public string DefaultGroup { get; set; } = "";
+        public string DefaultCategory { get; set; } = "Обобщенные модели";
 
-        public ExtraScheduleItem ToScheduleItem(string groupOverride = null)
+        public ExtraScheduleItem ToScheduleItem(string groupOverride = null, string categoryOverride = null)
         {
             return new ExtraScheduleItem
             {
@@ -199,7 +211,10 @@ namespace BimboClub.ExtraScheduleItems
                 Count = this.DefaultCount,
                 Weight = this.Weight,
                 Note = this.Note,
-                Group = string.IsNullOrWhiteSpace(groupOverride) ? this.DefaultGroup : groupOverride
+                Group = string.IsNullOrWhiteSpace(groupOverride) ? this.DefaultGroup : groupOverride,
+                CategoryName = string.IsNullOrWhiteSpace(categoryOverride)
+                    ? (string.IsNullOrWhiteSpace(this.DefaultCategory) ? "Обобщенные модели" : this.DefaultCategory)
+                    : categoryOverride
             };
         }
     }
