@@ -191,17 +191,13 @@ namespace BimboClub.PipeClamps
                         try
                         {
                             clampInst = doc.Create.NewFamilyInstance(placementPoint, sym, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                            if (clampInst != null && level != null)
+                            {
+                                var pLvl = clampInst.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM);
+                                if (pLvl != null && !pLvl.IsReadOnly) pLvl.Set(level.Id);
+                            }
                         }
                         catch { }
-
-                        if (clampInst == null && level != null)
-                        {
-                            try
-                            {
-                                clampInst = doc.Create.NewFamilyInstance(placementPoint, sym, level, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
-                            }
-                            catch { }
-                        }
 
                         if (clampInst != null)
                         {

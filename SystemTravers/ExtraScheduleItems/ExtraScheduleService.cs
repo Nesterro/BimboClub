@@ -280,23 +280,19 @@ namespace BimboClub.ExtraScheduleItems
                         FamilyInstance instance = null;
                         try
                         {
-                            if (level != null)
+                            instance = doc.Create.NewFamilyInstance(location, symbol, StructuralType.NonStructural);
+                            if (instance != null && level != null)
                             {
-                                instance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+                                var pLevel = instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM);
+                                if (pLevel != null && !pLevel.IsReadOnly)
+                                {
+                                    pLevel.Set(level.Id);
+                                }
                             }
                         }
-                        catch { }
-
-                        if (instance == null)
+                        catch (Exception ex)
                         {
-                            try
-                            {
-                                instance = doc.Create.NewFamilyInstance(location, symbol, StructuralType.NonStructural);
-                            }
-                            catch (Exception ex)
-                            {
-                                Logger.LogError("Ошибка размещения экземпляра немоделируемого элемента", ex);
-                            }
+                            Logger.LogError("Ошибка размещения экземпляра немоделируемого элемента", ex);
                         }
 
                         if (instance == null) continue;

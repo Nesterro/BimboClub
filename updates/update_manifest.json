@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.17",
+    "latestVersion":  "2.4.18",
     "releaseDate":  "2026-09-25",
     "changelog":  [
-                      "Fix: Исправлена ошибка \u0027Input type(Room) is of an element type that exists in the API, but not in Revit native object model\u0027 в плагине \u0027Пространства по АР\u0027"
+                      "Fix: Исправлена ошибка \u0027MissingMethodException: ItemFactoryBase.NewFamilyInstance\u0027 при синхронизации элементов с моделью Revit в плагине \u0027Допы в спеку\u0027"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.17/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.17/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.18/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.18/bimboclub_net8.zip"
                  }
 }

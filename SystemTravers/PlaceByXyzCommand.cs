@@ -75,9 +75,17 @@ namespace BimboClub
                                 UnitUtils.ConvertToInternalUnits(pt.Z, MillimeterUnitType)
                             );
 
-                            FamilyInstance instance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+                            FamilyInstance instance = doc.Create.NewFamilyInstance(location, symbol, StructuralType.NonStructural);
                             if (instance != null)
                             {
+                                if (level != null)
+                                {
+                                    var pLvl = instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM);
+                                    if (pLvl != null && !pLvl.IsReadOnly)
+                                    {
+                                        pLvl.Set(level.Id);
+                                    }
+                                }
                                 successCount++;
 
                                 // Write mark parameter if specified
