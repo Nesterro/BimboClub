@@ -22,10 +22,10 @@ namespace BimboClub
             }
         }
 
-        public string SelectedDxfPath => DxfPathTextBox.Text;
-        public string SelectedFamilyName => FamilyNameTextBox.Text.Trim();
-        public BuiltInCategory SelectedCategory => (CategoryComboBox.SelectedItem as CategoryOption)?.Category ?? BuiltInCategory.OST_GenericModel;
-        public bool AutoPlace => AutoPlaceCheckBox.IsChecked == true;
+        public string SelectedDxfPath { get; private set; }
+        public string SelectedFamilyName { get; private set; }
+        public BuiltInCategory SelectedCategory { get; private set; } = BuiltInCategory.OST_GenericModel;
+        public bool AutoPlace { get; private set; } = true;
 
         public CreateFamilyFromDxfWindow(string initialDxfPath = null)
         {
@@ -109,17 +109,31 @@ namespace BimboClub
 
         private void Create_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(SelectedDxfPath) || !File.Exists(SelectedDxfPath))
+            string dxf = DxfPathTextBox.Text;
+            if (string.IsNullOrWhiteSpace(dxf) || !File.Exists(dxf))
             {
                 MessageBox.Show("Пожалуйста, выберите существующий файл DXF.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(SelectedFamilyName))
+            string famName = FamilyNameTextBox.Text.Trim();
+            if (string.IsNullOrWhiteSpace(famName))
             {
                 MessageBox.Show("Пожалуйста, укажите имя семейства.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+
+            SelectedDxfPath = dxf;
+            SelectedFamilyName = famName;
+            if (CategoryComboBox.SelectedItem is CategoryOption catOpt)
+            {
+                SelectedCategory = catOpt.Category;
+            }
+            else
+            {
+                SelectedCategory = BuiltInCategory.OST_GenericModel;
+            }
+            AutoPlace = AutoPlaceCheckBox.IsChecked == true;
 
             DialogResult = true;
             Close();

@@ -434,15 +434,15 @@ namespace BimboClub.ExtraScheduleItems
                     Document famDoc = app.NewFamilyDocument(templatePath);
                     if (famDoc != null)
                     {
-                        // Если категория отличается от OST_GenericModel, меняем категорию семейства
-                        if (bic != BuiltInCategory.OST_GenericModel)
+                        if (bic != BuiltInCategory.OST_GenericModel && famDoc.OwnerFamily != null)
                         {
                             try
                             {
-                                Category targetCat = famDoc.Settings.Categories.get_Item(bic);
-                                if (targetCat != null && famDoc.OwnerFamily != null)
+                                using (Transaction tCat = new Transaction(famDoc, "Категория"))
                                 {
-                                    famDoc.OwnerFamily.FamilyCategory = targetCat;
+                                    tCat.Start();
+                                    famDoc.OwnerFamily.FamilyCategoryId = new ElementId(bic);
+                                    tCat.Commit();
                                 }
                             }
                             catch (Exception ex)

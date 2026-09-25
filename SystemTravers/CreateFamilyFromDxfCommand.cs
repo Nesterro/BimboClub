@@ -71,25 +71,56 @@ namespace BimboClub
                 }
 
                 // 4. Назначение выбранной категории семейства (если отличается от типовой модели)
-                try
+                if (targetCategoryType != BuiltInCategory.OST_GenericModel && famDoc.OwnerFamily != null)
                 {
-                    if (targetCategoryType != BuiltInCategory.OST_GenericModel)
+                    try
                     {
                         using (Transaction tCat = new Transaction(famDoc, "Назначение категории"))
                         {
                             tCat.Start();
-                            Category targetCategory = famDoc.Settings.Categories.get_Item(targetCategoryType);
-                            if (targetCategory != null && famDoc.OwnerFamily != null)
+                            ElementId newCatId = new ElementId(targetCategoryType);
+                            bool applied = false;
+
+                            try
                             {
-                                famDoc.OwnerFamily.FamilyCategory = targetCategory;
+                                famDoc.OwnerFamily.FamilyCategoryId = newCatId;
+                                applied = true;
+                                Logger.Log($"Категория семейства успешно изменена на {targetCategoryType} через FamilyCategoryId", "INFO");
                             }
+                            catch (Exception exId)
+                            {
+                                Logger.Log($"Warning: не удалось назначить FamilyCategoryId {targetCategoryType}: {exId.Message}", "WARN");
+                            }
+
+                            if (!applied)
+                            {
+                                try
+                                {
+                                    Category targetCategory = Category.GetCategory(famDoc, targetCategoryType)
+                                                           ?? famDoc.Settings.Categories.get_Item(targetCategoryType);
+                                    if (targetCategory != null)
+                                    {
+                                        famDoc.OwnerFamily.FamilyCategory = targetCategory;
+                                        Logger.Log($"Категория семейства успешно изменена на {targetCategoryType} через FamilyCategory", "INFO");
+                                    }
+                                    else
+                                    {
+                                        Logger.Log($"Warning: не удалось найти категорию {targetCategoryType} в famDoc", "WARN");
+                                    }
+                                }
+                                catch (Exception exCat)
+                                {
+                                    Logger.Log($"Warning: не удалось назначить FamilyCategory {targetCategoryType}: {exCat.Message}", "WARN");
+                                }
+                            }
+
                             tCat.Commit();
                         }
                     }
-                }
-                catch (Exception exCat)
-                {
-                    Logger.Log($"Warning: не удалось назначить категорию {targetCategoryType}: {exCat.Message}", "WARN");
+                    catch (Exception exCatTrans)
+                    {
+                        Logger.Log($"Error: ошибка транзакции назначения категории: {exCatTrans.Message}", "ERROR");
+                    }
                 }
 
                 // 5. Импорт DXF в документ семейства

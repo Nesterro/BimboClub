@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.13",
+    "latestVersion":  "2.4.14",
     "releaseDate":  "2026-09-25",
     "changelog":  [
-                      "Feature: Добавлена категория Оборудование в диалог создания семейства по DXF"
+                      "Fix: Корректное назначение категории (Оборудование и др.) при создании семейства по DXF"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.13/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.13/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.14/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.14/bimboclub_net8.zip"
                  }
 }
