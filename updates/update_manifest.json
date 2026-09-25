@@ -1,13 +1,12 @@
 ﻿{
-    "latestVersion":  "2.4.11",
+    "latestVersion":  "2.4.12",
     "releaseDate":  "2026-09-25",
     "changelog":  [
-                      "UI: Исправлена контрастность активных и сортируемых заголовков колонок спецификации в Допах в спеку",
-                      "Feature: Добавлен модуль Соединить коннекторы (циклическое соединение MEP элементов)",
-                      "Feature: Добавлен модуль Семейство по DXF (импорт и запуск размещения)"
+                      "UI: Семейство по DXF вынесено в отдельную кнопку на ленте",
+                      "Feature: Добавлено диалоговое окно выбора категории Revit и имени семейства при создании по DXF"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.11/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.11/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.12/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.12/bimboclub_net8.zip"
                  }
 }

@@ -513,7 +513,6 @@ namespace BimboClub
 					pd.LargeImage = bitmapSourceExcel;
 					pd.Image = bitmapSourceExcel16;
 					pd.AddPushButton(pushButtonDataExtraSchedule);
-					pd.AddPushButton(pushButtonDataFamilyDxf);
 					pd.AddPushButton(pushButtonDataPrint);
 					pd.AddPushButton(pushButtonDataSchedulePackBcc);
 					pd.AddPushButton(pushButtonDataJson);
@@ -530,6 +529,13 @@ namespace BimboClub
 				ribbonPanel.AddItem(pushButtonDataExtraSchedule);
 			}
 			catch (Exception ex) { Logger.LogError("Ошибка добавления Допы в спеку", ex); }
+
+			// 4. Отдельная крупная кнопка "Семейство по DXF"
+			try
+			{
+				ribbonPanel.AddItem(pushButtonDataFamilyDxf);
+			}
+			catch (Exception ex) { Logger.LogError("Ошибка добавления Семейство по DXF", ex); }
 
 			// 2. Отдельная крупная кнопка "Инфо v2.0.1" с прямо отображаемой версией
 			try

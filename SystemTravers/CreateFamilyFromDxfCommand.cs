@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Interop;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using View = Autodesk.Revit.DB.View;
 using TaskDialog = Autodesk.Revit.UI.TaskDialog;
-using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
-using DialogResult = System.Windows.Forms.DialogResult;
+using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace BimboClub
 {
@@ -31,22 +31,20 @@ namespace BimboClub
 
             try
             {
-                // 1. Выбор конкретного файла DXF
-                string dxfPath = null;
-                using (OpenFileDialog ofd = new OpenFileDialog())
+                // 1. Открытие диалогового окна выбора параметров создания семейства
+                CreateFamilyFromDxfWindow window = new CreateFamilyFromDxfWindow();
+                WindowInteropHelper helper = new WindowInteropHelper(window);
+                helper.Owner = uiapp.MainWindowHandle;
+
+                if (window.ShowDialog() != true)
                 {
-                    ofd.Title = "Выберите файл DXF для создания семейства";
-                    ofd.Filter = "AutoCAD DXF (*.dxf)|*.dxf|Все файлы (*.*)|*.*";
-                    ofd.Multiselect = false;
-                    ofd.CheckFileExists = true;
-
-                    if (ofd.ShowDialog() != DialogResult.OK)
-                    {
-                        return Result.Cancelled;
-                    }
-
-                    dxfPath = ofd.FileName;
+                    return Result.Cancelled;
                 }
+
+                string dxfPath = window.SelectedDxfPath;
+                string familyName = window.SelectedFamilyName;
+                BuiltInCategory targetCategoryType = window.SelectedCategory;
+                bool autoPlace = window.AutoPlace;
 
                 if (string.IsNullOrEmpty(dxfPath) || !File.Exists(dxfPath))
                 {
@@ -61,7 +59,6 @@ namespace BimboClub
                     return Result.Cancelled;
                 }
 
-                string familyName = Path.GetFileNameWithoutExtension(dxfPath);
                 string dxfDir = Path.GetDirectoryName(dxfPath);
                 string rfaPath = Path.Combine(dxfDir, familyName + ".rfa");
 
@@ -73,7 +70,29 @@ namespace BimboClub
                     return Result.Failed;
                 }
 
-                // 4. Импорт DXF в документ семейства
+                // 4. Назначение выбранной категории семейства (если отличается от типовой модели)
+                try
+                {
+                    if (targetCategoryType != BuiltInCategory.OST_GenericModel)
+                    {
+                        using (Transaction tCat = new Transaction(famDoc, "Назначение категории"))
+                        {
+                            tCat.Start();
+                            Category targetCategory = famDoc.Settings.Categories.get_Item(targetCategoryType);
+                            if (targetCategory != null && famDoc.OwnerFamily != null)
+                            {
+                                famDoc.OwnerFamily.FamilyCategory = targetCategory;
+                            }
+                            tCat.Commit();
+                        }
+                    }
+                }
+                catch (Exception exCat)
+                {
+                    Logger.Log($"Warning: не удалось назначить категорию {targetCategoryType}: {exCat.Message}", "WARN");
+                }
+
+                // 5. Импорт DXF в документ семейства
                 View targetView = famDoc.ActiveView;
                 if (targetView == null || targetView.IsTemplate)
                 {
@@ -109,7 +128,7 @@ namespace BimboClub
                     tImport.Commit();
                 }
 
-                // 5. Сохранение файла .rfa
+                // 6. Сохранение файла .rfa
                 try
                 {
                     famDoc.SaveAs(rfaPath, new SaveAsOptions { OverwriteExistingFile = true });
@@ -121,7 +140,7 @@ namespace BimboClub
                     famDoc.SaveAs(rfaPath, new SaveAsOptions { OverwriteExistingFile = true });
                 }
 
-                // 6. Загрузка в текущий проект
+                // 7. Загрузка в текущий проект
                 Family family = famDoc.LoadFamily(doc, new BimboFamilyLoadOption());
                 famDoc.Close(false);
 
@@ -131,7 +150,7 @@ namespace BimboClub
                     return Result.Failed;
                 }
 
-                // 7. Поиск и активация типоразмера
+                // 8. Поиск и активация типоразмера
                 FamilySymbol symbol = null;
                 ISet<ElementId> symbolIds = family.GetFamilySymbolIds();
                 if (symbolIds != null && symbolIds.Count > 0)
@@ -155,14 +174,21 @@ namespace BimboClub
                     tSymbol.Commit();
                 }
 
-                // 8. Загрузить и сразу активировать размещение на виде
-                try
+                // 9. Размещение на виде (если выбран чекбокс)
+                if (autoPlace)
                 {
-                    uidoc.PromptForFamilyInstancePlacement(symbol);
+                    try
+                    {
+                        uidoc.PromptForFamilyInstancePlacement(symbol);
+                    }
+                    catch (Autodesk.Revit.Exceptions.OperationCanceledException)
+                    {
+                        // Пользователь закончил размещение или нажал ESC
+                    }
                 }
-                catch (Autodesk.Revit.Exceptions.OperationCanceledException)
+                else
                 {
-                    // Пользователь закончил размещение или нажал ESC
+                    TaskDialog.Show("Семейство по DXF", $"Семейство '{familyName}' успешно создано и загружено в проект.");
                 }
 
                 return Result.Succeeded;
@@ -213,19 +239,20 @@ namespace BimboClub
             }
 
             // 3. Fallback: ручной выбор пользователем
-            using (OpenFileDialog rftDialog = new OpenFileDialog())
+            OpenFileDialog rftDialog = new OpenFileDialog
             {
-                rftDialog.Title = "Укажите шаблон семейства (Метрическая система, типовая модель.rft)";
-                rftDialog.Filter = "Шаблоны семейств (*.rft)|*.rft|Все файлы (*.*)|*.*";
-                if (!string.IsNullOrEmpty(basePath) && Directory.Exists(basePath))
-                {
-                    rftDialog.InitialDirectory = basePath;
-                }
+                Title = "Укажите шаблон семейства (Метрическая система, типовая модель.rft)",
+                Filter = "Шаблоны семейств (*.rft)|*.rft|Все файлы (*.*)|*.*"
+            };
 
-                if (rftDialog.ShowDialog() == DialogResult.OK)
-                {
-                    return rftDialog.FileName;
-                }
+            if (!string.IsNullOrEmpty(basePath) && Directory.Exists(basePath))
+            {
+                rftDialog.InitialDirectory = basePath;
+            }
+
+            if (rftDialog.ShowDialog() == true)
+            {
+                return rftDialog.FileName;
             }
 
             return null;
@@ -247,7 +274,6 @@ namespace BimboClub
                     string[] files = Directory.GetFiles(dir, pat, SearchOption.AllDirectories);
                     if (files.Length == 0) continue;
 
-                    // Предпочитаем стандартный базовый шаблон (без привязок к стене, потолку, полу, грани)
                     string cleanMatch = files.FirstOrDefault(f =>
                     {
                         string fn = Path.GetFileNameWithoutExtension(f).ToLowerInvariant();
