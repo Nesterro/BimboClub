@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.16",
+    "latestVersion":  "2.4.17",
     "releaseDate":  "2026-09-25",
     "changelog":  [
-                      "Feature: Добавлен модуль автоматической расстановки пространств по помещениям из связанного файла АР с именами, номерами и высотными отметками"
+                      "Fix: Исправлена ошибка \u0027Input type(Room) is of an element type that exists in the API, but not in Revit native object model\u0027 в плагине \u0027Пространства по АР\u0027"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.16/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.16/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.17/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.17/bimboclub_net8.zip"
                  }
 }

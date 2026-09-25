@@ -69,9 +69,9 @@ namespace BimboClub.SpacesFromRooms
                 if (linkDoc == null) continue;
 
                 int roomCount = new FilteredElementCollector(linkDoc)
-                    .OfClass(typeof(SpatialElement))
-                    .WherePasses(new ElementMulticlassFilter(new List<Type> { typeof(Room) }))
-                    .Cast<Room>()
+                    .OfCategory(BuiltInCategory.OST_Rooms)
+                    .WhereElementIsNotElementType()
+                    .OfType<Room>()
                     .Count(r => r.Area > 0.001 && r.Location is LocationPoint);
 
                 string name = inst.Name;
@@ -141,9 +141,9 @@ namespace BimboClub.SpacesFromRooms
 
             // 4. Сбор всех помещений из связанного файла
             var rooms = new FilteredElementCollector(linkDoc)
-                .OfClass(typeof(SpatialElement))
-                .WherePasses(new ElementMulticlassFilter(new List<Type> { typeof(Room) }))
-                .Cast<Room>()
+                .OfCategory(BuiltInCategory.OST_Rooms)
+                .WhereElementIsNotElementType()
+                .OfType<Room>()
                 .Where(r => r.Area > 0.001 && r.Location is LocationPoint)
                 .ToList();
 
