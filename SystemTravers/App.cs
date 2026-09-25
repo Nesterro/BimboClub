@@ -230,6 +230,11 @@ namespace BimboClub
 				ToolTip = "Создание нового семейства на основе DXF файла (шаблон 'Метрическая система, типовая модель'), загрузка в проект и мгновенная активация размещения."
 			};
 
+			PushButtonData pushButtonDataSpacesFromRooms = new PushButtonData("cmdSpacesFromRooms", "Пространства\nпо АР", text4, "BimboClub.SpacesFromRooms.SpacesFromRoomsCommand")
+			{
+				ToolTip = "Автоматическая расстановка пространств MEP по помещениям из связанного файла АР с переносом имен, номеров и высотных отметок."
+			};
+
 			// Загрузка иконок
 			BitmapSource bitmapSource3D = LoadImage(System.IO.Path.Combine(text, "icon_3d.png"));
 			BitmapSource bitmapSource3D16 = LoadImage(System.IO.Path.Combine(text, "icon_3d_16.png"));
@@ -401,6 +406,9 @@ namespace BimboClub
 			if (bitmapSourceSpecs != null) pushButtonDataExtraSchedule.LargeImage = bitmapSourceSpecs;
 			if (bitmapSourceSpecs16 != null) pushButtonDataExtraSchedule.Image = bitmapSourceSpecs16;
 
+			if (bitmapSourceFloor != null) pushButtonDataSpacesFromRooms.LargeImage = bitmapSourceFloor;
+			if (bitmapSourceFloor16 != null) pushButtonDataSpacesFromRooms.Image = bitmapSourceFloor16;
+
 			// --- Pulldown: Схемы и Виды ---
 			try
 			{
@@ -446,6 +454,7 @@ namespace BimboClub
 				{
 					pd.LargeImage = bitmapSourceRouter;
 					pd.Image = bitmapSourceRouter16;
+					pd.AddPushButton(pushButtonDataSpacesFromRooms);
 					pd.AddPushButton(pushButtonDataRouter);
 					pd.AddPushButton(pushButtonDataHangersBcc);
 					pd.AddPushButton(pushButtonDataRiser);
@@ -536,6 +545,13 @@ namespace BimboClub
 				ribbonPanel.AddItem(pushButtonDataFamilyDxf);
 			}
 			catch (Exception ex) { Logger.LogError("Ошибка добавления Семейство по DXF", ex); }
+
+			// 5. Отдельная крупная кнопка "Пространства по АР"
+			try
+			{
+				ribbonPanel.AddItem(pushButtonDataSpacesFromRooms);
+			}
+			catch (Exception ex) { Logger.LogError("Ошибка добавления Пространства по АР", ex); }
 
 			// 2. Отдельная крупная кнопка "Инфо v2.0.1" с прямо отображаемой версией
 			try
