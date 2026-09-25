@@ -2,8 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="⚫ BimboClub | Создание семейства по DXF" 
-        Height="420" Width="560"
-        MinHeight="380" MinWidth="480"
+        Height="490" Width="560"
+        MinHeight="450" MinWidth="480"
         WindowStartupLocation="CenterScreen"
         Background="#181824"
         FontFamily="Segoe UI"
@@ -192,7 +192,38 @@
                 <TextBlock Text="Категория семейства Revit:" FontWeight="SemiBold" Foreground="{StaticResource TextWhiteBrush}" Margin="0,0,0,6"/>
                 <ComboBox x:Name="CategoryComboBox" DisplayMemberPath="DisplayName" Margin="0,0,0,16"/>
 
-                <!-- 4. Auto Place Checkbox -->
+                <!-- 4. Convert To Native Geometry Checkbox -->
+                <CheckBox x:Name="ConvertToNativeCheckBox" 
+                          Content="Преобразовывать в нативную 3D-геометрию Revit (FreeFormElement)" 
+                          IsChecked="True" 
+                          FontWeight="SemiBold" 
+                          Margin="0,0,0,4"
+                          Checked="ConvertToNative_Changed"
+                          Unchecked="ConvertToNative_Changed"/>
+                <TextBlock Text="Извлекает твердотельные тела (Solids/Meshes) и удаляет исходную CAD-подложку" 
+                           FontSize="11" 
+                           Foreground="{StaticResource TextMutedBrush}" 
+                           Margin="20,0,0,10"/>
+
+                <!-- 5. 2D Extrusion Height -->
+                <Grid x:Name="ExtrusionSettingsPanel" Margin="20,0,0,14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="80"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" 
+                               Text="Высота выдавливания для плоских 2D-контуров (мм):" 
+                               Foreground="{StaticResource TextMutedBrush}" 
+                               VerticalAlignment="Center"/>
+                    <TextBox x:Name="ExtrusionHeightTextBox" 
+                             Grid.Column="2" 
+                             Text="100" 
+                             Height="28" 
+                             TextAlignment="Right"/>
+                </Grid>
+
+                <!-- 6. Auto Place Checkbox -->
                 <CheckBox x:Name="AutoPlaceCheckBox" Content="Сразу разместить созданное семейство на виде проекта" IsChecked="True"/>
             </StackPanel>
         </Border>

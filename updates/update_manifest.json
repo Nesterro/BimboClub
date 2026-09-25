@@ -1,11 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.18",
+    "latestVersion":  "2.4.19",
     "releaseDate":  "2026-09-25",
     "changelog":  [
-                      "Fix: Исправлена ошибка \u0027MissingMethodException: ItemFactoryBase.NewFamilyInstance\u0027 при синхронизации элементов с моделью Revit в плагине \u0027Допы в спеку\u0027"
+                      "Feature: Модуль \u0027Семейство по DXF\u0027 теперь умеет генерировать нативную 3D-геометрию Revit (FreeFormElement/Solids/Meshes/2D-выдавливание) с автоматическим удалением CAD-подложки"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.18/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.18/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.19/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.19/bimboclub_net8.zip"
                  }
 }

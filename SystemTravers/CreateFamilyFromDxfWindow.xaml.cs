@@ -26,6 +26,8 @@ namespace BimboClub
         public string SelectedFamilyName { get; private set; }
         public BuiltInCategory SelectedCategory { get; private set; } = BuiltInCategory.OST_GenericModel;
         public bool AutoPlace { get; private set; } = true;
+        public bool ConvertToNativeGeometry { get; private set; } = true;
+        public double ExtrusionHeightMm { get; private set; } = 100.0;
 
         public CreateFamilyFromDxfWindow(string initialDxfPath = null)
         {
@@ -107,6 +109,15 @@ namespace BimboClub
             }
         }
 
+        private void ConvertToNative_Changed(object sender, RoutedEventArgs e)
+        {
+            if (ExtrusionSettingsPanel != null && ConvertToNativeCheckBox != null)
+            {
+                ExtrusionSettingsPanel.IsEnabled = ConvertToNativeCheckBox.IsChecked == true;
+                ExtrusionSettingsPanel.Opacity = ConvertToNativeCheckBox.IsChecked == true ? 1.0 : 0.4;
+            }
+        }
+
         private void Create_Click(object sender, RoutedEventArgs e)
         {
             string dxf = DxfPathTextBox.Text;
@@ -134,6 +145,16 @@ namespace BimboClub
                 SelectedCategory = BuiltInCategory.OST_GenericModel;
             }
             AutoPlace = AutoPlaceCheckBox.IsChecked == true;
+            ConvertToNativeGeometry = ConvertToNativeCheckBox.IsChecked == true;
+
+            if (double.TryParse(ExtrusionHeightTextBox.Text.Replace(',', '.'), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double hMm) && hMm > 0.1)
+            {
+                ExtrusionHeightMm = hMm;
+            }
+            else
+            {
+                ExtrusionHeightMm = 100.0;
+            }
 
             DialogResult = true;
             Close();
