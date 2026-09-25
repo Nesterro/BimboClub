@@ -1,13 +1,13 @@
 ﻿{
-    "latestVersion":  "2.4.10",
+    "latestVersion":  "2.4.11",
     "releaseDate":  "2026-09-25",
     "changelog":  [
-                      "UI: Исправлена контрастность элементов в библиотеке расходников (светлый текст, цветные бейджи)",
-                      "Feature: Добавлена возможность выбора категории Revit (Обобщенные модели, Арматура ОВ/ВК, Оборудование и др.)",
-                      "Feature: Категорию можно выбирать как для добавления по умолчанию, так и менять в строках таблицы спецификации"
+                      "UI: Исправлена контрастность активных и сортируемых заголовков колонок спецификации в Допах в спеку",
+                      "Feature: Добавлен модуль Соединить коннекторы (циклическое соединение MEP элементов)",
+                      "Feature: Добавлен модуль Семейство по DXF (импорт и запуск размещения)"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.10/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.10/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.11/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.11/bimboclub_net8.zip"
                  }
 }

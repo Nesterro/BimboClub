@@ -220,6 +220,16 @@ namespace BimboClub
 				ToolTip = "Добавление немоделируемых элементов (крепеж, герметики, изоляция, кабели, краска и др.) в спецификации Revit (ADSK) без создания 3D геометрии."
 			};
 
+			PushButtonData pushButtonDataConnectConnectors = new PushButtonData("cmdConnectConnectors", "Соединить\nконнекторы", text4, "BimboClub.ConnectConnectorsCommand")
+			{
+				ToolTip = "Циклическое соединение двух коннекторов (или MEP кривых) с поворотом и перемещением первого выбранного элемента."
+			};
+
+			PushButtonData pushButtonDataFamilyDxf = new PushButtonData("cmdFamilyFromDxf", "Семейство\nпо DXF", text4, "BimboClub.CreateFamilyFromDxfCommand")
+			{
+				ToolTip = "Создание нового семейства на основе DXF файла (шаблон 'Метрическая система, типовая модель'), загрузка в проект и мгновенная активация размещения."
+			};
+
 			// Загрузка иконок
 			BitmapSource bitmapSource3D = LoadImage(System.IO.Path.Combine(text, "icon_3d.png"));
 			BitmapSource bitmapSource3D16 = LoadImage(System.IO.Path.Combine(text, "icon_3d_16.png"));
@@ -350,8 +360,19 @@ namespace BimboClub
 
 			BitmapSource bitmapSourceConnect = LoadImage(System.IO.Path.Combine(text, "icon_connect.png"));
 			BitmapSource bitmapSourceConnect16 = LoadImage(System.IO.Path.Combine(text, "icon_connect_16.png"));
-			if (bitmapSourceConnect != null) pushButtonDataConnect.LargeImage = bitmapSourceConnect;
-			if (bitmapSourceConnect16 != null) pushButtonDataConnect.Image = bitmapSourceConnect16;
+			if (bitmapSourceConnect != null)
+			{
+				pushButtonDataConnect.LargeImage = bitmapSourceConnect;
+				pushButtonDataConnectConnectors.LargeImage = bitmapSourceConnect;
+			}
+			if (bitmapSourceConnect16 != null)
+			{
+				pushButtonDataConnect.Image = bitmapSourceConnect16;
+				pushButtonDataConnectConnectors.Image = bitmapSourceConnect16;
+			}
+
+			if (bitmapSource3D != null) pushButtonDataFamilyDxf.LargeImage = bitmapSource3D;
+			if (bitmapSource3D16 != null) pushButtonDataFamilyDxf.Image = bitmapSource3D16;
 
 			BitmapSource bitmapSourceCrop = LoadImage(System.IO.Path.Combine(text, "icon_crop.png"));
 			BitmapSource bitmapSourceCrop16 = LoadImage(System.IO.Path.Combine(text, "icon_crop_16.png"));
@@ -429,6 +450,7 @@ namespace BimboClub
 					pd.AddPushButton(pushButtonDataHangersBcc);
 					pd.AddPushButton(pushButtonDataRiser);
 					pd.AddPushButton(pushButtonDataConnect);
+					pd.AddPushButton(pushButtonDataConnectConnectors);
 					pd.AddPushButton(pushButtonDataPlacement);
 					pd.AddPushButton(pushButtonDataLevelingBcc);
 					pd.AddPushButton(pushButtonDataPlaceXyzBcc);
@@ -491,6 +513,7 @@ namespace BimboClub
 					pd.LargeImage = bitmapSourceExcel;
 					pd.Image = bitmapSourceExcel16;
 					pd.AddPushButton(pushButtonDataExtraSchedule);
+					pd.AddPushButton(pushButtonDataFamilyDxf);
 					pd.AddPushButton(pushButtonDataPrint);
 					pd.AddPushButton(pushButtonDataSchedulePackBcc);
 					pd.AddPushButton(pushButtonDataJson);
