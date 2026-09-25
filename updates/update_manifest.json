@@ -1,12 +1,11 @@
 ﻿{
-    "latestVersion":  "2.4.12",
+    "latestVersion":  "2.4.13",
     "releaseDate":  "2026-09-25",
     "changelog":  [
-                      "UI: Семейство по DXF вынесено в отдельную кнопку на ленте",
-                      "Feature: Добавлено диалоговое окно выбора категории Revit и имени семейства при создании по DXF"
+                      "Feature: Добавлена категория Оборудование в диалог создания семейства по DXF"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.12/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.12/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.13/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.13/bimboclub_net8.zip"
                  }
 }

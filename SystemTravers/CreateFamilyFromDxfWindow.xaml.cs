@@ -53,12 +53,15 @@ namespace BimboClub
             List<CategoryOption> categories = new List<CategoryOption>
             {
                 new CategoryOption("Обобщенные модели", BuiltInCategory.OST_GenericModel),
+                new CategoryOption("Оборудование", BuiltInCategory.OST_MechanicalEquipment),
                 new CategoryOption("Механическое оборудование", BuiltInCategory.OST_MechanicalEquipment),
                 new CategoryOption("Арматура трубопроводов", BuiltInCategory.OST_PipeAccessory),
                 new CategoryOption("Сантехнические приборы", BuiltInCategory.OST_PlumbingFixtures),
                 new CategoryOption("Арматура воздуховодов", BuiltInCategory.OST_DuctAccessory),
                 new CategoryOption("Воздухораспределители", BuiltInCategory.OST_DuctTerminal),
                 new CategoryOption("Электрооборудование", BuiltInCategory.OST_ElectricalEquipment),
+                new CategoryOption("Оборудование связи", BuiltInCategory.OST_CommunicationDevices),
+                new CategoryOption("Пожарная сигнализация", BuiltInCategory.OST_FireAlarmDevices),
                 new CategoryOption("Осветительные приборы", BuiltInCategory.OST_LightingFixtures),
                 new CategoryOption("Электроприборы", BuiltInCategory.OST_ElectricalFixtures),
                 new CategoryOption("Соединительные детали трубопроводов", BuiltInCategory.OST_PipeFitting),
