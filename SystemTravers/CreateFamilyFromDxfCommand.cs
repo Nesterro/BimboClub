@@ -51,13 +51,14 @@ namespace BimboClub
                     return Result.Cancelled;
                 }
 
-                // 2. Поиск стандартного шаблона семейства "Метрическая система, типовая модель.rft"
-                string templatePath = FindGenericModelTemplate(app);
+                // 2. Поиск подходящего шаблона семейства
+                string templatePath = FindTemplateForCategory(app, targetCategoryType);
                 if (string.IsNullOrEmpty(templatePath) || !File.Exists(templatePath))
                 {
-                    TaskDialog.Show("Семейство по DXF", "Не найден шаблон семейства 'Метрическая система, типовая модель.rft'. Операция отменена.");
+                    TaskDialog.Show("Семейство по DXF", "Не найден шаблон семейства. Операция отменена.");
                     return Result.Cancelled;
                 }
+                Logger.Log($"Используется шаблон семейства: {templatePath}", "INFO");
 
                 string dxfDir = Path.GetDirectoryName(dxfPath);
                 string rfaPath = Path.Combine(dxfDir, familyName + ".rfa");
@@ -70,51 +71,60 @@ namespace BimboClub
                     return Result.Failed;
                 }
 
-                // 4. Назначение выбранной категории семейства (если отличается от типовой модели)
-                if (targetCategoryType != BuiltInCategory.OST_GenericModel && famDoc.OwnerFamily != null)
+                // 4. Назначение выбранной категории семейства (если текущая отличается от целевой)
+                if (famDoc.OwnerFamily != null)
                 {
                     try
                     {
-                        using (Transaction tCat = new Transaction(famDoc, "Назначение категории"))
+                        ElementId currentCatId = famDoc.OwnerFamily.FamilyCategoryId;
+                        ElementId targetCatId = new ElementId(targetCategoryType);
+
+                        if (currentCatId == null || currentCatId.IntegerValue != targetCatId.IntegerValue)
                         {
-                            tCat.Start();
-                            ElementId newCatId = new ElementId(targetCategoryType);
-                            bool applied = false;
+                            using (Transaction tCat = new Transaction(famDoc, "Назначение категории"))
+                            {
+                                tCat.Start();
+                                bool applied = false;
 
-                            try
-                            {
-                                famDoc.OwnerFamily.FamilyCategoryId = newCatId;
-                                applied = true;
-                                Logger.Log($"Категория семейства успешно изменена на {targetCategoryType} через FamilyCategoryId", "INFO");
-                            }
-                            catch (Exception exId)
-                            {
-                                Logger.Log($"Warning: не удалось назначить FamilyCategoryId {targetCategoryType}: {exId.Message}", "WARN");
-                            }
-
-                            if (!applied)
-                            {
                                 try
                                 {
-                                    Category targetCategory = Category.GetCategory(famDoc, targetCategoryType)
-                                                           ?? famDoc.Settings.Categories.get_Item(targetCategoryType);
-                                    if (targetCategory != null)
-                                    {
-                                        famDoc.OwnerFamily.FamilyCategory = targetCategory;
-                                        Logger.Log($"Категория семейства успешно изменена на {targetCategoryType} через FamilyCategory", "INFO");
-                                    }
-                                    else
-                                    {
-                                        Logger.Log($"Warning: не удалось найти категорию {targetCategoryType} в famDoc", "WARN");
-                                    }
+                                    famDoc.OwnerFamily.FamilyCategoryId = targetCatId;
+                                    applied = true;
+                                    Logger.Log($"Категория семейства успешно изменена на {targetCategoryType} через FamilyCategoryId", "INFO");
                                 }
-                                catch (Exception exCat)
+                                catch (Exception exId)
                                 {
-                                    Logger.Log($"Warning: не удалось назначить FamilyCategory {targetCategoryType}: {exCat.Message}", "WARN");
+                                    Logger.Log($"Warning: не удалось назначить FamilyCategoryId {targetCategoryType}: {exId.Message}", "WARN");
                                 }
-                            }
 
-                            tCat.Commit();
+                                if (!applied)
+                                {
+                                    try
+                                    {
+                                        Category targetCategory = Category.GetCategory(famDoc, targetCategoryType)
+                                                               ?? famDoc.Settings.Categories.get_Item(targetCategoryType);
+                                        if (targetCategory != null)
+                                        {
+                                            famDoc.OwnerFamily.FamilyCategory = targetCategory;
+                                            Logger.Log($"Категория семейства успешно изменена на {targetCategoryType} через FamilyCategory", "INFO");
+                                        }
+                                        else
+                                        {
+                                            Logger.Log($"Warning: не удалось найти категорию {targetCategoryType} в famDoc", "WARN");
+                                        }
+                                    }
+                                    catch (Exception exCat)
+                                    {
+                                        Logger.Log($"Warning: не удалось назначить FamilyCategory {targetCategoryType}: {exCat.Message}", "WARN");
+                                    }
+                                }
+
+                                tCat.Commit();
+                            }
+                        }
+                        else
+                        {
+                            Logger.Log($"Семейство уже имеет целевую категорию: {famDoc.OwnerFamily.FamilyCategory?.Name}", "INFO");
                         }
                     }
                     catch (Exception exCatTrans)
@@ -232,13 +242,13 @@ namespace BimboClub
             }
         }
 
-        private static string FindGenericModelTemplate(Autodesk.Revit.ApplicationServices.Application app)
+        private static string FindTemplateForCategory(Autodesk.Revit.ApplicationServices.Application app, BuiltInCategory targetCategory)
         {
             // 1. Проверяем путь к шаблонам, настроенный в Revit
             string basePath = app.FamilyTemplatePath;
             if (!string.IsNullOrEmpty(basePath) && Directory.Exists(basePath))
             {
-                string found = SearchTemplateInDirectory(basePath);
+                string found = SearchTemplateInDirectory(basePath, targetCategory);
                 if (!string.IsNullOrEmpty(found)) return found;
             }
 
@@ -264,7 +274,7 @@ namespace BimboClub
             {
                 if (Directory.Exists(path))
                 {
-                    string found = SearchTemplateInDirectory(path);
+                    string found = SearchTemplateInDirectory(path, targetCategory);
                     if (!string.IsNullOrEmpty(found)) return found;
                 }
             }
@@ -289,41 +299,65 @@ namespace BimboClub
             return null;
         }
 
-        private static string SearchTemplateInDirectory(string dir)
+        private static string SearchTemplateInDirectory(string dir, BuiltInCategory targetCategory)
         {
             try
             {
-                string[] patterns = new[]
+                // Сначала ищем прямой шаблон для выбранной категории (если применимо)
+                string[] specificPatterns = GetSpecificTemplatePatterns(targetCategory);
+                if (specificPatterns != null && specificPatterns.Length > 0)
+                {
+                    foreach (string pat in specificPatterns)
+                    {
+                        string[] files = Directory.GetFiles(dir, pat, SearchOption.AllDirectories);
+                        string match = files.FirstOrDefault(f => IsValidTemplate(f));
+                        if (match != null)
+                        {
+                            Logger.Log($"Найден специализированный шаблон для категории {targetCategory}: {match}", "INFO");
+                            return match;
+                        }
+                    }
+                }
+
+                // Ищем стандартный шаблон типовой модели
+                string[] genericPatterns = new[]
                 {
                     "*типовая модель*.rft",
                     "*Generic Model*.rft",
                     "*GenericModel*.rft"
                 };
 
-                foreach (string pat in patterns)
+                List<string> candidateFiles = new List<string>();
+                foreach (string pat in genericPatterns)
                 {
                     string[] files = Directory.GetFiles(dir, pat, SearchOption.AllDirectories);
-                    if (files.Length == 0) continue;
+                    candidateFiles.AddRange(files);
+                }
 
-                    string cleanMatch = files.FirstOrDefault(f =>
+                if (candidateFiles.Count > 0)
+                {
+                    // 1. Точное совпадение со стандартным шаблоном (Метрическая система, типовая модель.rft)
+                    string exact = candidateFiles.FirstOrDefault(f =>
                     {
-                        string fn = Path.GetFileNameWithoutExtension(f).ToLowerInvariant();
-                        return !fn.Contains("на основе") && 
-                               !fn.Contains("based") && 
-                               !fn.Contains("стена") && 
-                               !fn.Contains("wall") && 
-                               !fn.Contains("потолок") && 
-                               !fn.Contains("ceiling") && 
-                               !fn.Contains("пол") && 
-                               !fn.Contains("floor") && 
-                               !fn.Contains("линия") && 
-                               !fn.Contains("line") && 
-                               !fn.Contains("грань") && 
-                               !fn.Contains("face");
+                        string fn = Path.GetFileNameWithoutExtension(f).Trim().ToLowerInvariant();
+                        return fn == "метрическая система, типовая модель" ||
+                               fn == "metric generic model" ||
+                               fn == "типовая модель" ||
+                               fn == "generic model";
                     });
+                    if (exact != null)
+                    {
+                        Logger.Log($"Найден точный шаблон типовой модели: {exact}", "INFO");
+                        return exact;
+                    }
 
-                    if (cleanMatch != null) return cleanMatch;
-                    return files[0];
+                    // 2. Любой не-адаптивный и не-хостовый шаблон типовой модели
+                    string cleanMatch = candidateFiles.FirstOrDefault(f => IsValidTemplate(f));
+                    if (cleanMatch != null)
+                    {
+                        Logger.Log($"Найден подходящий шаблон типовой модели: {cleanMatch}", "INFO");
+                        return cleanMatch;
+                    }
                 }
             }
             catch (Exception ex)
@@ -332,6 +366,51 @@ namespace BimboClub
             }
 
             return null;
+        }
+
+        private static bool IsValidTemplate(string filePath)
+        {
+            string fn = Path.GetFileNameWithoutExtension(filePath).ToLowerInvariant();
+
+            // КРИТИЧЕСКИ ВАЖНО: исключаем адаптивные шаблоны! В адаптивных семействах Revit запрещает смену категории
+            if (fn.Contains("адаптивн") || fn.Contains("adaptive")) return false;
+
+            // Исключаем шаблоны на основе образца
+            if (fn.Contains("образц") || fn.Contains("pattern")) return false;
+
+            // Исключаем хостовые шаблоны (на основе стены, грани, потолка, пола, линии, крыши и т.д.)
+            if (fn.Contains("на основе") || fn.Contains("based")) return false;
+            if (fn.Contains("настенн") || fn.Contains("потолочн") || fn.Contains("подрезк")) return false;
+            if (fn.Contains("стена") || fn.Contains("wall")) return false;
+            if (fn.Contains("потолок") || fn.Contains("ceiling")) return false;
+            if (fn.Contains("пол") || fn.Contains("floor")) return false;
+            if (fn.Contains("крыш") || fn.Contains("roof")) return false;
+            if (fn.Contains("линия") || fn.Contains("line")) return false;
+            if (fn.Contains("грань") || fn.Contains("face")) return false;
+            if (fn.Contains("двух уровн") || fn.Contains("two level")) return false;
+
+            return true;
+        }
+
+        private static string[] GetSpecificTemplatePatterns(BuiltInCategory cat)
+        {
+            switch (cat)
+            {
+                case BuiltInCategory.OST_MechanicalEquipment:
+                    return new[] { "*оборудование*.rft", "*Mechanical Equipment*.rft" };
+                case BuiltInCategory.OST_ElectricalEquipment:
+                    return new[] { "*электрооборудование*.rft", "*Electrical Equipment*.rft" };
+                case BuiltInCategory.OST_PlumbingFixtures:
+                    return new[] { "*сантехнический прибор*.rft", "*Plumbing Fixture*.rft" };
+                case BuiltInCategory.OST_LightingFixtures:
+                    return new[] { "*осветительный прибор*.rft", "*Lighting Fixture*.rft" };
+                case BuiltInCategory.OST_Furniture:
+                    return new[] { "*мебель*.rft", "*Furniture*.rft" };
+                case BuiltInCategory.OST_SpecialityEquipment:
+                    return new[] { "*специальное оборудование*.rft", "*Specialty Equipment*.rft" };
+                default:
+                    return null;
+            }
         }
 
         private class BimboFamilyLoadOption : IFamilyLoadOptions
