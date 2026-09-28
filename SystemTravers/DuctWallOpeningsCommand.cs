@@ -1547,7 +1547,7 @@ namespace DuctWallOpenings
             Style comboBoxItemStyle = new Style(typeof(ComboBoxItem));
             comboBoxItemStyle.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, bgBrush));
             comboBoxItemStyle.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
-            this.Resources.Add(typeof(ComboBoxItem), comboBoxItemStyle);
+            this.Resources[typeof(ComboBoxItem)] = comboBoxItemStyle;
 
             Style textBoxStyle = new Style(typeof(TextBox));
             textBoxStyle.Setters.Add(new Setter(TextBox.BackgroundProperty, bgBrush));
@@ -2004,7 +2004,7 @@ namespace DuctWallOpenings
             Style style3 = new Style(typeof(ComboBoxItem));
             style3.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36))));
             style3.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
-            this.Resources.Add(typeof(ComboBoxItem), style3);
+            this.Resources[typeof(ComboBoxItem)] = style3;
 
             Style style4 = new Style(typeof(CheckBox));
             style4.Setters.Add(new Setter(CheckBox.ForegroundProperty, Brushes.White));

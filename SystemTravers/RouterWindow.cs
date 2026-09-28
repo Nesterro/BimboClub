@@ -148,7 +148,7 @@ namespace BimboClub
             Style comboBoxItemStyle = new Style(typeof(System.Windows.Controls.ComboBoxItem));
             comboBoxItemStyle.Setters.Add(new Setter(System.Windows.Controls.ComboBoxItem.BackgroundProperty, controlBg));
             comboBoxItemStyle.Setters.Add(new Setter(System.Windows.Controls.ComboBoxItem.ForegroundProperty, Brushes.White));
-            this.Resources.Add(typeof(System.Windows.Controls.ComboBoxItem), comboBoxItemStyle);
+            this.Resources[typeof(System.Windows.Controls.ComboBoxItem)] = comboBoxItemStyle;
 
             Style checkBoxStyle = new Style(typeof(CheckBox));
             checkBoxStyle.Setters.Add(new Setter(CheckBox.ForegroundProperty, Brushes.White));

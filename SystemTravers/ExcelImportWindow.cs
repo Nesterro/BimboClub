@@ -171,7 +171,7 @@ namespace BimboClub
             Style comboBoxItemStyle = new Style(typeof(ComboBoxItem));
             comboBoxItemStyle.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, controlBg));
             comboBoxItemStyle.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
-            this.Resources.Add(typeof(ComboBoxItem), comboBoxItemStyle);
+            this.Resources[typeof(ComboBoxItem)] = comboBoxItemStyle;
 
             Style roundedButtonStyle = GetRoundedButtonStyle(5);
 

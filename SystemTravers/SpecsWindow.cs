@@ -206,7 +206,7 @@ namespace BimboClub
             selectedTabTrigger.Setters.Add(new Setter(TabItem.ForegroundProperty, activeBorderBrush));
             tabItemStyle.Triggers.Add(selectedTabTrigger);
 
-            tabControl.Resources.Add(typeof(TabItem), tabItemStyle);
+            tabControl.Resources[typeof(TabItem)] = tabItemStyle;
 
             // Вкладка 1: Выбор категорий и группировки
             TabItem tab1 = new TabItem { Header = "Категории и режимы" };
