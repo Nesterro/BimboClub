@@ -1,11 +1,12 @@
 ﻿{
-    "latestVersion":  "2.4.19",
-    "releaseDate":  "2026-09-25",
+    "latestVersion":  "2.4.20",
+    "releaseDate":  "2026-09-28",
     "changelog":  [
-                      "Feature: Модуль \u0027Семейство по DXF\u0027 теперь умеет генерировать нативную 3D-геометрию Revit (FreeFormElement/Solids/Meshes/2D-выдавливание) с автоматическим удалением CAD-подложки"
+                      "Fix: Исправлен сбой дублирования ключа ComboBoxItem при открытии окна печати чертежей и других диалогов",
+                      "UI: Исправлена контрастность элементов интерфейса и темной темы в Менеджере параметров"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.19/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.19/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.20/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.20/bimboclub_net8.zip"
                  }
 }
