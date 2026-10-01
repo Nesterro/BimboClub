@@ -34,6 +34,7 @@ Copy-Item "DuctSystemParamCopy\bin\x64\Release\net48\DuctSystemParamCopy.dll" -D
 Copy-Item "SystemTravers\BimboClub.addin" -Destination $tempNet48 -Force
 Copy-Item "SystemTravers\icon32.png" -Destination $tempNet48 -Force
 Copy-Item "SystemTravers\icon_*.png" -Destination $tempNet48 -Force
+Set-Content -Path "$tempNet48\version.txt" -Value $Version -Force
 
 # Copy net8 files
 Copy-Item "SystemTravers\bin\x64\Release\net8.0-windows\BimboClub.dll" -Destination $tempNet8 -Force
@@ -41,6 +42,7 @@ Copy-Item "DuctSystemParamCopy\bin\x64\Release\net8.0-windows\DuctSystemParamCop
 Copy-Item "SystemTravers\BimboClub.addin" -Destination $tempNet8 -Force
 Copy-Item "SystemTravers\icon32.png" -Destination $tempNet8 -Force
 Copy-Item "SystemTravers\icon_*.png" -Destination $tempNet8 -Force
+Set-Content -Path "$tempNet8\version.txt" -Value $Version -Force
 
 # Create ZIP packages
 $null = New-Item -ItemType Directory -Path "UpdateServerMock\packages" -Force

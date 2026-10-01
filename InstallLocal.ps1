@@ -34,6 +34,9 @@ foreach ($ver in $versions) {
         Copy-Item -Path $addinFile -Destination $targetDir -Force
     }
 
+    # Write version.txt
+    Set-Content -Path (Join-Path $targetDir "version.txt") -Value "2.4.20" -Force
+
     # Copy icons
     Get-ChildItem -Path (Join-Path $baseDir "SystemTravers") -Filter "icon*.png" | ForEach-Object {
         Copy-Item -Path $_.FullName -Destination $targetDir -Force
@@ -44,6 +47,7 @@ foreach ($ver in $versions) {
     if (Test-Path $progDataDir) {
         if (Test-Path $sourceDll) { Copy-Item -Path $sourceDll -Destination $progDataDir -Force }
         if (Test-Path $addinFile) { Copy-Item -Path $addinFile -Destination $progDataDir -Force }
+        Set-Content -Path (Join-Path $progDataDir "version.txt") -Value "2.4.20" -Force
         Get-ChildItem -Path (Join-Path $baseDir "SystemTravers") -Filter "icon*.png" | ForEach-Object {
             Copy-Item -Path $_.FullName -Destination $progDataDir -Force
         }

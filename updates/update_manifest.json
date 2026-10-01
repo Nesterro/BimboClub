@@ -1,12 +1,13 @@
 ﻿{
-    "latestVersion":  "2.4.20",
-    "releaseDate":  "2026-09-28",
+    "latestVersion":  "2.4.21",
+    "releaseDate":  "2026-10-01",
     "changelog":  [
-                      "Fix: Исправлен сбой дублирования ключа ComboBoxItem при открытии окна печати чертежей и других диалогов",
-                      "UI: Исправлена контрастность элементов интерфейса и темной темы в Менеджере параметров"
+                      "Update: Защита от краша Revit и модальное окно синхронизации",
+                      "UI: Раздельные бейджи текущей и доступной версий в менеджере",
+                      "Revit: Отображение актуальной версии плагина в ленте Revit"
                   ],
     "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.20/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.20/bimboclub_net8.zip"
+                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.21/bimboclub_net48.zip",
+                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.21/bimboclub_net8.zip"
                  }
 }

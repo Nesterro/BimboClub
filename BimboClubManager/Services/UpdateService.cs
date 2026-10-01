@@ -88,25 +88,73 @@ namespace BimboClubManager.Services
 
         public bool IsRevitRunning()
         {
-            var processes = Process.GetProcessesByName("Revit");
-            return processes.Length > 0;
+            try
+            {
+                var processes = Process.GetProcessesByName("Revit");
+                return processes.Length > 0;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public void TerminateRevit()
+        public Process[] GetRevitProcesses()
         {
-            var processes = Process.GetProcessesByName("Revit");
+            try
+            {
+                return Process.GetProcessesByName("Revit");
+            }
+            catch
+            {
+                return Array.Empty<Process>();
+            }
+        }
+
+        public async Task<bool> CloseRevitGracefullyAsync(int timeoutSeconds = 10)
+        {
+            var processes = GetRevitProcesses();
+            if (processes.Length == 0) return true;
+
+            foreach (var proc in processes)
+            {
+                try
+                {
+                    proc.CloseMainWindow();
+                }
+                catch { }
+            }
+
+            var sw = Stopwatch.StartNew();
+            while (sw.Elapsed.TotalSeconds < timeoutSeconds)
+            {
+                if (!IsRevitRunning()) return true;
+                await Task.Delay(500);
+            }
+
+            return !IsRevitRunning();
+        }
+
+        public void ForceKillRevit()
+        {
+            var processes = GetRevitProcesses();
             foreach (var process in processes)
             {
                 try
                 {
                     process.Kill();
-                    process.WaitForExit(5000);
+                    process.WaitForExit(3000);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Failed to terminate Revit process: {ex.Message}");
                 }
             }
+        }
+
+        public void TerminateRevit()
+        {
+            ForceKillRevit();
         }
 
         public async Task InstallUpdateAsync(
@@ -116,7 +164,6 @@ namespace BimboClubManager.Services
             IProgress<double> progress, 
             CancellationToken cancellationToken)
         {
-            // 1. Determine package source (URL or local path)
             string packageUrlOrPath = versionInfo.TargetFramework == "net48" 
                 ? manifest.Packages.Net48Url 
                 : manifest.Packages.Net8Url;
@@ -141,7 +188,6 @@ namespace BimboClubManager.Services
                 }
                 else
                 {
-                    // Treat as local path (either absolute or relative to sourcePath)
                     string localZipPath = Path.IsPathRooted(packageUrlOrPath)
                         ? packageUrlOrPath
                         : Path.Combine(sourcePath, packageUrlOrPath);
@@ -176,7 +222,7 @@ namespace BimboClubManager.Services
                     Directory.CreateDirectory(targetDir);
                 }
 
-                // Copy files
+                // Copy files with retry to handle transient file locks
                 var files = Directory.GetFiles(tempExtractPath, "*.*", SearchOption.AllDirectories);
                 int fileCount = files.Length;
                 for (int i = 0; i < fileCount; i++)
@@ -191,14 +237,20 @@ namespace BimboClubManager.Services
                         Directory.CreateDirectory(destFolder);
                     }
 
-                    File.Copy(file, destFile, true);
+                    CopyFileWithRetry(file, destFile);
 
-                    // Update progress from 70% to 90%
                     double copyProgress = 70.0 + (20.0 * (i + 1) / fileCount);
                     progress.Report(copyProgress);
                 }
 
-                // 5. Verify / Write Addin Manifest
+                // 5. Write version.txt
+                try
+                {
+                    File.WriteAllText(Path.Combine(targetDir, "version.txt"), manifest.LatestVersion);
+                }
+                catch { }
+
+                // 6. Verify / Write Addin Manifest
                 progress.Report(95);
                 WriteAddinManifest(versionInfo.AddinPath);
 
@@ -219,6 +271,22 @@ namespace BimboClubManager.Services
             }
         }
 
+        private static void CopyFileWithRetry(string source, string dest, int maxRetries = 3)
+        {
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
+            {
+                try
+                {
+                    File.Copy(source, dest, true);
+                    return;
+                }
+                catch (IOException) when (attempt < maxRetries)
+                {
+                    Thread.Sleep(500);
+                }
+            }
+        }
+
         public void UninstallPlugin(RevitVersionInfo versionInfo)
         {
             string targetDir = Path.GetDirectoryName(versionInfo.AddinPath) ?? 
@@ -231,6 +299,7 @@ namespace BimboClubManager.Services
             DeleteFileIfExists(versionInfo.DllPath);
             DeleteFileIfExists(Path.Combine(targetDir, "DuctSystemParamCopy.dll"));
             DeleteFileIfExists(Path.Combine(targetDir, "icon32.png"));
+            DeleteFileIfExists(Path.Combine(targetDir, "version.txt"));
 
             // Delete icons
             string[] icons = {
@@ -245,7 +314,6 @@ namespace BimboClubManager.Services
                 DeleteFileIfExists(Path.Combine(targetDir, icon));
             }
 
-            // If folder is empty, delete it
             try
             {
                 if (Directory.GetFiles(targetDir).Length == 0 && Directory.GetDirectories(targetDir).Length == 0)
@@ -294,7 +362,6 @@ namespace BimboClubManager.Services
 
                 if (totalBytes != -1)
                 {
-                    // Map download progress to 10% - 40% range
                     double downloadProgress = 10.0 + (30.0 * totalReadBytes / totalBytes);
                     progress.Report(downloadProgress);
                 }

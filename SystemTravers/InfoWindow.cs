@@ -186,29 +186,62 @@ namespace BimboClub
             try
             {
                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string managerPath = Path.Combine(appData, "BimboClubManager", "BimboClubManager.exe");
+                string progData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string thisDir = Path.GetDirectoryName(typeof(InfoWindow).Assembly.Location) ?? "";
 
-                if (!File.Exists(managerPath))
+                string[] candidatePaths = new[]
                 {
-                    // Fallback to Yandex Disk or default path
-                    managerPath = @"D:\Yandex.Disk\Revit\Plugins\BimboClubManager\BimboClubManager.exe";
+                    Path.Combine(appData, "BimboClubManager", "BimboClubManager.exe"),
+                    Path.Combine(progData, "BimboClubManager", "BimboClubManager.exe"),
+                    Path.Combine(localAppData, "BimboClubManager", "BimboClubManager.exe"),
+                    Path.Combine(thisDir, "BimboClubManager.exe"),
+                    Path.Combine(thisDir, "BimboClubManager", "BimboClubManager.exe"),
+                    Path.GetFullPath(Path.Combine(thisDir, "..", "BimboClubManager", "BimboClubManager.exe")),
+                    Path.GetFullPath(Path.Combine(thisDir, "..", "..", "BimboClubManager", "BimboClubManager.exe")),
+                    @"D:\Revit\Plugins\BimboClub\BimboClubManager\bin\x64\Release\net8.0-windows\BimboClubManager.exe",
+                    @"D:\Revit\Plugins\BimboClub\BimboClubManager\bin\Release\net8.0-windows\BimboClubManager.exe",
+                    @"D:\Yandex.Disk\Revit\Plugins\BimboClubManager\BimboClubManager.exe"
+                };
+
+                string foundPath = null;
+                foreach (var p in candidatePaths)
+                {
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(p) && File.Exists(p))
+                        {
+                            foundPath = p;
+                            break;
+                        }
+                    }
+                    catch { }
                 }
 
-                if (File.Exists(managerPath))
+                if (!string.IsNullOrEmpty(foundPath))
                 {
                     Process.Start(new ProcessStartInfo
                     {
-                        FileName = managerPath,
+                        FileName = foundPath,
                         UseShellExecute = true
                     });
                 }
                 else
                 {
-                    MessageBox.Show(
-                        "BimboClubManager не найден по стандартному пути. Вы можете скачать последнюю версию с GitHub Releases.",
+                    var res = MessageBox.Show(
+                        "BimboClubManager не найден на локальном компьютере.\nОткрыть страницу релизов на GitHub для загрузки?",
                         "Менеджер не найден",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (res == MessageBoxResult.Yes)
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "https://github.com/Nesterro/BimboClub/releases",
+                            UseShellExecute = true
+                        });
+                    }
                 }
             }
             catch (Exception ex)

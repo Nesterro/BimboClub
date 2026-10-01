@@ -553,14 +553,15 @@ namespace BimboClub
 			}
 			catch (Exception ex) { Logger.LogError("Ошибка добавления Пространства по АР", ex); }
 
-			// 2. Отдельная крупная кнопка "Инфо v2.0.1" с прямо отображаемой версией
+			// 2. Отдельная крупная кнопка "Инфо vX.X.X" с прямо отображаемой версией
 			try
 			{
 				string currentVer = InfoCommand.GetCurrentVersion();
+				BitmapSource bitmapSourceLogo = LoadImage(System.IO.Path.Combine(text, "icon32.png"));
 				PushButtonData pushButtonDataInfo = new PushButtonData("cmdInfo", $"Инфо\nv{currentVer}", text4, "BimboClub.InfoCommand")
 				{
 					ToolTip = $"BimboClub Tools v{currentVer}\nКликните для просмотра сведений о плагине и запуска Менеджера обновлений.",
-					LargeImage = bitmapSourceCopy,
+					LargeImage = bitmapSourceLogo ?? bitmapSourceCopy,
 					Image = bitmapSourceCopy16
 				};
 				ribbonPanel.AddItem(pushButtonDataInfo);
