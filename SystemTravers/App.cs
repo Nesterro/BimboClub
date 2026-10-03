@@ -568,6 +568,140 @@ namespace BimboClub
 			}
 			catch (Exception ex) { Logger.LogError("Ошибка добавления Инфо", ex); }
 
+			// --- Панель: "Аналоги" ---
+			try
+			{
+				RibbonPanel analogsPanel = application.CreateRibbonPanel(tabName, "Аналоги");
+
+				BitmapSource bitmapSourceSizer = LoadImage(System.IO.Path.Combine(text, "icon_sizer.png"));
+				BitmapSource bitmapSourceSizer16 = LoadImage(System.IO.Path.Combine(text, "icon_sizer_16.png"));
+
+				// 1. Pulldown: MEP выравнивание
+				PulldownButtonData pdMepAlignData = new PulldownButtonData("pbMepAlign", "MEP\nвыравнивание");
+				PulldownButton pdMepAlign = analogsPanel.AddItem(pdMepAlignData) as PulldownButton;
+				if (pdMepAlign != null)
+				{
+					pdMepAlign.LargeImage = bitmapSourceConnect;
+					pdMepAlign.Image = bitmapSourceConnect16;
+
+					// Команда 1: Выровнять по оси
+					PushButtonData btnAlign = new PushButtonData("cmdMepAlign", "Выровнять по оси", text4, "BimboClub.Analogs.MepAlign.MepAlignCommand")
+					{
+						ToolTip = "Соосное выравнивание труб, воздуховодов, лотков и фитингов (относительно ближайшего коннектора).",
+						LargeImage = bitmapSourceConnect,
+						Image = bitmapSourceConnect16
+					};
+					pdMepAlign.AddPushButton(btnAlign);
+
+					// Команда 2: Выровнять по высоте
+					PushButtonData btnAlignElev = new PushButtonData("cmdMepAlignElevation", "Выровнять по высоте", text4, "BimboClub.Analogs.MepAlign.MepAlignElevationCommand")
+					{
+						ToolTip = "Перемещение выравниваемого элемента по оси Z до пересечения траектории с опорным элементом.",
+						LargeImage = bitmapSourceRiser,
+						Image = bitmapSourceRiser16
+					};
+					pdMepAlign.AddPushButton(btnAlignElev);
+
+					// Команда 3: Задать расстояние
+					PushButtonData btnSetDist = new PushButtonData("cmdMepSetDistance", "Задать расстояние", text4, "BimboClub.Analogs.MepAlign.MepSetDistanceCommand")
+					{
+						ToolTip = "Установка точного расстояния между MEP кривыми по горизонтали или вертикали (по осям или по граням с учетом изоляции).",
+						LargeImage = bitmapSourceSizer ?? bitmapSourceNetwork,
+						Image = bitmapSourceSizer16 ?? bitmapSourceNetwork16
+					};
+					pdMepAlign.AddPushButton(btnSetDist);
+
+					// Команда 4: Выровнять стояк вертикально
+					PushButtonData btnAlignVert = new PushButtonData("cmdMepAlignVertical", "Выровнять стояк", text4, "BimboClub.Analogs.MepAlign.MepAlignVerticalCommand")
+					{
+						ToolTip = "Выравнивание стояка строго по вертикали (верхняя точка проецируется точно над нижней).",
+						LargeImage = bitmapSourceRiser,
+						Image = bitmapSourceRiser16
+					};
+					pdMepAlign.AddPushButton(btnAlignVert);
+
+					// Команда 5: Мультипостроение
+					PushButtonData btnMultiRoute = new PushButtonData("cmdMepMultiRoute", "Мультипостроение", text4, "BimboClub.Analogs.MepAlign.MepMultiRouteCommand")
+					{
+						ToolTip = "Параллельная прокладка нескольких трасс с фиксацией углов и авто-отводами.",
+						LargeImage = bitmapSourceRouter,
+						Image = bitmapSourceRouter16
+					};
+					pdMepAlign.AddPushButton(btnMultiRoute);
+				}
+
+				// 2. Крупная кнопка: Базовый уровень
+				PushButtonData btnBaseLevel = new PushButtonData("cmdBaseLevel", "Базовый\nуровень", text4, "BimboClub.Analogs.BaseLevel.BaseLevelCommand")
+				{
+					ToolTip = "Пакетная перепривязка элементов к базовым и верхним уровням без физического смещения геометрии в пространстве.",
+					LargeImage = bitmapSourceFloor ?? bitmapSourceNetwork,
+					Image = bitmapSourceFloor16 ?? bitmapSourceNetwork16
+				};
+				analogsPanel.AddItem(btnBaseLevel);
+
+				// 3. Крупная кнопка: Заменить шрифт
+				PushButtonData btnFontReplacer = new PushButtonData("cmdFontReplacer", "Заменить\nшрифт", text4, "BimboClub.Analogs.FontReplacer.FontReplacerCommand")
+				{
+					ToolTip = "Пакетная замена шрифта и свойств текста в размерных стилях, текстовых стилях, спецификациях и семействах марок.",
+					LargeImage = bitmapSourceRename ?? bitmapSourceTags,
+					Image = bitmapSourceRename16 ?? bitmapSourceTags16
+				};
+				analogsPanel.AddItem(btnFontReplacer);
+
+				// 4. Pulldown: Быстрая подрезка
+				PulldownButtonData pdFastCutData = new PulldownButtonData("pbFastViewCut", "Быстрая\nподрезка");
+				PulldownButton pdFastCut = analogsPanel.AddItem(pdFastCutData) as PulldownButton;
+				if (pdFastCut != null)
+				{
+					pdFastCut.LargeImage = bitmapSourceCrop ?? bitmapSource3D;
+					pdFastCut.Image = bitmapSourceCrop16 ?? bitmapSource3D16;
+
+					PushButtonData btnCrop2D = new PushButtonData("cmdFastCrop2D", "Подрезка 2D вида", text4, "BimboClub.Analogs.FastViewCut.FastCrop2DCommand")
+					{
+						ToolTip = "Быстрая подрезка активного вида (плана, фасада, разреза, узла) по двум угловым точкам.",
+						LargeImage = bitmapSourceCrop ?? bitmapSource3D,
+						Image = bitmapSourceCrop16 ?? bitmapSource3D16
+					};
+					pdFastCut.AddPushButton(btnCrop2D);
+
+					PushButtonData btnCrop3D = new PushButtonData("cmdFastCrop3D", "3D сечение по плану", text4, "BimboClub.Analogs.FastViewCut.FastCrop3DCommand")
+					{
+						ToolTip = "Создание или обновление 3D-вида с границей сечения (секущим кубом) по двум точкам на плане этажа.",
+						LargeImage = bitmapSource3D,
+						Image = bitmapSource3D16
+					};
+					pdFastCut.AddPushButton(btnCrop3D);
+				}
+
+				// 5. Крупная кнопка: Копировать листы
+				PushButtonData btnCopySheets = new PushButtonData("cmdCopySheets", "Копировать\nлисты", text4, "BimboClub.Analogs.CopySheets.CopySheetsCommand")
+				{
+					ToolTip = "Копирование листов, чертёжных видов, легенд, спецификаций и рамок между открытыми документами проекта.",
+					LargeImage = bitmapSourcePrint ?? bitmapSourceCopy,
+					Image = bitmapSourcePrint16 ?? bitmapSourceCopy16
+				};
+				analogsPanel.AddItem(btnCopySheets);
+
+				// 6. Крупная кнопка: Копировать элементы
+				PushButtonData btnCopyElements = new PushButtonData("cmdCopyElements", "Копировать\nэлементы", text4, "BimboClub.Analogs.CopyElements.CopyElementsCommand")
+				{
+					ToolTip = "Копирование стандартов проекта, типоразмеров, фильтров, спецификаций и элементов модели в открытые документы.",
+					LargeImage = bitmapSourceCopy ?? bitmapSourceRename,
+					Image = bitmapSourceCopy16 ?? bitmapSourceRename16
+				};
+				analogsPanel.AddItem(btnCopyElements);
+
+				// 7. Крупная кнопка: Размеры на плане
+				PushButtonData btnPlanDimensions = new PushButtonData("cmdPlanDimensions", "Размеры\nна плане", text4, "BimboClub.Analogs.InteriorPlanDimensions.PlanDimensionsCommand")
+				{
+					ToolTip = "Автоматическая расстановка цепочек размеров стен, проёмов, толщин и привязок колонн к осям на плане этажа.",
+					LargeImage = bitmapSourceCrop ?? bitmapSourceTags,
+					Image = bitmapSourceCrop16 ?? bitmapSourceTags16
+				};
+				analogsPanel.AddItem(btnPlanDimensions);
+			}
+			catch (Exception ex) { Logger.LogError("Ошибка создания панели Аналоги", ex); }
+
 			// --- Wpf-маркер вкладки Revit (ModPlus style) ---
 			TrySetTabLogo(application, tabName);
 
