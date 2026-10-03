@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 
@@ -56,10 +57,42 @@ namespace BimboClub.ExtraScheduleItems
         public static readonly string[] MarkParamNames = { "ADSK_Марка", "ADSK_Обозначение", "Марка", "Обозначение" };
         public static readonly string[] CodeParamNames = { "ADSK_Код изделия", "Код изделия", "Код" };
         public static readonly string[] ManufacturerParamNames = { "ADSK_Завод-изготовитель", "ADSK_Изготовитель", "Завод-изготовитель", "Изготовитель" };
-        public static readonly string[] UnitParamNames = { "ADSK_Единица измерения", "Единица измерения", "Ед. изм.", "Ед.изм." };
+        public static readonly string[] UnitParamNames = {
+            "ADSK_Единицы измерения",
+            "ADSK_Единица измерения",
+            "ADSK_Единицы измрения",
+            "ADSK_Единица измрения",
+            "Единицы измерения",
+            "Единица измерения",
+            "Ед. изм.",
+            "Ед.изм."
+        };
         public static readonly string[] CountParamNames = { "ADSK_Количество", "Количество", "Число" };
         public static readonly string[] WeightParamNames = { "ADSK_Масса", "Масса", "Вес" };
         public static readonly string[] NoteParamNames = { "ADSK_Примечание", "Примечание", "Примечания" };
+
+        private class AdskParamDef
+        {
+            public string Name { get; set; }
+            public Guid Guid { get; set; }
+            public bool IsNumber { get; set; }
+        }
+
+        private static readonly AdskParamDef[] AdskParams = new[]
+        {
+            new AdskParamDef { Name = "ADSK_Группирование", Guid = new Guid("2b5ec4e0-7168-4509-9ec6-896894ea2613"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Позиция", Guid = new Guid("6a2e4c49-0144-4861-8284-a134eb9fa388"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Наименование", Guid = new Guid("e6e0f5cd-3e26-407b-9993-4a11be2454be"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Марка", Guid = new Guid("809e51c8-c689-49c9-a548-8cf9c9162985"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Код изделия", Guid = new Guid("a22efc36-7c9b-4e08-9dfc-91aa0350d755"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Завод-изготовитель", Guid = new Guid("aa041857-96a2-4a0b-8526-cb17a5be5573"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Единицы измерения", Guid = new Guid("4289cb19-9517-45de-9c02-5a74ebf5c86d"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Единица измерения", Guid = new Guid("5526cb60-d264-4e4f-b620-333e144a9910"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Единицы измрения", Guid = new Guid("f12a32c4-0692-411a-a1b7-a3cf2d0e82c5"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Количество", Guid = new Guid("8d0092c6-3023-455b-80fb-b0c4119d8504"), IsNumber = true },
+            new AdskParamDef { Name = "ADSK_Масса", Guid = new Guid("4b71f9cf-ff58-45f8-b32c-7b447432c668"), IsNumber = true },
+            new AdskParamDef { Name = "ADSK_Примечание", Guid = new Guid("e2a4beaa-43e7-4b77-8fa0-681e18ca4743"), IsNumber = false }
+        };
 
         /// <summary>
         /// Сканирование документа Revit на ранее созданные немоделируемые элементы во всех поддерживаемых категориях
@@ -173,9 +206,20 @@ namespace BimboClub.ExtraScheduleItems
             int updated = 0;
             int deleted = 0;
 
+            if (itemsToSync == null) itemsToSync = new List<ExtraScheduleItem>();
+
+            // 0. Предобработка: проверяем семейства и параметры ДО открытия транзакции в doc
+            EnsureFamiliesAndBindings(doc, itemsToSync);
+
             using (Transaction t = new Transaction(doc, "Синхронизация доп. элементов спецификации"))
             {
                 t.Start();
+
+                // 0.1 Гарантируем, что в проекте параметры единиц измерения привязаны как параметры ЭКЗЕМПЛЯРА
+                foreach (var kvp in SupportedCategories)
+                {
+                    EnsureProjectInstanceBindings(doc, kvp.Value);
+                }
 
                 // 1. Удаление элементов, удаленных пользователем
                 if (deletedIds != null)
@@ -332,7 +376,7 @@ namespace BimboClub.ExtraScheduleItems
             SetParam(elem, MarkParamNames, item.Mark);
             SetParam(elem, CodeParamNames, item.Code);
             SetParam(elem, ManufacturerParamNames, item.Manufacturer);
-            SetParam(elem, UnitParamNames, item.Unit);
+            SetParam(elem, UnitParamNames, item.Unit, setAllMatches: true);
             SetParam(elem, CountParamNames, item.Count);
             SetParam(elem, WeightParamNames, item.Weight);
             SetParam(elem, NoteParamNames, item.Note);
@@ -409,6 +453,377 @@ namespace BimboClub.ExtraScheduleItems
             return null;
         }
 
+        public class ExtraScheduleFamilyLoadOptions : IFamilyLoadOptions
+        {
+            public bool OnFamilyFound(bool familyInUse, out bool overwriteParameterValues)
+            {
+                overwriteParameterValues = true;
+                return true;
+            }
+
+            public bool OnSharedFamilyFound(Family sharedFamily, bool familyInUse, out FamilySource source, out bool overwriteParameterValues)
+            {
+                source = FamilySource.Family;
+                overwriteParameterValues = true;
+                return true;
+            }
+        }
+
+        private static string EnsureAdskSharedParamFile()
+        {
+            string appData = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "BimboClub",
+                "Families"
+            );
+            if (!Directory.Exists(appData)) Directory.CreateDirectory(appData);
+
+            string filePath = Path.Combine(appData, "BCC_ADSK_SharedParams.txt");
+            var sb = new StringBuilder();
+            sb.AppendLine("# This is a Revit shared parameter file.");
+            sb.AppendLine("# Do not edit manually.");
+            sb.AppendLine("*META\tVERSION\tMINVERSION");
+            sb.AppendLine("META\t2\t1");
+            sb.AppendLine("*GROUP\tID\tNAME");
+            sb.AppendLine("GROUP\t1\tADSK");
+            sb.AppendLine("*PARAM\tGUID\tNAME\tDATATYPE\tDATACATEGORY\tGROUP\tVISIBLE\tDESCRIPTION\tUSERMODIFIABLE\tHIDEWHENNOVALUE");
+            foreach (var p in AdskParams)
+            {
+                string dt = p.IsNumber ? "NUMBER" : "TEXT";
+                sb.AppendLine($"PARAM\t{p.Guid}\t{p.Name}\t{dt}\t\t1\t1\t\t1\t0");
+            }
+            File.WriteAllText(filePath, sb.ToString(), Encoding.Unicode);
+            return filePath;
+        }
+
+        private static FamilyParameter EnsureFamilyParameter(
+            FamilyManager famMgr,
+            DefinitionGroup grp,
+            string paramName,
+            ForgeTypeId specTypeId,
+            Guid paramGuid,
+            ref bool modified,
+            bool isInstance = true)
+        {
+            FamilyParameter fp = famMgr.get_Parameter(paramName);
+            if (fp != null)
+            {
+                if (!fp.IsInstance && isInstance)
+                {
+                    try
+                    {
+                        famMgr.MakeInstance(fp);
+                        modified = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Не удалось сделать параметр {paramName} экземпляром: {ex.Message}", "WARN");
+                    }
+                }
+                return fp;
+            }
+
+            try
+            {
+                Definition def = grp?.Definitions?.get_Item(paramName);
+                if (def == null && grp != null)
+                {
+                    ExternalDefinitionCreationOptions extOpts = new ExternalDefinitionCreationOptions(paramName, specTypeId)
+                    {
+                        GUID = paramGuid != Guid.Empty ? paramGuid : Guid.NewGuid(),
+                        UserModifiable = true
+                    };
+                    def = grp.Definitions.Create(extOpts);
+                }
+
+                if (def is ExternalDefinition extDef)
+                {
+#if NET48
+#pragma warning disable CS0618
+                    fp = famMgr.AddParameter(extDef, BuiltInParameterGroup.PG_DATA, isInstance: isInstance);
+#pragma warning restore CS0618
+#else
+                    fp = famMgr.AddParameter(extDef, GroupTypeId.Data, isInstance: isInstance);
+#endif
+                    modified = true;
+                }
+                else
+                {
+                    fp = famMgr.AddParameter(paramName, GroupTypeId.Data, specTypeId, isInstance: isInstance);
+                    modified = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Ошибка добавления параметра {paramName} в семейство: {ex.Message}", "WARN");
+            }
+
+            return fp;
+        }
+
+        private static void EnsureFamilyParameters(Autodesk.Revit.ApplicationServices.Application app, FamilyManager famMgr, ref bool modified)
+        {
+            if (famMgr == null) return;
+
+            // 1. Если параметры уже есть в семействе как параметры ТИПА — преобразуем в ЭКЗЕМПЛЯР
+            foreach (FamilyParameter fp in famMgr.Parameters)
+            {
+                if (fp == null || fp.Definition == null) continue;
+                string pName = fp.Definition.Name;
+
+                bool isTarget = UnitParamNames.Any(u => string.Equals(u, pName, StringComparison.OrdinalIgnoreCase))
+                    || AdskParams.Any(ap => string.Equals(ap.Name, pName, StringComparison.OrdinalIgnoreCase));
+
+                if (isTarget && !fp.IsInstance)
+                {
+                    try
+                    {
+                        famMgr.MakeInstance(fp);
+                        modified = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Не удалось сделать параметр {pName} экземпляром: {ex.Message}", "WARN");
+                    }
+                }
+            }
+
+            // 2. Создаем/открываем файл общих параметров ADSK
+            string origShared = null;
+            try
+            {
+                origShared = app.SharedParametersFilename;
+            }
+            catch { }
+
+            try
+            {
+                string sharedPath = EnsureAdskSharedParamFile();
+                app.SharedParametersFilename = sharedPath;
+                DefinitionFile defFile = app.OpenSharedParameterFile();
+                if (defFile != null)
+                {
+                    DefinitionGroup defGroup = defFile.Groups.get_Item("ADSK") ?? defFile.Groups.Create("ADSK");
+
+                    foreach (var pDef in AdskParams)
+                    {
+                        FamilyParameter fp = famMgr.get_Parameter(pDef.Name);
+                        if (fp != null)
+                        {
+                            if (!fp.IsInstance)
+                            {
+                                try
+                                {
+                                    famMgr.MakeInstance(fp);
+                                    modified = true;
+                                }
+                                catch { }
+                            }
+                            continue;
+                        }
+
+                        ForgeTypeId specTypeId = pDef.IsNumber ? SpecTypeId.Number : SpecTypeId.String.Text;
+                        EnsureFamilyParameter(famMgr, defGroup, pDef.Name, specTypeId, pDef.Guid, ref modified, isInstance: true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Ошибка настройки общих параметров семейства", ex);
+            }
+            finally
+            {
+                try
+                {
+                    if (origShared != null) app.SharedParametersFilename = origShared;
+                }
+                catch { }
+            }
+
+            // 3. Fallback: гарантируем наличие параметров единиц измерения как параметров экземпляра
+            try
+            {
+                bool hasUnitParam = false;
+                foreach (FamilyParameter fp in famMgr.Parameters)
+                {
+                    if (fp != null && fp.Definition != null &&
+                        (string.Equals(fp.Definition.Name, "ADSK_Единицы измерения", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(fp.Definition.Name, "ADSK_Единица измерения", StringComparison.OrdinalIgnoreCase)))
+                    {
+                        hasUnitParam = true;
+                        if (!fp.IsInstance)
+                        {
+                            famMgr.MakeInstance(fp);
+                            modified = true;
+                        }
+                    }
+                }
+
+                if (!hasUnitParam)
+                {
+                    famMgr.AddParameter("ADSK_Единицы измерения", GroupTypeId.Data, SpecTypeId.String.Text, isInstance: true);
+                    modified = true;
+                }
+            }
+            catch { }
+        }
+
+        private static void EnsureFamiliesAndBindings(Document doc, IEnumerable<ExtraScheduleItem> items)
+        {
+            if (doc == null) return;
+
+            var catNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (items != null)
+            {
+                foreach (var item in items)
+                {
+                    string cat = string.IsNullOrWhiteSpace(item.CategoryName) ? "Обобщенные модели" : item.CategoryName;
+                    catNames.Add(cat);
+                }
+            }
+            if (catNames.Count == 0) catNames.Add("Обобщенные модели");
+
+            foreach (string catName in catNames)
+            {
+                string famName = GetFamilyNameForCategory(catName);
+                BuiltInCategory bic = ResolveBuiltInCategory(catName);
+
+                // 1. Убеждаемся, что файл семейства на диске существует и имеет параметры экземпляра
+                EnsureFamilyFile(doc.Application, famName, bic);
+
+                // 2. Если семейство уже загружено в документ — проверяем, чтобы параметры не были параметрами ТИПА
+                try
+                {
+                    var family = new FilteredElementCollector(doc)
+                        .OfClass(typeof(Family))
+                        .Cast<Family>()
+                        .FirstOrDefault(f => f != null && string.Equals(f.Name, famName, StringComparison.OrdinalIgnoreCase));
+
+                    if (family != null && family.IsEditable)
+                    {
+                        bool hasTypeUnitParam = false;
+                        foreach (ElementId symId in family.GetFamilySymbolIds())
+                        {
+                            if (doc.GetElement(symId) is FamilySymbol fs)
+                            {
+                                foreach (string uName in UnitParamNames)
+                                {
+                                    Parameter p = fs.LookupParameter(uName);
+                                    if (p != null)
+                                    {
+                                        hasTypeUnitParam = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (hasTypeUnitParam) break;
+                        }
+
+                        if (hasTypeUnitParam)
+                        {
+                            Document famDoc = doc.EditFamily(family);
+                            if (famDoc != null)
+                            {
+                                bool modified = false;
+                                using (Transaction tf = new Transaction(famDoc, "BimboClub: Параметры экземпляра"))
+                                {
+                                    tf.Start();
+                                    EnsureFamilyParameters(doc.Application, famDoc.FamilyManager, ref modified);
+                                    tf.Commit();
+                                }
+
+                                if (modified)
+                                {
+                                    famDoc.LoadFamily(doc, new ExtraScheduleFamilyLoadOptions());
+                                }
+                                famDoc.Close(false);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"Ошибка проверки параметров семейства {famName}: {ex.Message}", "WARN");
+                }
+            }
+        }
+
+        public static void EnsureProjectInstanceBindings(Document doc, BuiltInCategory bic)
+        {
+            if (doc == null) return;
+            try
+            {
+                BindingMap bindMap = doc.ParameterBindings;
+                if (bindMap == null) return;
+
+                Category targetCat = null;
+                try
+                {
+                    targetCat = doc.Settings.Categories.get_Item(bic);
+                }
+                catch { }
+
+                if (targetCat == null) return;
+
+                // 1. Проверяем существующие привязки проекта: если параметр единиц измерения привязан как параметр ТИПА — перепривязываем к ЭКЗЕМПЛЯРУ!
+                DefinitionBindingMapIterator it = bindMap.ForwardIterator();
+                var reinsertList = new List<Tuple<Definition, InstanceBinding>>();
+
+                while (it.MoveNext())
+                {
+                    Definition def = it.Key;
+                    if (def == null) continue;
+
+                    bool isUnitParam = UnitParamNames.Any(u => string.Equals(u, def.Name, StringComparison.OrdinalIgnoreCase));
+                    if (!isUnitParam) continue;
+
+                    Binding binding = it.Current as Binding;
+                    if (binding is TypeBinding tb)
+                    {
+                        // Привязан как параметр типа в проекте — делаем параметром экземпляра!
+                        CategorySet catSet = tb.Categories ?? doc.Application.Create.NewCategorySet();
+                        if (!catSet.Contains(targetCat))
+                        {
+                            catSet.Insert(targetCat);
+                        }
+                        InstanceBinding instBinding = doc.Application.Create.NewInstanceBinding(catSet);
+                        reinsertList.Add(Tuple.Create(def, instBinding));
+                    }
+                    else if (binding is InstanceBinding ib)
+                    {
+                        CategorySet catSet = ib.Categories;
+                        if (catSet != null && !catSet.Contains(targetCat))
+                        {
+                            catSet.Insert(targetCat);
+                            reinsertList.Add(Tuple.Create(def, ib));
+                        }
+                    }
+                }
+
+                foreach (var item in reinsertList)
+                {
+                    try
+                    {
+#if NET48
+#pragma warning disable CS0618
+                        bindMap.ReInsert(item.Item1, item.Item2, BuiltInParameterGroup.PG_DATA);
+#pragma warning restore CS0618
+#else
+                        bindMap.ReInsert(item.Item1, item.Item2, GroupTypeId.Data);
+#endif
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Ошибка перепривязки {item.Item1.Name} к экземпляру: {ex.Message}", "WARN");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("Ошибка в EnsureProjectInstanceBindings", ex);
+            }
+        }
+
         private static string EnsureFamilyFile(Autodesk.Revit.ApplicationServices.Application app, string famName, BuiltInCategory bic)
         {
             string appData = Path.Combine(
@@ -419,7 +834,35 @@ namespace BimboClub.ExtraScheduleItems
             if (!Directory.Exists(appData)) Directory.CreateDirectory(appData);
 
             string targetPath = Path.Combine(appData, $"{famName}.rfa");
-            if (File.Exists(targetPath)) return targetPath;
+            if (File.Exists(targetPath))
+            {
+                // Проверяем существующий файл семейства и убеждаемся, что параметры являются параметрами экземпляра
+                try
+                {
+                    Document existingFamDoc = app.OpenDocumentFile(targetPath);
+                    if (existingFamDoc != null)
+                    {
+                        bool modified = false;
+                        using (Transaction tParams = new Transaction(existingFamDoc, "Проверка параметров экземпляра"))
+                        {
+                            tParams.Start();
+                            EnsureFamilyParameters(app, existingFamDoc.FamilyManager, ref modified);
+                            tParams.Commit();
+                        }
+
+                        if (modified)
+                        {
+                            existingFamDoc.Save();
+                        }
+                        existingFamDoc.Close(false);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"Проверка существующего файла семейства {famName}: {ex.Message}", "DEBUG");
+                }
+                return targetPath;
+            }
 
             // Поиск шаблона Metric Generic Model.rft
             string templatePath = FindGenericModelTemplate(app.VersionNumber);
@@ -447,7 +890,15 @@ namespace BimboClub.ExtraScheduleItems
                             }
                         }
 
-                        // Сохраняем пустое семейство (без геометрии)
+                        // Добавляем параметры ADSK как параметры ЭКЗЕМПЛЯРА
+                        bool modified = false;
+                        using (Transaction tParams = new Transaction(famDoc, "Параметры ADSK (экземпляр)"))
+                        {
+                            tParams.Start();
+                            EnsureFamilyParameters(app, famDoc.FamilyManager, ref modified);
+                            tParams.Commit();
+                        }
+
                         SaveAsOptions opt = new SaveAsOptions { OverwriteExistingFile = true };
                         famDoc.SaveAs(targetPath, opt);
                         famDoc.Close(false);
@@ -542,39 +993,49 @@ namespace BimboClub.ExtraScheduleItems
             return defaultValue;
         }
 
-        public static bool SetParam(Element elem, string[] paramNames, object value)
+        public static bool SetParam(Element elem, string[] paramNames, object value, bool setAllMatches = false)
         {
             if (elem == null || value == null) return false;
 
+            bool anySet = false;
             foreach (string name in paramNames)
             {
                 Parameter p = elem.LookupParameter(name);
                 if (p != null && !p.IsReadOnly)
                 {
+                    // ВАЖНО: Если записываем в экземпляр (FamilyInstance), параметр не должен принадлежать FamilySymbol (параметр типа)
+                    if (elem is FamilyInstance && p.Element is FamilySymbol)
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         if (p.StorageType == StorageType.String)
                         {
                             p.Set(value.ToString());
-                            return true;
+                            anySet = true;
+                            if (!setAllMatches) return true;
                         }
                         else if (p.StorageType == StorageType.Double)
                         {
-                            if (value is double d) { p.Set(d); return true; }
-                            if (value is int i) { p.Set((double)i); return true; }
-                            if (double.TryParse(value.ToString().Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double parsed))
+                            if (value is double d) { p.Set(d); anySet = true; if (!setAllMatches) return true; }
+                            else if (value is int i) { p.Set((double)i); anySet = true; if (!setAllMatches) return true; }
+                            else if (double.TryParse(value.ToString().Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double parsed))
                             {
                                 p.Set(parsed);
-                                return true;
+                                anySet = true;
+                                if (!setAllMatches) return true;
                             }
                         }
                         else if (p.StorageType == StorageType.Integer)
                         {
-                            if (value is int i) { p.Set(i); return true; }
-                            if (int.TryParse(value.ToString(), out int parsed))
+                            if (value is int i) { p.Set(i); anySet = true; if (!setAllMatches) return true; }
+                            else if (int.TryParse(value.ToString(), out int parsed))
                             {
                                 p.Set(parsed);
-                                return true;
+                                anySet = true;
+                                if (!setAllMatches) return true;
                             }
                         }
                     }
@@ -582,7 +1043,7 @@ namespace BimboClub.ExtraScheduleItems
                 }
             }
 
-            return false;
+            return anySet;
         }
 
         #endregion
