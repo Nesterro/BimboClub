@@ -11,7 +11,8 @@
         Height="720" Width="1160"
         Style="{StaticResource ModernWindowStyle}"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
+        MinWidth="960" MinHeight="600"
+        ResizeMode="CanResizeWithGrip">
     
     <Window.DataContext>
         <vm:MainViewModel />
@@ -31,7 +32,7 @@
             </Grid.RowDefinitions>
 
             <!-- Custom Title Bar -->
-            <Border Grid.Row="0" Background="#080611" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Border Grid.Row="0" Background="#262626" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -42,7 +43,7 @@
                     <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" Margin="16,0,0,0">
                         <Image Source="icon_manager.png" Width="24" Height="24" Margin="0,0,10,0" VerticalAlignment="Center" />
                         <TextBlock Text="BimboClub Tools" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
-                        <Border Margin="8,0,0,0" Padding="6,2" CornerRadius="4" Background="#1D153E" VerticalAlignment="Center">
+                        <Border Margin="8,0,0,0" Padding="6,2" CornerRadius="4" Background="#383838" VerticalAlignment="Center">
                             <TextBlock Text="Менеджер обновлений" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextSecondaryBrush}" />
                         </Border>
                     </StackPanel>
@@ -57,7 +58,7 @@
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="btnBorder" Property="Background" Value="#1C1835" />
+                                            <Setter TargetName="btnBorder" Property="Background" Value="#383838" />
                                             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                                         </Trigger>
                                     </ControlTemplate.Triggers>
@@ -199,14 +200,14 @@
                                                     <Border Grid.Column="0" Width="48" Height="48" CornerRadius="10" Margin="0,0,14,0" VerticalAlignment="Center">
                                                         <Border.Style>
                                                             <Style TargetType="Border">
-                                                                <Setter Property="Background" Value="#251E3D" />
+                                                                <Setter Property="Background" Value="#383838" />
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding IsRevitInstalled}" Value="False">
-                                                                        <Setter Property="Background" Value="#171220" />
+                                                                        <Setter Property="Background" Value="#2F2F2F" />
                                                                         <Setter Property="Opacity" Value="0.4" />
                                                                     </DataTrigger>
                                                                     <DataTrigger Binding="{Binding IsUpdateAvailable}" Value="True">
-                                                                        <Setter Property="Background" Value="#3D291E" />
+                                                                        <Setter Property="Background" Value="#383838" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
@@ -250,7 +251,7 @@
                                                         <!-- Version Badges (Installed vs Available) -->
                                                         <StackPanel Orientation="Horizontal" Margin="0,5,0,3">
                                                             <!-- Installed Version Badge -->
-                                                            <Border CornerRadius="4" Background="#1C1835" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="6,2" Margin="0,0,8,0">
+                                                            <Border CornerRadius="4" Background="#383838" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="6,2" Margin="0,0,8,0">
                                                                 <StackPanel Orientation="Horizontal">
                                                                     <TextBlock Text="Установлена: " FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
                                                                     <TextBlock Text="{Binding InstalledVersionDisplay}" FontSize="11" FontWeight="Bold">
@@ -272,7 +273,7 @@
                                                             </Border>
 
                                                             <!-- Available Version Badge -->
-                                                            <Border CornerRadius="4" Background="#1C1835" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="6,2">
+                                                            <Border CornerRadius="4" Background="#383838" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="6,2">
                                                                 <StackPanel Orientation="Horizontal">
                                                                     <TextBlock Text="Доступна: " FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" />
                                                                     <TextBlock Text="{Binding AvailableVersionDisplay}" FontSize="11" FontWeight="Bold">
@@ -341,8 +342,8 @@
 
                                                         <!-- Update Button -->
                                                         <Button Content="Обновить" 
-                                                                Background="{StaticResource WarningGradientBrush}"
-                                                                Foreground="#121020" FontWeight="Bold"
+                                                                Background="{StaticResource AccentBrush}"
+                                                                Foreground="White" FontWeight="Bold"
                                                                 Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                 CommandParameter="{Binding}" 
                                                                 Height="32" FontSize="12" Padding="14,0" Margin="0,0,6,0">
@@ -407,7 +408,7 @@
 
                                                         <!-- Not installed placeholder label -->
                                                         <TextBlock Text="—" 
-                                                                   Foreground="#3A344E" 
+                                                                   Foreground="#484848"
                                                                    FontWeight="Bold" 
                                                                    VerticalAlignment="Center" 
                                                                    Margin="10,0">
@@ -457,8 +458,8 @@
                                         <!-- Update All Button if updates are available -->
                                         <Button Content="{Binding UpdateAllButtonText}"
                                                 Command="{Binding UpdateAllCommand}"
-                                                Background="{StaticResource WarningGradientBrush}"
-                                                Foreground="#121020" FontWeight="Bold"
+                                                Background="{StaticResource AccentBrush}"
+                                                Foreground="White" FontWeight="Bold"
                                                 Height="38" FontSize="13" Margin="0,0,0,14">
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
@@ -533,9 +534,6 @@
                                               IsChecked="{Binding AutoCheckUpdates}" 
                                               Style="{StaticResource ModernCheckBoxStyle}" Margin="0,0,0,8" />
                                     
-                                    <CheckBox Content="Включить предварительные сборки (Pre-release)" 
-                                              IsChecked="{Binding IncludePreReleases}" 
-                                              Style="{StaticResource ModernCheckBoxStyle}" />
                                 </StackPanel>
                             </Border>
 
@@ -605,16 +603,16 @@
             <Grid Grid.RowSpan="2" Background="#D9080611" 
                   Visibility="{Binding ShowRevitWarning, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Border Width="560" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Background="#16112C" BorderBrush="{StaticResource WarningBrush}" BorderThickness="1.5"
+                        Background="#2F2F2F" BorderBrush="{StaticResource WarningBrush}" BorderThickness="1.5"
                         CornerRadius="16" Padding="28">
                     <Border.Effect>
-                        <DropShadowEffect Color="#000000" BlurRadius="30" ShadowDepth="6" Opacity="0.7" />
+                        <DropShadowEffect Color="#262626" BlurRadius="30" ShadowDepth="6" Opacity="0.7" />
                     </Border.Effect>
 
                     <StackPanel>
                         <!-- Header with Warning Icon -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
-                            <Border Width="40" Height="40" CornerRadius="20" Background="#3D291E" Margin="0,0,12,0" VerticalAlignment="Center">
+                            <Border Width="40" Height="40" CornerRadius="20" Background="#383838" Margin="0,0,12,0" VerticalAlignment="Center">
                                 <TextBlock Text="⚠️" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <StackPanel VerticalAlignment="Center">
@@ -628,7 +626,7 @@
                                    FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" LineHeight="18" Margin="0,0,0,16" />
 
                         <!-- High priority alert box: Save & Sync instructions -->
-                        <Border Background="#2B151F" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,0,0,16">
+                        <Border Background="#2F2F2F" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,0,0,16">
                             <StackPanel>
                                 <TextBlock Text="🔴 ВНИМАНИЕ: СИНХРОНИЗИРУЙТЕ ПРОЕКТ!" FontWeight="Bold" FontSize="12" Foreground="{StaticResource DangerBrush}" Margin="0,0,0,6" />
                                 <TextBlock Text="Перед закрытием обязательно сохраните работу и выполните синхронизацию с хранилищем:&#x0a;«Совместная работа» → «Синхронизировать с хранилищем» (Sync with Central). Не закрывайте Revit без сохранения!"
@@ -677,10 +675,10 @@
             <Grid Grid.RowSpan="2" Background="#B0080611"
                   Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Border Width="380" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Background="#17122E" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                        Background="#2F2F2F" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                         CornerRadius="14" Padding="24">
                     <Border.Effect>
-                        <DropShadowEffect Color="#000000" BlurRadius="25" ShadowDepth="4" Opacity="0.5" />
+                        <DropShadowEffect Color="#262626" BlurRadius="25" ShadowDepth="4" Opacity="0.5" />
                     </Border.Effect>
 
                     <StackPanel HorizontalAlignment="Center" Width="330">
@@ -689,7 +687,7 @@
                                    TextAlignment="Center" Margin="0,0,0,14" TextWrapping="Wrap" />
 
                         <ProgressBar Value="{Binding GlobalProgress}" Minimum="0" Maximum="100" Height="8" 
-                                     Foreground="{StaticResource AccentBrush}" Background="#251E3D" BorderThickness="0" Margin="0,0,0,8" />
+                                     Foreground="{StaticResource AccentBrush}" Background="#383838" BorderThickness="0" Margin="0,0,0,8" />
 
                         <TextBlock Text="{Binding GlobalProgress, StringFormat='{}{0:F0}%'}" 
                                    Foreground="{StaticResource TextSecondaryBrush}" FontSize="11" 

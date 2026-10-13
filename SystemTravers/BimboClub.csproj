@@ -7,7 +7,7 @@
     <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
     <Platforms>x64</Platforms>
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>10.0</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>

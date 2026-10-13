@@ -5,7 +5,7 @@
         Height="480" Width="500"
         MinHeight="440" MinWidth="450"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E2E"
+        Background="#2F2F2F"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#FFFFFF"
@@ -46,8 +46,8 @@
                     <Setter Property="Background" Value="#A50E0E"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#E0E0E0"/>
-                    <Setter Property="Foreground" Value="#888888"/>
+                    <Setter Property="Background" Value="#BBBBBB"/>
+                    <Setter Property="Foreground" Value="#BBBBBB"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -59,7 +59,7 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="32"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#B0B0B0"/>
+            <Setter Property="BorderBrush" Value="#BBBBBB"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FocusVisualStyle" Value="{StaticResource WcagFocusVisual}"/>
             <Setter Property="Template">
@@ -73,7 +73,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E5E5E5"/>
+                    <Setter Property="Background" Value="#BBBBBB"/>
                     <Setter Property="BorderBrush" Value="#005FB8"/>
                 </Trigger>
             </Style.Triggers>
@@ -110,7 +110,7 @@
         <!-- Title Header -->
         <Border Grid.Row="0" BorderBrush="#EAEAEA" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="BimboClub" Foreground="#FFD700" FontWeight="Bold" FontSize="18"/>
+                <TextBlock Text="BimboClub" Foreground="#0078D4" FontWeight="Bold" FontSize="18"/>
                 <TextBlock Text=" | ПРИВЯЗКА ЭЛЕМЕНТОВ К УРОВНЯМ" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="18" Margin="5,0,0,0"/>
             </StackPanel>
         </Border>
@@ -118,9 +118,9 @@
         <!-- Main Form Content -->
         <StackPanel Grid.Row="1" Margin="0,0,0,12">
             <!-- Selection Scope Section Card -->
-            <Border Background="#252536" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,0,0,12">
+            <Border Background="#383838" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="Область обработки элементов:" FontWeight="SemiBold" Foreground="#595959" Margin="0,0,0,8"/>
+                    <TextBlock Text="Область обработки элементов:" FontWeight="SemiBold" Foreground="#484848" Margin="0,0,0,8"/>
                     
                     <RadioButton x:Name="ActiveViewRadioButton" Content="Все элементы на активном виде" IsChecked="True" Margin="0,0,0,8"/>
                     <RadioButton x:Name="SelectedElementsRadioButton" Content="Предварительно выбранные элементы в Revit" Margin="0,0,0,8"/>
@@ -131,9 +131,9 @@
             </Border>
 
             <!-- Options Section Card -->
-            <Border Background="#252536" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="6" Padding="14">
+            <Border Background="#383838" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="6" Padding="14">
                 <StackPanel>
-                    <TextBlock Text="Параметры привязки:" FontWeight="SemiBold" Foreground="#595959" Margin="0,0,0,8"/>
+                    <TextBlock Text="Параметры привязки:" FontWeight="SemiBold" Foreground="#484848" Margin="0,0,0,8"/>
                     <CheckBox x:Name="AutoFindNearestCheckBox" IsChecked="True" Content="Автоматически определять ближайший уровень снизу" Margin="0,0,0,8"/>
                     <CheckBox x:Name="RecalculateOffsetCheckBox" IsChecked="True" Content="Пересчитывать смещение от уровня (сохранять высоту)"/>
                 </StackPanel>

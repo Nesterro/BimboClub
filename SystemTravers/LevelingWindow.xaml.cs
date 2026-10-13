@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -25,6 +25,7 @@ namespace BimboClub
         public LevelingWindow(Document doc, bool hasSelectedElements)
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
             _doc = doc;
 
             SelectedElementsRadioButton.IsEnabled = hasSelectedElements;

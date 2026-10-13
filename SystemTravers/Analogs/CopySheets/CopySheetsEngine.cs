@@ -26,6 +26,7 @@ namespace BimboClub.Analogs.CopySheets
     public class CopySheetsResult
     {
         public int SheetsCreated { get; set; }
+        public int SheetsUpdated { get; set; }
         public int SheetsSkipped { get; set; }
         public int ViewsCopied { get; set; }
         public int SchedulesPlaced { get; set; }
@@ -73,12 +74,11 @@ namespace BimboClub.Analogs.CopySheets
                 tr.Start();
 
                 // Получаем все существующие номера листов в целевом документе
-                var existingSheetNumbers = new HashSet<string>(
-                    new FilteredElementCollector(targetDoc)
+                var existingSheets = new FilteredElementCollector(targetDoc)
                         .OfClass(typeof(ViewSheet))
                         .Cast<ViewSheet>()
-                        .Select(s => s.SheetNumber),
-                    StringComparer.OrdinalIgnoreCase);
+                        .ToDictionary(s => s.SheetNumber, StringComparer.OrdinalIgnoreCase);
+                var existingSheetNumbers = new HashSet<string>(existingSheets.Keys, StringComparer.OrdinalIgnoreCase);
 
                 foreach (ViewSheet srcSheet in sourceSheets)
                 {
@@ -88,6 +88,12 @@ namespace BimboClub.Analogs.CopySheets
                     // Разрешение конфликтов номеров
                     if (existingSheetNumbers.Contains(targetNumber))
                     {
+                        if (options.ConflictMode == ConflictResolution.OverwriteParameters)
+                        {
+                            CopyElementParameters(srcSheet, existingSheets[targetNumber]);
+                            result.SheetsUpdated++;
+                            continue;
+                        }
                         if (options.ConflictMode == ConflictResolution.Skip)
                         {
                             result.SheetsSkipped++;
@@ -122,18 +128,26 @@ namespace BimboClub.Analogs.CopySheets
 
                     // 2. Создание листа в целевом документе
                     ViewSheet newSheet = null;
-                    try
+                    using (var sheetCreation = new SubTransaction(targetDoc))
                     {
-                        newSheet = ViewSheet.Create(targetDoc, targetTitleBlockSymbolId);
-                        newSheet.SheetNumber = targetNumber;
-                        newSheet.Name = targetName;
-                        existingSheetNumbers.Add(targetNumber);
-                        result.SheetsCreated++;
-                    }
-                    catch (Exception ex)
-                    {
-                        result.Messages.Add($"Ошибка создания листа {targetNumber}: {ex.Message}");
-                        continue;
+                        sheetCreation.Start();
+                        try
+                        {
+                            newSheet = ViewSheet.Create(targetDoc, targetTitleBlockSymbolId);
+                            newSheet.SheetNumber = targetNumber;
+                            newSheet.Name = targetName;
+                            if (sheetCreation.Commit() != TransactionStatus.Committed)
+                                throw new InvalidOperationException("Создание листа не подтверждено транзакцией.");
+                            existingSheetNumbers.Add(targetNumber);
+                            existingSheets[targetNumber] = newSheet;
+                            result.SheetsCreated++;
+                        }
+                        catch (Exception ex)
+                        {
+                            if (sheetCreation.GetStatus() == TransactionStatus.Started) sheetCreation.RollBack();
+                            result.Messages.Add($"Ошибка создания листа {targetNumber}: {ex.Message}");
+                            continue;
+                        }
                     }
 
                     // 3. Перенос параметров листа

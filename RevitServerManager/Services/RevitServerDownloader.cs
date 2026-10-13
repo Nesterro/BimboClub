@@ -160,7 +160,16 @@ namespace RevitServerManager.Services
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
-                await process.WaitForExitAsync(cancellationToken);
+                try
+                {
+                    await process.WaitForExitAsync(cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    if (!process.HasExited) process.Kill(entireProcessTree: true);
+                    await process.WaitForExitAsync(CancellationToken.None);
+                    throw;
+                }
 
                 if (process.ExitCode == 0 && File.Exists(destinationFile))
                 {

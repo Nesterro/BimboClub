@@ -119,7 +119,7 @@ namespace BimboClub
                 if (btn.IsEnabled)
                     btn.Background = normalGrad;
                 else
-                    btn.Background = new SolidColorBrush(Color.FromRgb(70, 70, 82));
+                    btn.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
             };
         }
 
@@ -138,18 +138,18 @@ namespace BimboClub
             this.Width = 500;
             this.Height = 730;
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            this.Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            this.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window); // #18181C
             this.FontFamily = new FontFamily("Segoe UI");
             this.FontSize = 13;
             this.MinHeight = 500;
             this.MinWidth = 450;
 
             // Цветовая палитра
-            SolidColorBrush panelBg = new SolidColorBrush(Color.FromRgb(32, 32, 38)); // #202026
-            SolidColorBrush controlBg = new SolidColorBrush(Color.FromRgb(40, 40, 48)); // #282830
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(255, 46, 91)); // #FF2E5B (Scarlet)
-            SolidColorBrush textMuted = new SolidColorBrush(Color.FromRgb(160, 160, 170));
+            SolidColorBrush panelBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface); // #202026
+            SolidColorBrush controlBg = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #282830
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #303038
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Accent); // #FF2E5B (Scarlet)
+            SolidColorBrush textMuted = new SolidColorBrush(global::BimboClub.NeutralColors.Muted);
 
             // Общие стили для элементов ввода
             Style textBoxStyle = new Style(typeof(TextBox));
@@ -194,8 +194,8 @@ namespace BimboClub
             Border headerBorder = new Border
             {
                 Background = new LinearGradientBrush(
-                    Color.FromRgb(18, 18, 20),
-                    Color.FromRgb(179, 14, 45), // #B30E2D (Бренд алый)
+                    global::BimboClub.NeutralColors.Window,
+                    global::BimboClub.NeutralColors.Accent, // #B30E2D (Бренд алый)
                     0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
@@ -560,8 +560,8 @@ namespace BimboClub
             _btnGenerate.Click += BtnGenerate_Click;
             
             // Настройка градиентов для кнопки
-            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
-            LinearGradientBrush hoverGrad = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.Accent, global::BimboClub.NeutralColors.Accent, 90.0);
+            LinearGradientBrush hoverGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.AccentHover, global::BimboClub.NeutralColors.AccentHover, 90.0);
             ApplyButtonStyles(_btnGenerate, normalGrad, hoverGrad, roundedButtonStyle);
             bottomGrid.Children.Add(_btnGenerate);
 
@@ -576,16 +576,16 @@ namespace BimboClub
             };
             btnCancel.Click += (s, e) => { this.DialogResult = false; this.Close(); };
             
-            SolidColorBrush cancelNormal = new SolidColorBrush(Color.FromRgb(58, 58, 66));
-            SolidColorBrush cancelHover = new SolidColorBrush(Color.FromRgb(78, 78, 88));
+            SolidColorBrush cancelNormal = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
+            SolidColorBrush cancelHover = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
             ApplyFlatButtonStyles(btnCancel, cancelNormal, cancelHover, roundedButtonStyle);
             
             Grid.SetColumn(btnCancel, 1);
             bottomGrid.Children.Add(btnCancel);
 
-            StyleComboBoxDark(_cbFilterParam, controlBg, borderBrush);
-            StyleComboBoxDark(_cbParam1, controlBg, borderBrush);
-            StyleComboBoxDark(_cbParam2, controlBg, borderBrush);
+            StyleComboBoxNeutral(_cbFilterParam, controlBg, borderBrush);
+            StyleComboBoxNeutral(_cbParam1, controlBg, borderBrush);
+            StyleComboBoxNeutral(_cbParam2, controlBg, borderBrush);
 
             // Подписываемся на изменения галочек для обновления счетчика на кнопке
             foreach (var system in _allSystems)
@@ -698,9 +698,9 @@ namespace BimboClub
             this.Close();
         }
 
-        private void StyleComboBoxDark(ComboBox cb, SolidColorBrush bg, SolidColorBrush borderBrush)
+        private void StyleComboBoxNeutral(ComboBox cb, SolidColorBrush bg, SolidColorBrush borderBrush)
         {
-            UiThemeHelper.StyleComboBoxDark(cb, bg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(cb, bg, borderBrush);
         }
     }
 }

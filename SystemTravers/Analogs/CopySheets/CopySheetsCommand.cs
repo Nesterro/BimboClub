@@ -63,13 +63,14 @@ namespace BimboClub.Analogs.CopySheets
                 foreach (Document targetDoc in targetDocs)
                 {
                     CopySheetsResult res = CopySheetsEngine.CopySheets(sourceDoc, selectedSheets, targetDoc, options);
-                    totalCreated += res.SheetsCreated;
+                    totalCreated += res.SheetsCreated + res.SheetsUpdated;
                     totalSkipped += res.SheetsSkipped;
                     totalViews += res.ViewsCopied;
                     totalSchedules += res.SchedulesPlaced;
 
                     report.AppendLine($"Документ «{targetDoc.Title}»:");
-                    report.AppendLine($"  - Создано/обновлено листов: {res.SheetsCreated}");
+                    report.AppendLine($"  - Создано листов: {res.SheetsCreated}, обновлено: {res.SheetsUpdated}");
+                    foreach (string detail in res.Messages) report.AppendLine("  - " + detail);
                     if (res.SheetsSkipped > 0)
                         report.AppendLine($"  - Пропущено листов: {res.SheetsSkipped}");
                     if (res.ViewsCopied > 0)

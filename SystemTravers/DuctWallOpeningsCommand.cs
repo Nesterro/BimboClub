@@ -1523,7 +1523,7 @@ namespace DuctWallOpenings
             ResizeMode = ResizeMode.NoResize;
 
             // Настройка темы оформления BimboClub (Темная тема)
-            this.Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            this.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window); // #18181C
             this.FontFamily = new FontFamily("Segoe UI");
             this.FontSize = 13;
             this.Foreground = Brushes.White;
@@ -1541,8 +1541,8 @@ namespace DuctWallOpenings
             catch { }
 
             // Кисти
-            SolidColorBrush bgBrush = new SolidColorBrush(Color.FromRgb(45, 45, 53)); // #2D2D35
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
+            SolidColorBrush bgBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #2D2D35
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #303038
 
             Style comboBoxItemStyle = new Style(typeof(ComboBoxItem));
             comboBoxItemStyle.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, bgBrush));
@@ -1560,8 +1560,8 @@ namespace DuctWallOpenings
             Border headerBorder = new Border
             {
                 Background = new LinearGradientBrush(
-                    Color.FromRgb(18, 18, 20),
-                    Color.FromRgb(179, 14, 45), // #B30E2D
+                    global::BimboClub.NeutralColors.Window,
+                    global::BimboClub.NeutralColors.Accent, // #B30E2D
                     0.0),
                 Padding = new Thickness(15, 10, 15, 10),
                 Height = 50
@@ -1728,7 +1728,7 @@ namespace DuctWallOpenings
                 Margin = new Thickness(0, 0, 10, 0),
                 IsDefault = true,
                 Style = roundedButtonStyle,
-                Background = new SolidColorBrush(Color.FromRgb(179, 14, 45)), // Brand crimson
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Accent), // Brand crimson
                 Foreground = Brushes.White,
                 FontWeight = FontWeights.Bold
             };
@@ -1742,7 +1742,7 @@ namespace DuctWallOpenings
                 Height = 32,
                 IsCancel = true,
                 Style = roundedButtonStyle,
-                Background = new SolidColorBrush(Color.FromRgb(58, 58, 66)), // Dark slate
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Border), // Dark slate
                 Foreground = Brushes.White
             };
             buttons.Children.Add(cancelBtn);
@@ -1750,10 +1750,10 @@ namespace DuctWallOpenings
             grid.Children.Add(buttons);
 
             // Применяем красивый стиль ко всем комбобоксам
-            UiThemeHelper.StyleComboBoxDark(_comboFamily, bgBrush, borderBrush);
-            UiThemeHelper.StyleComboBoxDark(_comboWidth, bgBrush, borderBrush);
-            UiThemeHelper.StyleComboBoxDark(_comboHeight, bgBrush, borderBrush);
-            UiThemeHelper.StyleComboBoxDark(_comboDepth, bgBrush, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_comboFamily, bgBrush, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_comboWidth, bgBrush, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_comboHeight, bgBrush, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_comboDepth, bgBrush, borderBrush);
 
             _comboFamily.SelectionChanged += (s, e) => UpdateParamLists();
             UpdateParamLists();
@@ -1928,13 +1928,13 @@ namespace DuctWallOpenings
             Height = 480.0;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.NoResize;
-            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28));
+            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window);
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13.0;
 
-            SolidColorBrush panelBg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 48));
-            SolidColorBrush borderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-            SolidColorBrush accentBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
+            SolidColorBrush panelBg = new SolidColorBrush(global::BimboClub.NeutralColors.Input);
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input);
+            SolidColorBrush accentBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
 
             try
             {
@@ -1955,7 +1955,7 @@ namespace DuctWallOpenings
 
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(global::BimboClub.NeutralColors.Window, global::BimboClub.NeutralColors.Accent, 0.0),
                 Padding = new Thickness(15.0, 10.0, 15.0, 10.0)
             };
             grid.Children.Add(headerBorder);
@@ -1990,19 +1990,19 @@ namespace DuctWallOpenings
             contentBorder.Child = grid2;
 
             Style style = new Style(typeof(TextBox));
-            style.Setters.Add(new Setter(TextBox.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36))));
+            style.Setters.Add(new Setter(TextBox.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Surface)));
             style.Setters.Add(new Setter(TextBox.ForegroundProperty, Brushes.White));
             style.Setters.Add(new Setter(TextBox.BorderBrushProperty, borderBrush));
             style.Setters.Add(new Setter(TextBox.CaretBrushProperty, Brushes.White));
             style.Setters.Add(new Setter(TextBox.PaddingProperty, new Thickness(5, 2, 5, 2)));
 
             Style style2 = new Style(typeof(ComboBox));
-            style2.Setters.Add(new Setter(ComboBox.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36))));
+            style2.Setters.Add(new Setter(ComboBox.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Surface)));
             style2.Setters.Add(new Setter(ComboBox.ForegroundProperty, Brushes.White));
             style2.Setters.Add(new Setter(ComboBox.BorderBrushProperty, borderBrush));
 
             Style style3 = new Style(typeof(ComboBoxItem));
-            style3.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36))));
+            style3.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Surface)));
             style3.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
             this.Resources[typeof(ComboBoxItem)] = style3;
 
@@ -2051,8 +2051,8 @@ namespace DuctWallOpenings
                 Margin = new Thickness(0.0, 0.0, 0.0, 10.0),
                 Style = roundedButtonStyle
             };
-            LinearGradientBrush normalGrad = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(255, 46, 91), System.Windows.Media.Color.FromRgb(179, 14, 45), 90.0);
-            LinearGradientBrush hoverGrad = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(255, 80, 118), System.Windows.Media.Color.FromRgb(210, 20, 60), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.Accent, global::BimboClub.NeutralColors.Accent, 90.0);
+            LinearGradientBrush hoverGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.AccentHover, global::BimboClub.NeutralColors.AccentHover, 90.0);
             this.ApplyButtonStyles(button, normalGrad, hoverGrad, roundedButtonStyle);
             button.Click += new RoutedEventHandler(this.SelectBtn_Click);
             Grid.SetRow(button, num);
@@ -2082,7 +2082,7 @@ namespace DuctWallOpenings
                 Margin = new Thickness(0.0, 0.0, 0.0, 5.0),
                 Height = 26.0
             };
-            UiThemeHelper.StyleComboBoxDark(this._comboSourceFamily, panelBg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(this._comboSourceFamily, panelBg, borderBrush);
 
             this._allItems = symbols.Select(s => new SymbolItem
             {
@@ -2213,8 +2213,8 @@ namespace DuctWallOpenings
                 Cursor = Cursors.Hand,
                 Style = roundedButtonStyle
             };
-            SolidColorBrush normalBrush2 = new SolidColorBrush(System.Windows.Media.Color.FromRgb(58, 58, 66));
-            SolidColorBrush hoverBrush2 = new SolidColorBrush(System.Windows.Media.Color.FromRgb(78, 78, 88));
+            SolidColorBrush normalBrush2 = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
+            SolidColorBrush hoverBrush2 = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
             this.ApplyFlatButtonStyles(button3, normalBrush2, hoverBrush2, roundedButtonStyle);
             button3.Click += (s, ev) =>
             {
@@ -2244,7 +2244,7 @@ namespace DuctWallOpenings
         {
             Border border = new Border
             {
-                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 70)),
+                BorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Border),
                 BorderThickness = new Thickness(0.0, 0.0, 0.0, 1.0),
                 Padding = new Thickness(0.0, 10.0, 0.0, 5.0),
                 Margin = new Thickness(0.0, 5.0, 0.0, 10.0)
@@ -2252,7 +2252,7 @@ namespace DuctWallOpenings
             TextBlock child = new TextBlock
             {
                 Text = text,
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 46, 91)),
+                Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Accent),
                 FontWeight = FontWeights.Bold,
                 FontSize = 12.0
             };

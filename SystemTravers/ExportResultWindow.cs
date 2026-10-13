@@ -17,7 +17,7 @@ namespace BimboClub
             Width = 450;
             Height = 240;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window); // #18181C
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
             ResizeMode = ResizeMode.NoResize;
@@ -25,8 +25,8 @@ namespace BimboClub
 
             // Styles
             Style roundedButtonStyle = GetRoundedButtonStyle(4);
-            LinearGradientBrush redBtnGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
-            LinearGradientBrush redBtnHover = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
+            LinearGradientBrush redBtnGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.Accent, global::BimboClub.NeutralColors.Accent, 90.0);
+            LinearGradientBrush redBtnHover = new LinearGradientBrush(global::BimboClub.NeutralColors.AccentHover, global::BimboClub.NeutralColors.AccentHover, 90.0);
 
             Grid grid = new Grid();
             grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(50) });    // Header
@@ -37,7 +37,7 @@ namespace BimboClub
             // Header
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(global::BimboClub.NeutralColors.Window, global::BimboClub.NeutralColors.Accent, 0.0),
                 Padding = new Thickness(15, 0, 15, 0)
             };
             Grid.SetRow(headerBorder, 0);
@@ -71,7 +71,7 @@ namespace BimboClub
             TextBlock txtPath = new TextBlock
             {
                 Text = $"Сохранено в: {folderPath}",
-                Foreground = new SolidColorBrush(Color.FromRgb(160, 160, 170)),
+                Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Muted),
                 FontSize = 11,
                 FontStyle = FontStyles.Italic,
                 TextWrapping = TextWrapping.Wrap
@@ -118,8 +118,8 @@ namespace BimboClub
                 Cursor = Cursors.Hand
             };
             btnClose.Style = roundedButtonStyle;
-            SolidColorBrush normalBrush = new SolidColorBrush(Color.FromRgb(58, 58, 66));
-            SolidColorBrush hoverBrush = new SolidColorBrush(Color.FromRgb(78, 78, 88));
+            SolidColorBrush normalBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
+            SolidColorBrush hoverBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
             btnClose.Background = normalBrush;
             btnClose.MouseEnter += (s, e) => btnClose.Background = hoverBrush;
             btnClose.MouseLeave += (s, e) => btnClose.Background = normalBrush;

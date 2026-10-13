@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <!-- 1. Header -->
-        <Border Grid.Row="0" Background="#181820" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,0,0,1" Padding="20,10">
+        <Border Grid.Row="0" Background="#2F2F2F" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,0,0,1" Padding="20,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -40,7 +40,7 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Column="2">
-                    <Border x:Name="StatusBadge" Background="#282834" CornerRadius="12" Padding="10,4" Margin="0,0,10,0">
+                    <Border x:Name="StatusBadge" Background="#383838" CornerRadius="12" Padding="10,4" Margin="0,0,10,0">
                         <StackPanel Orientation="Horizontal">
                             <Ellipse x:Name="StatusIndicator" Width="8" Height="8" Fill="{StaticResource WarningYellowBrush}" Margin="0,0,6,0"/>
                             <TextBlock x:Name="StatusBadgeText" Text="Не подключено" FontSize="11.5" Foreground="{StaticResource TextWhiteBrush}"/>
@@ -273,7 +273,7 @@
         </Border>
 
         <!-- 5. Footer Action Bar -->
-        <Border Grid.Row="4" Background="#181820" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,1,0,0" Padding="15,10">
+        <Border Grid.Row="4" Background="#2F2F2F" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,1,0,0" Padding="15,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

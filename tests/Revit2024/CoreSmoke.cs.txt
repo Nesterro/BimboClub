@@ -1,0 +1,59 @@
+var assembly = System.Reflection.Assembly.Load(System.IO.File.ReadAllBytes(@"D:\Codex\Project1\BimboClub\SystemTravers\bin\x64\Release\net48\BimboClub.dll"));
+Func<string,object> make = n => Activator.CreateInstance(assembly.GetType(n, true));
+Action<object,string,object> set = (o,n,v) => o.GetType().GetProperty(n).SetValue(o,v,null);
+Func<object,string,object> get = (o,n) => o.GetType().GetProperty(n).GetValue(o,null);
+var checks = new List<string>();
+Action<bool,string> check = (ok, message) => { if(!ok) throw new Exception(message); checks.Add(message); };
+Document source = null;
+Document target = null;
+try {
+source = app.Application.NewProjectDocument(UnitSystem.Metric);
+target = app.Application.NewProjectDocument(UnitSystem.Metric);
+ViewSheet sheet;
+using(var tx = new Transaction(source,"Test source")) { tx.Start(); sheet = ViewSheet.Create(source,ElementId.InvalidElementId); sheet.SheetNumber = "BCC-TEST-001"; sheet.Name = "Source"; sheet.get_Parameter(BuiltInParameter.SHEET_DRAWN_BY).Set("Codex test"); tx.Commit(); }
+var options = make("BimboClub.Analogs.CopySheets.CopySheetsOptions");
+foreach(var name in new[]{"CopyTitleBlock","CopyDraftingViews","CopyLegendViews","CopySchedules"}) set(options,name,false);
+var copy = assembly.GetType("BimboClub.Analogs.CopySheets.CopySheetsEngine").GetMethod("CopySheets");
+Func<object> run = () => copy.Invoke(null,new object[]{source,new List<ViewSheet>{sheet},target,options});
+var result = run();
+check((int)get(result,"SheetsCreated")==1,"CopySheets creates one sheet");
+var copied = new FilteredElementCollector(target).OfClass(typeof(ViewSheet)).Cast<ViewSheet>().Single();
+check(copied.get_Parameter(BuiltInParameter.SHEET_DRAWN_BY).AsString()=="Codex test","CopySheets copies parameters");
+using(var tx = new Transaction(target,"Test overwrite")) { tx.Start(); copied.get_Parameter(BuiltInParameter.SHEET_DRAWN_BY).Set("old"); tx.Commit(); }
+var mode = options.GetType().GetProperty("ConflictMode").PropertyType;
+set(options,"ConflictMode",Enum.Parse(mode,"OverwriteParameters"));
+result = run();
+check((int)get(result,"SheetsUpdated")==1 && copied.get_Parameter(BuiltInParameter.SHEET_DRAWN_BY).AsString()=="Codex test","CopySheets overwrites existing sheet parameters");
+check(new FilteredElementCollector(target).OfClass(typeof(ViewSheet)).GetElementCount()==1,"Overwrite creates no duplicate sheet");
+set(options,"ConflictMode",Enum.Parse(mode,"Skip")); result=run();
+check((int)get(result,"SheetsSkipped")==1,"CopySheets skips conflict");
+set(options,"ConflictMode",Enum.Parse(mode,"AddSuffix")); result=run();
+check((int)get(result,"SheetsCreated")==1 && new FilteredElementCollector(target).OfClass(typeof(ViewSheet)).GetElementCount()==2,"CopySheets adds suffix for conflict");
+set(options,"Suffix","[invalid]"); result=run();
+check((int)get(result,"SheetsCreated")==0 && new FilteredElementCollector(target).OfClass(typeof(ViewSheet)).GetElementCount()==2,"Invalid sheet number leaves no orphan");
+
+View3D from, first, second;
+ParameterFilterElement filter;
+using(var tx = new Transaction(target,"Filter setup")) { tx.Start();
+var vt = new FilteredElementCollector(target).OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>().First(t=>t.ViewFamily==ViewFamily.ThreeDimensional);
+from=View3D.CreateIsometric(target,vt.Id); first=View3D.CreateIsometric(target,vt.Id); second=View3D.CreateIsometric(target,vt.Id);
+filter=ParameterFilterElement.Create(target,"BCC test filter",new List<ElementId>{new ElementId(BuiltInCategory.OST_Walls)});
+foreach(var v in new[]{from,first,second}) v.AddFilter(filter.Id);
+from.SetFilterOverrides(filter.Id,new OverrideGraphicSettings().SetHalftone(true).SetProjectionLineColor(new Color(1,120,210)));
+first.SetFilterOverrides(filter.Id,new OverrideGraphicSettings().SetHalftone(false));
+second.SetFilterOverrides(filter.Id,new OverrideGraphicSettings().SetHalftone(true));
+tx.Commit(); }
+var engine=Activator.CreateInstance(assembly.GetType("BimboClub.FilterCopyEngine"),target);
+var filters=engine.GetType().GetMethod("GetViewFilters").Invoke(engine,new object[]{from.Id});
+var targets=(System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(assembly.GetType("BimboClub.BccTargetViewItem")));
+foreach(var v in new[]{first,second}) { var item=make("BimboClub.BccTargetViewItem"); set(item,"ViewId",v.Id); set(item,"IsSelected",true); targets.Add(item); }
+var filterOptions=make("BimboClub.FilterCopyOptions"); set(filterOptions,"CopyHalftone",false); set(filterOptions,"CopyToAppliedTemplates",false);
+var filterResult=engine.GetType().GetMethod("ExecuteCopy").Invoke(engine,new object[]{from.Id,filters,targets,filterOptions});
+check((int)get(filterResult,"CopiedFilterInstances")==2,"FilterCopy copies to both targets");
+check(!first.GetFilterOverrides(filter.Id).Halftone && second.GetFilterOverrides(filter.Id).Halftone,"FilterCopy preserves each target halftone");
+var filterItem=((System.Collections.IList)filters)[0];
+check(((OverrideGraphicSettings)get(filterItem,"GraphicOverrides")).Halftone,"FilterCopy does not mutate source settings");
+check(first.GetFilterOverrides(filter.Id).ProjectionLineColor.Blue==210,"FilterCopy transfers line color");
+check(((System.Collections.IList)engine.GetType().GetMethod("GetSourceViews").Invoke(engine,null)).Count>=3,"FilterCopy discovers source views");
+return new { Assembly=assembly.FullName, Passed=checks.Count, Checks=checks };
+} finally { if(target!=null) target.Close(false); if(source!=null) source.Close(false); }

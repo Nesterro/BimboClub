@@ -12,3 +12,9 @@ RevitServerManager.exe
 RevitServerManager_Setup.exe
 RevitServerManagerInstaller/Payload/
 *.ovpn
+*.000[0-9].rvt
+*.00[1-9][0-9].rvt
+TestWcf.exe
+RevitServerBridge/Libs/Test*.exe
+DuctSystemParamCopy/DuctSystemParamCopy.dll
+artifacts/

@@ -1,0 +1,25 @@
+name: Build and regression checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build all projects
+        run: dotnet build BimboClub.sln -c Release --nologo
+      - name: Verify update behavior
+        run: dotnet run --project tests/UpdateService.Tests -c Release
+      - name: Render WPF previews and verify editable controls
+        run: dotnet run --project tools/UiPreview -c Release -- . artifacts/ui
+      - name: Upload interface previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: interface-previews
+          path: artifacts/ui

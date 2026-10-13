@@ -18,43 +18,26 @@ namespace BimboClub
         {
             List<SourceViewItem> list = new List<SourceViewItem>();
 
-            List<View> allViews = new FilteredElementCollector(_doc)
+            var candidates = new FilteredElementCollector(_doc)
                 .OfClass(typeof(View))
                 .Cast<View>()
-                .Where(v => !v.IsTemplate && IsValidViewType(v.ViewType))
-                .Where(v => v.GetFilters().Count > 0)
-                .OrderBy(v => v.Name)
+                .Where(v => IsValidViewType(v.ViewType))
+                .Select(v => new { View = v, Count = v.GetFilters().Count })
+                .Where(item => item.Count > 0)
+                .OrderBy(item => item.View.IsTemplate)
+                .ThenBy(item => item.View.Name)
                 .ToList();
 
-            foreach (View v in allViews)
+            foreach (var candidate in candidates)
             {
+                View v = candidate.View;
                 list.Add(new SourceViewItem
                 {
                     ViewId = v.Id,
                     ViewName = v.Name,
                     ViewType = v.ViewType,
-                    IsTemplate = false,
-                    FilterCount = v.GetFilters().Count
-                });
-            }
-
-            List<View> templates = new FilteredElementCollector(_doc)
-                .OfClass(typeof(View))
-                .Cast<View>()
-                .Where(v => v.IsTemplate && IsValidViewType(v.ViewType))
-                .Where(v => v.GetFilters().Count > 0)
-                .OrderBy(v => v.Name)
-                .ToList();
-
-            foreach (View t in templates)
-            {
-                list.Add(new SourceViewItem
-                {
-                    ViewId = t.Id,
-                    ViewName = t.Name,
-                    ViewType = t.ViewType,
-                    IsTemplate = true,
-                    FilterCount = t.GetFilters().Count
+                    IsTemplate = v.IsTemplate,
+                    FilterCount = candidate.Count
                 });
             }
 
@@ -205,7 +188,7 @@ namespace BimboClub
 
                                 if (options.CopyGraphicOverrides && BccFilterCopyItem.GraphicOverrides != null)
                                 {
-                                    OverrideGraphicSettings ogs = BccFilterCopyItem.GraphicOverrides;
+                                    OverrideGraphicSettings ogs = new OverrideGraphicSettings(BccFilterCopyItem.GraphicOverrides);
                                     if (!options.CopyHalftone)
                                     {
                                         OverrideGraphicSettings currentTargetOgs = v.GetFilterOverrides(fId);

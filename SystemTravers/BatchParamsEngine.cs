@@ -60,193 +60,241 @@ namespace BimboClub
             int updatedCount = 0;
 
             DefinitionFile defFile = null;
-            if (!string.IsNullOrEmpty(fopPath) && File.Exists(fopPath))
+            string originalSharedParameterFile = doc.Application.SharedParametersFilename;
+            try
             {
-                try
+                if (!string.IsNullOrEmpty(fopPath) && File.Exists(fopPath))
                 {
                     doc.Application.SharedParametersFilename = fopPath;
                     defFile = doc.Application.OpenSharedParameterFile();
                 }
-                catch { }
-            }
 
-            using (Transaction trans = new Transaction(doc, "BimboClub Пакетное добавление параметров"))
-            {
-                trans.Start();
-
-                int total = paramsToAdd.Count;
-
-                if (doc.IsFamilyDocument)
+                using (Transaction trans = new Transaction(doc, "BimboClub Пакетное добавление параметров"))
                 {
-                    // ----------------------------------------------------
-                    // FAMILY EDITOR (.rfa) BINDING
-                    // ----------------------------------------------------
-                    FamilyManager famMgr = doc.FamilyManager;
+                    trans.Start();
 
-                    for (int i = 0; i < total; i++)
+                    int total = paramsToAdd.Count;
+
+                    if (doc.IsFamilyDocument)
                     {
-                        var item = paramsToAdd[i];
-                        bool isInstance = item.IsInstance;
-                        BuiltInParameterGroup group = item.BindingGroup;
+                        // ----------------------------------------------------
+                        // FAMILY EDITOR (.rfa) BINDING
+                        // ----------------------------------------------------
+                        FamilyManager famMgr = doc.FamilyManager;
 
-                        double pct = ((double)(i + 1) / total) * 100;
-                        progressCallback?.Invoke((int)pct, $"Добавление в семейство ({i + 1}/{total}): {item.Name}...");
-
-                        ExternalDefinition extDef = GetExternalDefinition(item, defFile);
-                        if (extDef == null) continue;
-
-                        try
+                        for (int i = 0; i < total; i++)
                         {
-                            FamilyParameter existing = famMgr.get_Parameter(extDef.GUID);
-                            if (existing == null)
-                            {
-                                existing = famMgr.get_Parameter(extDef.Name);
-                            }
+                            var item = paramsToAdd[i];
+                            bool isInstance = item.IsInstance;
+                            BuiltInParameterGroup group = item.BindingGroup;
 
-#if NET48
-                            if (existing == null)
-                            {
-                                existing = famMgr.AddParameter(extDef, group, isInstance);
-                                addedCount++;
-                            }
-                            else
-                            {
-                                famMgr.ReplaceParameter(existing, extDef, group, isInstance);
-                                updatedCount++;
-                            }
-#else
-                            if (existing == null)
-                            {
-                                existing = famMgr.AddParameter(extDef, GroupTypeId.Data, isInstance);
-                                addedCount++;
-                            }
-                            else
-                            {
-                                famMgr.ReplaceParameter(existing, extDef, GroupTypeId.Data, isInstance);
-                                updatedCount++;
-                            }
-#endif
+                            double pct = ((double)(i + 1) / total) * 100;
+                            progressCallback?.Invoke((int)pct, $"Добавление в семейство ({i + 1}/{total}): {item.Name}...");
 
-                            // Apply formula / default value if provided
-                            string formulaToApply = !string.IsNullOrWhiteSpace(item.Formula) ? item.Formula : item.DefaultValue;
-                            if (existing != null && !string.IsNullOrWhiteSpace(formulaToApply))
-                            {
-                                formulaToApply = formulaToApply.Trim();
-                                string dt = item.DataType != null ? item.DataType.ToLowerInvariant() : "";
-                                bool isText = dt.Contains("string") || dt.Contains("text") || dt.Contains("multiline");
+                            ExternalDefinition extDef = GetExternalDefinition(item, defFile);
+                            if (extDef == null) throw new InvalidOperationException($"Общий параметр «{item.Name}» не найден в ФОП.");
 
-                                if (isText)
+                            try
+                            {
+                                FamilyParameter existing = famMgr.get_Parameter(extDef.GUID);
+                                if (existing == null)
                                 {
-                                    if (!formulaToApply.StartsWith("\""))
-                                    {
-                                        formulaToApply = "\"" + formulaToApply + "\"";
-                                    }
+                                    existing = famMgr.get_Parameter(extDef.Name);
+                                }
+
+    #if NET48
+                                if (existing == null)
+                                {
+                                    existing = famMgr.AddParameter(extDef, group, isInstance);
+                                    addedCount++;
                                 }
                                 else
                                 {
-                                    // For numbers, lengths, integers, angles: use '.' for decimal separator and DO NOT enclose in quotes
-                                    formulaToApply = formulaToApply.Replace(',', '.');
-                                    if (formulaToApply.StartsWith("\"") && formulaToApply.EndsWith("\"") && formulaToApply.Length > 2)
-                                    {
-                                        formulaToApply = formulaToApply.Substring(1, formulaToApply.Length - 2);
-                                    }
+                                    existing = ReplaceFamilyParameter(doc, famMgr, existing, extDef, group, isInstance);
+                                    updatedCount++;
                                 }
+    #else
+                                if (existing == null)
+                                {
+                                    existing = famMgr.AddParameter(extDef, GetGroupTypeId(group), isInstance);
+                                    addedCount++;
+                                }
+                                else
+                                {
+                                    existing = ReplaceFamilyParameter(doc, famMgr, existing, extDef, group, isInstance);
+                                    updatedCount++;
+                                }
+    #endif
 
-                                try
+                                // Apply formula / default value if provided
+                                string formulaToApply = !string.IsNullOrWhiteSpace(item.Formula) ? item.Formula : item.DefaultValue;
+                                if (existing != null && !string.IsNullOrWhiteSpace(formulaToApply))
                                 {
-                                    famMgr.SetFormula(existing, formulaToApply);
-                                }
-                                catch
-                                {
-                                    // Fallback: set direct value if formula assignment fails
+                                    formulaToApply = formulaToApply.Trim();
+                                    string dt = item.DataType != null ? item.DataType.ToLowerInvariant() : "";
+                                    bool isText = dt.Contains("string") || dt.Contains("text") || dt.Contains("multiline");
+
+                                    if (isText)
+                                    {
+                                        if (!formulaToApply.StartsWith("\""))
+                                        {
+                                            formulaToApply = "\"" + formulaToApply + "\"";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // For numbers, lengths, integers, angles: use '.' for decimal separator and DO NOT enclose in quotes
+                                        formulaToApply = formulaToApply.Replace(',', '.');
+                                        if (formulaToApply.StartsWith("\"") && formulaToApply.EndsWith("\"") && formulaToApply.Length > 2)
+                                        {
+                                            formulaToApply = formulaToApply.Substring(1, formulaToApply.Length - 2);
+                                        }
+                                    }
+
                                     try
                                     {
-                                        if (isText)
-                                        {
-                                            famMgr.Set(existing, item.DefaultValue ?? "");
-                                        }
-                                        else if (double.TryParse(formulaToApply, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double dVal))
-                                        {
-                                            famMgr.Set(existing, dVal);
-                                        }
-                                        else if (int.TryParse(formulaToApply, out int iVal))
-                                        {
-                                            famMgr.Set(existing, iVal);
-                                        }
+                                        famMgr.SetFormula(existing, formulaToApply);
                                     }
-                                    catch { }
+                                    catch
+                                    {
+                                        // Fallback: set direct value if formula assignment fails
+                                        try
+                                        {
+                                            if (isText)
+                                            {
+                                                famMgr.Set(existing, item.DefaultValue ?? "");
+                                            }
+                                            else if (double.TryParse(formulaToApply, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double dVal))
+                                            {
+                                                famMgr.Set(existing, dVal);
+                                            }
+                                            else if (int.TryParse(formulaToApply, out int iVal))
+                                            {
+                                                famMgr.Set(existing, iVal);
+                                            }
+                                        }
+                                        catch { }
+                                    }
                                 }
                             }
+                            catch (Exception ex)
+                            {
+                                throw new InvalidOperationException($"Не удалось записать параметр «{item.Name}». Изменения пакета отменены.", ex);
+                            }
                         }
-                        catch { }
                     }
+                    else
+                    {
+                        // ----------------------------------------------------
+                        // PROJECT (.rvt) BINDING
+                        // ----------------------------------------------------
+                        if (categories == null || categories.Count == 0) return (0, 0);
+
+                        CategorySet catSet = doc.Application.Create.NewCategorySet();
+                        foreach (var catItem in categories)
+                        {
+                            if (catItem.Category != null)
+                            {
+                                catSet.Insert(catItem.Category);
+                            }
+                        }
+
+                        for (int i = 0; i < total; i++)
+                        {
+                            var item = paramsToAdd[i];
+                            bool isInstance = item.IsInstance;
+                            BuiltInParameterGroup group = item.BindingGroup;
+
+                            double pct = ((double)(i + 1) / total) * 100;
+                            progressCallback?.Invoke((int)pct, $"Добавление в проект ({i + 1}/{total}): {item.Name}...");
+
+                            ExternalDefinition extDef = GetExternalDefinition(item, defFile);
+                            if (extDef == null) throw new InvalidOperationException($"Общий параметр «{item.Name}» не найден в ФОП.");
+
+                            ElementBinding binding = isInstance
+                                ? (ElementBinding)doc.Application.Create.NewInstanceBinding(catSet)
+                                : (ElementBinding)doc.Application.Create.NewTypeBinding(catSet);
+
+    #if NET48
+                            Binding existingBinding = doc.ParameterBindings.get_Item(extDef);
+                            if (existingBinding != null)
+                            {
+                                bool success = doc.ParameterBindings.ReInsert(extDef, binding, group);
+                                if (success) updatedCount++;
+                            }
+                            else
+                            {
+                                bool success = doc.ParameterBindings.Insert(extDef, binding, group);
+                                if (success) addedCount++;
+                            }
+    #else
+                            Binding existingBinding = doc.ParameterBindings.get_Item(extDef);
+                            if (existingBinding != null)
+                            {
+                                bool success = doc.ParameterBindings.ReInsert(extDef, binding, GetGroupTypeId(group));
+                                if (success) updatedCount++;
+                            }
+                            else
+                            {
+                                bool success = doc.ParameterBindings.Insert(extDef, binding, GetGroupTypeId(group));
+                                if (success) addedCount++;
+                            }
+    #endif
+                        }
+                    }
+
+                    trans.Commit();
+                }
+
+                return (addedCount, updatedCount);
+            }
+            finally { doc.Application.SharedParametersFilename = originalSharedParameterFile; }
+        }
+
+        private static FamilyParameter ReplaceFamilyParameter(Document doc, FamilyManager manager,
+            FamilyParameter existing, ExternalDefinition definition, BuiltInParameterGroup group, bool isInstance)
+        {
+            using (var replacement = new SubTransaction(doc))
+            {
+                replacement.Start();
+                if (existing.IsShared && existing.GUID == definition.GUID)
+                {
+                    if (existing.IsInstance != isInstance)
+                    {
+                        if (isInstance) manager.MakeInstance(existing);
+                        else manager.MakeType(existing);
+                    }
+                    ((InternalDefinition)existing.Definition).SetGroupTypeId(GetGroupTypeId(group));
                 }
                 else
                 {
-                    // ----------------------------------------------------
-                    // PROJECT (.rvt) BINDING
-                    // ----------------------------------------------------
-                    if (categories == null || categories.Count == 0) return (0, 0);
-
-                    CategorySet catSet = doc.Application.Create.NewCategorySet();
-                    foreach (var catItem in categories)
-                    {
-                        if (catItem.Category != null)
-                        {
-                            catSet.Insert(catItem.Category);
-                        }
-                    }
-
-                    for (int i = 0; i < total; i++)
-                    {
-                        var item = paramsToAdd[i];
-                        bool isInstance = item.IsInstance;
-                        BuiltInParameterGroup group = item.BindingGroup;
-
-                        double pct = ((double)(i + 1) / total) * 100;
-                        progressCallback?.Invoke((int)pct, $"Добавление в проект ({i + 1}/{total}): {item.Name}...");
-
-                        ExternalDefinition extDef = GetExternalDefinition(item, defFile);
-                        if (extDef == null) continue;
-
-                        ElementBinding binding = isInstance
-                            ? (ElementBinding)doc.Application.Create.NewInstanceBinding(catSet)
-                            : (ElementBinding)doc.Application.Create.NewTypeBinding(catSet);
-
-#if NET48
-                        Binding existingBinding = doc.ParameterBindings.get_Item(extDef);
-                        if (existingBinding != null)
-                        {
-                            bool success = doc.ParameterBindings.ReInsert(extDef, binding, group);
-                            if (success) updatedCount++;
-                        }
-                        else
-                        {
-                            bool success = doc.ParameterBindings.Insert(extDef, binding, group);
-                            if (success) addedCount++;
-                        }
-#else
-                        Binding existingBinding = doc.ParameterBindings.get_Item(extDef);
-                        if (existingBinding != null)
-                        {
-                            bool success = doc.ParameterBindings.ReInsert(extDef, binding, GroupTypeId.Data);
-                            if (success) updatedCount++;
-                        }
-                        else
-                        {
-                            bool success = doc.ParameterBindings.Insert(extDef, binding, GroupTypeId.Data);
-                            if (success) addedCount++;
-                        }
-#endif
-                    }
+                    // Revit rejects replacement when a non-shared parameter keeps the incoming name.
+                    // Renaming through FamilyManager preserves references in formulas.
+                    if (!existing.IsShared)
+                        manager.RenameParameter(existing, "BCC_Replacement_" + Guid.NewGuid().ToString("N"));
+                    existing = manager.ReplaceParameter(existing, definition, GetGroupTypeId(group), isInstance);
                 }
-
-                trans.Commit();
+                if (replacement.Commit() != TransactionStatus.Committed)
+                    throw new InvalidOperationException("Замена параметра не подтверждена транзакцией.");
+                return existing;
             }
-
-            return (addedCount, updatedCount);
         }
 
+        private static ForgeTypeId GetGroupTypeId(BuiltInParameterGroup group)
+        {
+            switch (group)
+            {
+                case BuiltInParameterGroup.PG_TEXT: return GroupTypeId.Text;
+                case BuiltInParameterGroup.PG_IDENTITY_DATA: return GroupTypeId.IdentityData;
+                case BuiltInParameterGroup.PG_GEOMETRY: return GroupTypeId.Geometry;
+                case BuiltInParameterGroup.PG_MECHANICAL: return GroupTypeId.Mechanical;
+                case BuiltInParameterGroup.PG_ELECTRICAL: return GroupTypeId.Electrical;
+                case BuiltInParameterGroup.PG_PLUMBING: return GroupTypeId.Plumbing;
+                case BuiltInParameterGroup.PG_MATERIALS: return GroupTypeId.Materials;
+                case BuiltInParameterGroup.INVALID: return new ForgeTypeId();
+                default: return GroupTypeId.Data;
+            }
+        }
         private static ExternalDefinition GetExternalDefinition(SharedParamItem item, DefinitionFile defFile)
         {
             if (item.Definition != null) return item.Definition;

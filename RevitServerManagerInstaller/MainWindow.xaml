@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="#181820" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,0,0,1" Padding="20,12">
+        <Border Grid.Row="0" Background="#2F2F2F" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,0,0,1" Padding="20,12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -67,7 +67,7 @@
         </StackPanel>
 
         <!-- Footer -->
-        <Border Grid.Row="2" Background="#181820" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,1,0,0" Padding="20,12">
+        <Border Grid.Row="2" Background="#2F2F2F" BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="0,1,0,0" Padding="20,12">
             <Grid>
                 <Button x:Name="CancelButton" Content="Отмена" Background="{StaticResource ControlDarkBrush}" Foreground="{StaticResource TextWhiteBrush}"
                         BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="1" Width="90" Height="34" HorizontalAlignment="Left" Cursor="Hand"

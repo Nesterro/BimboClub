@@ -39,7 +39,7 @@ namespace BimboClubManager.ViewModels
         public bool IsLoading
         {
             get => _isLoading;
-            set { _isLoading = value; OnPropertyChanged(); }
+            set { _isLoading = value; OnPropertyChanged(); CommandManager.InvalidateRequerySuggested(); }
         }
 
         public double GlobalProgress
@@ -73,7 +73,6 @@ namespace BimboClubManager.ViewModels
         }
 
         public bool AutoCheckUpdates { get; set; } = true;
-        public bool IncludePreReleases { get; set; } = false;
 
         public string CurrentTab
         {
@@ -174,11 +173,11 @@ namespace BimboClubManager.ViewModels
 
             // Initialize Commands
             NavigateCommand = new RelayCommand<string>(tab => CurrentTab = tab ?? "plugins");
-            CheckUpdatesCommand = new RelayCommand(async () => await CheckUpdatesAsync());
-            InstallCommand = new RelayCommand<RevitVersionInfo>(async ver => await StartInstallAsync(ver));
-            ReinstallCommand = new RelayCommand<RevitVersionInfo>(async ver => await StartInstallAsync(ver));
-            UpdateAllCommand = new RelayCommand(async () => await StartUpdateAllAsync());
-            UninstallCommand = new RelayCommand<RevitVersionInfo>(ver => Uninstall(ver));
+            CheckUpdatesCommand = new RelayCommand(async () => await CheckUpdatesAsync(), () => !IsLoading);
+            InstallCommand = new RelayCommand<RevitVersionInfo>(async ver => await StartInstallAsync(ver), ver => !IsLoading && ver?.IsRevitInstalled == true);
+            ReinstallCommand = new RelayCommand<RevitVersionInfo>(async ver => await StartInstallAsync(ver), ver => !IsLoading && ver?.IsRevitInstalled == true);
+            UpdateAllCommand = new RelayCommand(async () => await StartUpdateAllAsync(), () => !IsLoading);
+            UninstallCommand = new RelayCommand<RevitVersionInfo>(ver => Uninstall(ver), ver => !IsLoading && ver?.IsPluginInstalled == true);
             SaveSettingsCommand = new RelayCommand(SaveSettings);
             
             CloseWarningCommand = new RelayCommand(CancelWarning);
@@ -192,7 +191,7 @@ namespace BimboClubManager.ViewModels
             if (OperatingSystem.IsWindows())
             {
                 RefreshLocalVersions();
-                _ = CheckUpdatesAsync();
+                if (AutoCheckUpdates) _ = CheckUpdatesAsync();
             }
         }
 
@@ -577,6 +576,7 @@ namespace BimboClubManager.ViewModels
         // Settings load & save
         private class UserSettings
         {
+            public bool AutoCheckUpdates { get; set; } = true;
             public string UpdateSource { get; set; } = string.Empty;
             public bool AutoCloseRevit { get; set; } = false;
         }
@@ -598,6 +598,7 @@ namespace BimboClubManager.ViewModels
                     {
                         UpdateSource = string.IsNullOrEmpty(settings.UpdateSource) ? defaultRawPath : settings.UpdateSource;
                         AutoCloseRevit = settings.AutoCloseRevit;
+                        AutoCheckUpdates = settings.AutoCheckUpdates;
                         return;
                     }
                 }
@@ -625,7 +626,8 @@ namespace BimboClubManager.ViewModels
                 var settings = new UserSettings
                 {
                     UpdateSource = UpdateSource,
-                    AutoCloseRevit = AutoCloseRevit
+                    AutoCloseRevit = AutoCloseRevit,
+                    AutoCheckUpdates = AutoCheckUpdates
                 };
 
                 string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });

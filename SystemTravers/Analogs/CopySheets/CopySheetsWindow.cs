@@ -111,14 +111,14 @@ namespace BimboClub.Analogs.CopySheets
             MinHeight = 520;
             MinWidth = 700;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28));
+            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window);
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
 
-            var bgCard = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38));
-            var borderCard = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-            var accentRed = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
-            var textMuted = new SolidColorBrush(System.Windows.Media.Color.FromRgb(180, 180, 200));
+            var bgCard = new SolidColorBrush(global::BimboClub.NeutralColors.Surface);
+            var borderCard = new SolidColorBrush(global::BimboClub.NeutralColors.Input);
+            var accentRed = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
+            var textMuted = new SolidColorBrush(global::BimboClub.NeutralColors.Muted);
 
             WpfGrid mainGrid = new WpfGrid();
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Header
@@ -131,8 +131,8 @@ namespace BimboClub.Analogs.CopySheets
             Border headerBorder = new Border
             {
                 Background = new LinearGradientBrush(
-                    System.Windows.Media.Color.FromRgb(18, 18, 20),
-                    System.Windows.Media.Color.FromRgb(179, 14, 45), 0),
+                    global::BimboClub.NeutralColors.Window,
+                    global::BimboClub.NeutralColors.Accent, 0),
                 Padding = new Thickness(16, 12, 16, 12)
             };
             StackPanel headerStack = new StackPanel();
@@ -180,7 +180,7 @@ namespace BimboClub.Analogs.CopySheets
             _cbSourceDoc = new ComboBox
             {
                 DisplayMemberPath = "Title",
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
                 Padding = new Thickness(8, 4, 8, 4)
@@ -230,7 +230,7 @@ namespace BimboClub.Analogs.CopySheets
 
             _tbFilterSheets = new TextBox
             {
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
                 Padding = new Thickness(4)
@@ -264,11 +264,11 @@ namespace BimboClub.Analogs.CopySheets
                 HeadersVisibility = DataGridHeadersVisibility.Column,
                 GridLinesVisibility = DataGridGridLinesVisibility.Horizontal,
                 HorizontalGridLinesBrush = borderCard,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
-                RowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(28, 28, 34)),
-                AlternatingRowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(34, 34, 40))
+                RowBackground = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
+                AlternatingRowBackground = new SolidColorBrush(global::BimboClub.NeutralColors.Surface)
             };
 
             // Чекбокс колонка
@@ -423,7 +423,7 @@ namespace BimboClub.Analogs.CopySheets
                 Text = "_Копия",
                 Width = 80,
                 Margin = new Thickness(8, 0, 0, 0),
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
                 Padding = new Thickness(3)
@@ -490,7 +490,7 @@ namespace BimboClub.Analogs.CopySheets
                 Content = "Закрыть",
                 Width = 90,
                 Height = 34,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 52)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                 Foreground = Brushes.White,
                 BorderThickness = new Thickness(0),
                 Cursor = Cursors.Hand
@@ -616,7 +616,7 @@ namespace BimboClub.Analogs.CopySheets
             var btn = new Button
             {
                 Content = text,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 52)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                 Foreground = Brushes.White,
                 Padding = new Thickness(8, 3, 8, 3),
                 Margin = new Thickness(0, 0, 6, 0),

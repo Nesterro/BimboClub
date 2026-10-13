@@ -31,11 +31,11 @@ namespace BimboClub.ExtraScheduleItems
 
             try
             {
-                UiThemeHelper.ApplyDarkTheme(this);
+                UiThemeHelper.ApplyNeutralTheme(this);
             }
             catch (Exception ex)
             {
-                Logger.Log($"ApplyDarkTheme warning: {ex.Message}", "WARN");
+                Logger.Log($"ApplyNeutralTheme warning: {ex.Message}", "WARN");
             }
 
             DocInfoTextBlock.Text = $"Документ: {_doc?.Title ?? "Без имени"}";
@@ -134,7 +134,7 @@ namespace BimboClub.ExtraScheduleItems
                     {
                         var markBorder = new Border
                         {
-                            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(55, 30, 40)),
+                            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                             CornerRadius = new CornerRadius(3),
                             Padding = new Thickness(4, 1, 4, 1),
                             Margin = new Thickness(6, 0, 0, 0),

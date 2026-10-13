@@ -2,19 +2,19 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Color Palette -->
-    <SolidColorBrush x:Key="BgDarkBrush" Color="#141418" />
-    <SolidColorBrush x:Key="PanelDarkBrush" Color="#1C1C22" />
-    <SolidColorBrush x:Key="ControlDarkBrush" Color="#282832" />
-    <SolidColorBrush x:Key="BorderDarkBrush" Color="#3A3A46" />
-    <SolidColorBrush x:Key="BorderFocusBrush" Color="#FF2E5B" />
+    <SolidColorBrush x:Key="BgDarkBrush" Color="#262626" />
+    <SolidColorBrush x:Key="PanelDarkBrush" Color="#2F2F2F" />
+    <SolidColorBrush x:Key="ControlDarkBrush" Color="#383838" />
+    <SolidColorBrush x:Key="BorderDarkBrush" Color="#484848" />
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="#0078D4" />
     
     <SolidColorBrush x:Key="TextWhiteBrush" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="TextMutedBrush" Color="#A5A5B5" />
-    <SolidColorBrush x:Key="TextGrayBrush" Color="#707080" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#BBBBBB" />
+    <SolidColorBrush x:Key="TextGrayBrush" Color="#BBBBBB" />
 
-    <SolidColorBrush x:Key="AccentScarletBrush" Color="#B30E2D" />
-    <SolidColorBrush x:Key="AccentScarletHoverBrush" Color="#E0113A" />
-    <SolidColorBrush x:Key="AccentScarletActiveBrush" Color="#FF2E5B" />
+    <SolidColorBrush x:Key="AccentScarletBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="AccentScarletHoverBrush" Color="#1E8CE1" />
+    <SolidColorBrush x:Key="AccentScarletActiveBrush" Color="#0078D4" />
 
     <SolidColorBrush x:Key="SuccessGreenBrush" Color="#10B981" />
     <SolidColorBrush x:Key="WarningYellowBrush" Color="#F59E0B" />
@@ -58,7 +58,7 @@
                         </Trigger>
                         <Trigger Property="IsFocused" Value="true">
                             <Setter Property="BorderBrush" Value="{StaticResource AccentScarletActiveBrush}" TargetName="border"/>
-                            <Setter Property="Background" Value="#2E2E3A" TargetName="border"/>
+                            <Setter Property="Background" Value="#383838" TargetName="border"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -88,7 +88,7 @@
                             <Setter Property="Background" Value="{StaticResource AccentScarletActiveBrush}" TargetName="btnBorder"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="#3F3F4C" TargetName="btnBorder"/>
+                            <Setter Property="Background" Value="#484848" TargetName="btnBorder"/>
                             <Setter Property="Opacity" Value="0.6"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -113,7 +113,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#383846" TargetName="btnBorder"/>
+                            <Setter Property="Background" Value="#484848" TargetName="btnBorder"/>
                             <Setter Property="BorderBrush" Value="{StaticResource AccentScarletActiveBrush}" TargetName="btnBorder"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
@@ -216,7 +216,7 @@
                                 <Condition Property="IsSelected" Value="true"/>
                                 <Condition Property="IsSelectionActive" Value="false"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background" TargetName="Bd" Value="#3F3F4E"/>
+                            <Setter Property="Background" TargetName="Bd" Value="#484848"/>
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -239,7 +239,7 @@
         <Setter Property="Foreground" Value="{StaticResource TextWhiteBrush}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
-        <Setter Property="BorderBrush" Value="#25252F" />
+        <Setter Property="BorderBrush" Value="#2F2F2F" />
         <Setter Property="Padding" Value="6,4" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
@@ -250,10 +250,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#2A2A36" TargetName="border"/>
+                            <Setter Property="Background" Value="#383838" TargetName="border"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="#3A2532" TargetName="border"/>
+                            <Setter Property="Background" Value="#383838" TargetName="border"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

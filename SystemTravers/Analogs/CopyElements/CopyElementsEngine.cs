@@ -8,14 +8,13 @@ namespace BimboClub.Analogs.CopyElements
     public enum ElementDuplicateAction
     {
         UseDestinationTypes,
-        CreateNewTypes
+        AbortOnConflict
     }
 
     public class CopyElementsOptions
     {
         public ElementDuplicateAction DuplicateAction { get; set; } = ElementDuplicateAction.UseDestinationTypes;
         public bool SuppressWarnings { get; set; } = true;
-        public bool CloseGeneratedViews { get; set; } = true;
         public Transform Transform { get; set; } = Transform.Identity;
     }
 

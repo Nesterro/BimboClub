@@ -33,6 +33,8 @@ namespace BimboClubManager.Services
 
         public class UpdateManifest
         {
+            [JsonIgnore]
+            public string? SourceDirectory { get; set; }
             [JsonPropertyName("latestVersion")]
             public string LatestVersion { get; set; } = string.Empty;
 
@@ -133,6 +135,7 @@ namespace BimboClubManager.Services
                         var manifest = JsonSerializer.Deserialize<UpdateManifest>(json);
                         if (manifest != null && !string.IsNullOrEmpty(manifest.LatestVersion))
                         {
+                            manifest.SourceDirectory = Path.GetDirectoryName(Path.GetFullPath(file));
                             LastFetchError = null;
                             return manifest;
                         }
@@ -384,7 +387,7 @@ namespace BimboClubManager.Services
                 progress.Report(10); // Start download
 
                 // 2. Download / Copy package
-                string? localZip = FindLocalPackage(sourcePath, packageUrlOrPath, versionInfo.TargetFramework);
+                string? localZip = FindLocalPackage(manifest.SourceDirectory ?? sourcePath, packageUrlOrPath);
                 if (!string.IsNullOrEmpty(localZip) && File.Exists(localZip))
                 {
                     progress.Report(40);
@@ -421,6 +424,8 @@ namespace BimboClubManager.Services
                 }
                 Directory.CreateDirectory(tempExtractPath);
                 ZipFile.ExtractToDirectory(tempZipPath, tempExtractPath);
+                cancellationToken.ThrowIfCancellationRequested();
+                ValidatePackage(tempExtractPath, manifest.LatestVersion);
 
                 progress.Report(70);
 
@@ -455,15 +460,10 @@ namespace BimboClubManager.Services
                 }
 
                 // 5. Write version.txt
-                try
-                {
-                    File.WriteAllText(Path.Combine(targetDir, "version.txt"), manifest.LatestVersion);
-                }
-                catch { }
-
                 // 6. Verify / Write Addin Manifest
                 progress.Report(95);
                 WriteAddinManifest(versionInfo.AddinPath);
+                File.WriteAllText(Path.Combine(targetDir, "version.txt"), manifest.LatestVersion);
 
                 progress.Report(100);
             }
@@ -498,94 +498,33 @@ namespace BimboClubManager.Services
             }
         }
 
-        private static string? FindLocalPackage(string sourcePath, string packageUrlOrPath, string targetFramework)
+        internal static string? FindLocalPackage(string sourcePath, string packageUrlOrPath)
         {
-            string? candidateFileName = null;
-            if (Uri.TryCreate(packageUrlOrPath, UriKind.Absolute, out Uri? uri) && !string.IsNullOrEmpty(uri.AbsolutePath))
-            {
-                candidateFileName = Path.GetFileName(uri.AbsolutePath);
-            }
-            else if (!string.IsNullOrWhiteSpace(packageUrlOrPath))
-            {
-                candidateFileName = Path.GetFileName(packageUrlOrPath);
-            }
+            // A URL identifies an exact release. Never substitute a same-named local archive.
+            if (Uri.TryCreate(packageUrlOrPath, UriKind.Absolute, out var uri) &&
+                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+                return null;
+            if (Path.IsPathRooted(packageUrlOrPath))
+                return Path.GetFullPath(packageUrlOrPath);
+            string cleanSource = sourcePath.Trim().Trim('"', '\'');
+            if (!IsLocalOrUncPath(cleanSource))
+                return null;
+            string directory = Directory.Exists(cleanSource) ? cleanSource :
+                Path.GetDirectoryName(Path.GetFullPath(cleanSource))!;
+            return Path.GetFullPath(Path.Combine(directory, packageUrlOrPath));
+        }
 
-            var fileNames = new List<string>();
-            if (!string.IsNullOrWhiteSpace(candidateFileName) && candidateFileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-            {
-                fileNames.Add(candidateFileName);
-            }
-
-            if (targetFramework.IndexOf("8", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                fileNames.Add("bimboclub_net8.zip");
-                fileNames.Add("BimboClub_net8.zip");
-                fileNames.Add("bimboclub_net8.0.zip");
-            }
-            else
-            {
-                fileNames.Add("bimboclub_net48.zip");
-                fileNames.Add("BimboClub_net48.zip");
-            }
-
-            var directories = new List<string>();
-
-            if (!string.IsNullOrWhiteSpace(packageUrlOrPath) &&
-                !packageUrlOrPath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
-                !packageUrlOrPath.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-            {
-                if (File.Exists(packageUrlOrPath))
-                {
-                    return Path.GetFullPath(packageUrlOrPath);
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(sourcePath))
-            {
-                string cleanSource = sourcePath.Trim().Trim('"', '\'');
-                if (Directory.Exists(cleanSource))
-                {
-                    directories.Add(cleanSource);
-                    directories.Add(Path.Combine(cleanSource, "updates"));
-                    directories.Add(Path.Combine(cleanSource, "bin"));
-                }
-                else if (File.Exists(cleanSource))
-                {
-                    string? dir = Path.GetDirectoryName(cleanSource);
-                    if (!string.IsNullOrEmpty(dir))
-                    {
-                        directories.Add(dir);
-                        directories.Add(Path.Combine(dir, "updates"));
-                    }
-                }
-                else
-                {
-                    string? dir = Path.GetDirectoryName(cleanSource);
-                    if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
-                    {
-                        directories.Add(dir);
-                    }
-                }
-            }
-
-            string appDir = AppDomain.CurrentDomain.BaseDirectory;
-            directories.Add(appDir);
-            directories.Add(Path.Combine(appDir, "updates"));
-
-            foreach (var dir in directories.Distinct(StringComparer.OrdinalIgnoreCase))
-            {
-                if (!Directory.Exists(dir)) continue;
-                foreach (var fn in fileNames.Distinct(StringComparer.OrdinalIgnoreCase))
-                {
-                    string fullPath = Path.Combine(dir, fn);
-                    if (File.Exists(fullPath))
-                    {
-                        return fullPath;
-                    }
-                }
-            }
-
-            return null;
+        internal static void ValidatePackage(string directory, string expectedVersion)
+        {
+            string dll = Path.Combine(directory, "BimboClub.dll");
+            if (!File.Exists(dll))
+                throw new InvalidDataException("Пакет не содержит BimboClub.dll.");
+            string actual = FileVersionInfo.GetVersionInfo(dll).FileVersion ?? "";
+            if (!Version.TryParse(actual, out var actualVersion) ||
+                !Version.TryParse(expectedVersion.TrimStart('v', 'V'), out var expected) ||
+                new Version(actualVersion.Major, actualVersion.Minor, Math.Max(0, actualVersion.Build), Math.Max(0, actualVersion.Revision)) !=
+                new Version(expected.Major, expected.Minor, Math.Max(0, expected.Build), Math.Max(0, expected.Revision)))
+                throw new InvalidDataException($"Версия DLL ({actual}) не совпадает с манифестом ({expectedVersion}).");
         }
 
         private async Task DownloadFileWithFallbacksAsync(string primaryUrl, string destinationPath, IProgress<double> progress, CancellationToken cancellationToken)

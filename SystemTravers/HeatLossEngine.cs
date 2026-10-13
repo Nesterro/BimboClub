@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Mechanical;
+using Autodesk.Revit.DB.ExtensibleStorage;
 
 
 namespace BimboClub
@@ -79,6 +80,26 @@ namespace BimboClub
         };
 
         private readonly Document _doc;
+        private static readonly Guid CubeOwnershipId = new Guid("FB35D824-3F51-4329-8109-99B34178766C");
+
+        private static Schema GetCubeOwnershipSchema()
+        {
+            Schema schema = Schema.Lookup(CubeOwnershipId);
+            if (schema != null) return schema;
+            var builder = new SchemaBuilder(CubeOwnershipId);
+            builder.SetSchemaName("BimboClubHeatLossOwner");
+            builder.SetReadAccessLevel(AccessLevel.Public);
+            builder.SetWriteAccessLevel(AccessLevel.Public);
+            builder.AddSimpleField("SpaceUniqueId", typeof(string));
+            return builder.Finish();
+        }
+
+        private static void SetCubeOwner(FamilyInstance cube, Space space)
+        {
+            var entity = new Entity(GetCubeOwnershipSchema());
+            entity.Set("SpaceUniqueId", space.UniqueId);
+            cube.SetEntity(entity);
+        }
 
         public HeatLossEngine(Document doc)
         {
@@ -103,6 +124,8 @@ namespace BimboClub
             bool processWindows,
             ExteriorDetectionOptions exteriorOptions = null)
         {
+            if (spaces == null || spaces.Count == 0) return 0;
+            if (symbol == null) throw new ArgumentNullException(nameof(symbol));
             if (exteriorOptions == null)
             {
                 exteriorOptions = new ExteriorDetectionOptions();
@@ -125,8 +148,10 @@ namespace BimboClub
             {
                 tx.Start();
 
-                // Удалить старые кубики теплопотерь перед новой расстановкой
-                try
+                // Only replace cubes explicitly owned by the selected spaces.
+                // Legacy cubes have no reliable ownership; preserve them.
+                var selectedSpaces = new HashSet<string>(spaces.Select(s => s.UniqueId));
+                var ownershipSchema = GetCubeOwnershipSchema();
                 {
                     FilteredElementCollector oldCubeCollector = new FilteredElementCollector(_doc);
                     List<ElementId> oldCubeIds = oldCubeCollector
@@ -134,9 +159,8 @@ namespace BimboClub
                         .OfCategory(BuiltInCategory.OST_GenericModel)
                         .WhereElementIsNotElementType()
                         .Where(e => {
-                            Parameter pMark = e.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
-                            return (pMark != null && pMark.AsString() != null && pMark.AsString().StartsWith("BCC_HL")) ||
-                                   e.LookupParameter("BCC_HL_Теплопотери") != null;
+                            Entity ownership = e.GetEntity(ownershipSchema);
+                            return ownership.IsValid() && selectedSpaces.Contains(ownership.Get<string>("SpaceUniqueId"));
                         })
                         .Select(e => e.Id)
                         .ToList();
@@ -146,7 +170,6 @@ namespace BimboClub
                         _doc.Delete(oldCubeIds);
                     }
                 }
-                catch { }
 
                 // Активировать символ
                 if (!symbol.IsActive)
@@ -175,6 +198,7 @@ namespace BimboClub
 
                     IList<IList<BoundarySegment>> boundaries =
                         space.GetBoundarySegments(boundaryOpts);
+                    if (boundaries == null || boundaries.Count == 0) continue;
 
                     // Предварительный сканирование ориентаций наружных стен для определения углового помещения
                     HashSet<string> exteriorOrientations = new HashSet<string>();
@@ -354,6 +378,7 @@ namespace BimboClub
                                                 ? Math.Max(0.01, Math.Round(grossWallAreaSqM - totalOpeningsAreaSqM, 2))
                                                 : Math.Round(areaSqM, 2);
 
+                                            SetCubeOwner(inst, space);
                                             SetText(inst, P_ROOM_NUMBER,  roomNumber);
                                             SetText(inst, P_ROOM_NAME,    roomName);
                                             SetText(inst, P_CONSTR_LABEL, label);
@@ -373,7 +398,7 @@ namespace BimboClub
                                             try
                                             {
                                                 Parameter pMark = inst.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
-                                                if (pMark != null && !pMark.IsReadOnly) pMark.Set("BCC_HL_CUBE");
+                                                if (pMark != null && !pMark.IsReadOnly) pMark.Set("BCC_HL_CUBE_" + inst.Id.ToString());
                                             }
                                             catch { }
 
@@ -387,7 +412,7 @@ namespace BimboClub
                             if (boundElem != null && isWall && (processDoors || processWindows))
                             {
                                 ProcessWallOpenings(boundElem, linkInst, space, roomNumber, roomName, cornerTypeStr, isCornerSpace,
-                                                    tempOutside, tempInside, symbol, seg, roomHeight,
+                                                    tempOutside, effectiveTempIn, symbol, seg, roomHeight,
                                                     processDoors, processWindows, isInteriorWall, processInteriorWalls, processedKeys, ref placedCount,
                                                     processExteriorWalls, exteriorOptions);
                             }
@@ -395,7 +420,8 @@ namespace BimboClub
                     }
                 }
 
-                tx.Commit();
+                if (tx.Commit() != TransactionStatus.Committed)
+                    throw new InvalidOperationException("Расстановка кубиков не подтверждена транзакцией.");
             }
 
             return placedCount;
@@ -929,6 +955,8 @@ namespace BimboClub
                     catch { }
 
                     try { System.IO.File.Delete(tempFile); } catch { }
+                    try { famDoc.Close(false); }
+                    catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"[EnsureCubeFamilyFormulas] Close failed: {ex.Message}"); }
                 }
             }
             catch (Exception ex)
@@ -1186,6 +1214,7 @@ namespace BimboClub
 
                         double openingAreaSqM = Math.Round(aSqM, 2);
 
+                        SetCubeOwner(inst, space);
                         SetText(inst, P_ROOM_NUMBER, roomNumber);
                         SetText(inst, P_ROOM_NAME, roomName);
                         SetText(inst, P_CONSTR_LABEL, label);
@@ -1205,7 +1234,7 @@ namespace BimboClub
                         try
                         {
                             Parameter pMark = inst.get_Parameter(BuiltInParameter.ALL_MODEL_MARK);
-                            if (pMark != null && !pMark.IsReadOnly) pMark.Set("BCC_HL_CUBE");
+                            if (pMark != null && !pMark.IsReadOnly) pMark.Set("BCC_HL_CUBE_" + inst.Id.ToString());
                         }
                         catch { }
 

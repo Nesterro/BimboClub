@@ -2,15 +2,15 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Color Palettes -->
-    <SolidColorBrush x:Key="BackgroundBrush" Color="#0B0816" />
-    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#130F25" />
-    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#080611" />
-    <SolidColorBrush x:Key="AccentBrush" Color="#6C5CE7" />
-    <SolidColorBrush x:Key="AccentHoverBrush" Color="#8072F5" />
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#262626" />
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#2F2F2F" />
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#262626" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#1E8CE1" />
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#968FAD" />
-    <SolidColorBrush x:Key="BorderBrush" Color="#2A2248" />
-    <SolidColorBrush x:Key="BorderFocusBrush" Color="#6C5CE7" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#BBBBBB" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#484848" />
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="#0078D4" />
     
     <SolidColorBrush x:Key="SuccessBrush" Color="#20BF6B" />
     <SolidColorBrush x:Key="WarningBrush" Color="#FF9F43" />
@@ -18,8 +18,8 @@
     
     <!-- Gradients -->
     <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#6C5CE7" Offset="0" />
-        <GradientStop Color="#A55EEA" Offset="1" />
+        <GradientStop Color="#0078D4" Offset="0" />
+        <GradientStop Color="#0078D4" Offset="1" />
     </LinearGradientBrush>
     
     <LinearGradientBrush x:Key="SuccessGradientBrush" StartPoint="0,0" EndPoint="1,1">
@@ -77,11 +77,11 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#1A1535" />
+                            <Setter Property="Background" Value="#383838" />
                             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" Value="#221C46" />
+                            <Setter Property="Background" Value="#484848" />
                             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                             <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
                         </Trigger>
@@ -101,7 +101,7 @@
         <Setter Property="Margin" Value="0,8" />
         <Setter Property="Effect">
             <Setter.Value>
-                <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="3" Opacity="0.3" />
+                <DropShadowEffect Color="#262626" BlurRadius="15" ShadowDepth="3" Opacity="0.3" />
             </Setter.Value>
         </Setter>
     </Style>
@@ -129,7 +129,7 @@
                             <Setter Property="Opacity" Value="0.9" />
                             <Setter Property="Effect">
                                 <Setter.Value>
-                                    <DropShadowEffect Color="#6C5CE7" BlurRadius="8" ShadowDepth="0" Opacity="0.5" />
+                                    <DropShadowEffect Color="#0078D4" BlurRadius="8" ShadowDepth="0" Opacity="0.5" />
                                 </Setter.Value>
                             </Setter>
                         </Trigger>
@@ -137,7 +137,7 @@
                             <Setter Property="Opacity" Value="0.8" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Background" Value="#2A2542" />
+                            <Setter Property="Background" Value="#484848" />
                             <Setter Property="Foreground" Value="#6A6284" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -169,15 +169,15 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#1A1535" />
+                            <Setter Property="Background" Value="#383838" />
                             <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
                             <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#251E49" />
+                            <Setter Property="Background" Value="#484848" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="BorderBrush" Value="#2A2542" />
+                            <Setter Property="BorderBrush" Value="#484848" />
                             <Setter Property="Foreground" Value="#6A6284" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -219,7 +219,7 @@
     <!-- Custom TextBox Style -->
     <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
         <Setter Property="Height" Value="36" />
-        <Setter Property="Background" Value="#130F25" />
+        <Setter Property="Background" Value="#2F2F2F" />
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -242,7 +242,7 @@
                         </Trigger>
                         <Trigger Property="IsFocused" Value="True">
                             <Setter Property="BorderBrush" Value="{StaticResource BorderFocusBrush}" />
-                            <Setter Property="Background" Value="#17122E" />
+                            <Setter Property="Background" Value="#2F2F2F" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -262,7 +262,7 @@
                         <BulletDecorator.Bullet>
                             <Border x:Name="checkBorder" 
                                     Width="18" Height="18" 
-                                    Background="#130F25" 
+                                    Background="#2F2F2F"
                                     BorderBrush="{StaticResource BorderBrush}" 
                                     BorderThickness="1" 
                                     CornerRadius="4"
@@ -317,7 +317,7 @@
                                 <Thumb Margin="0,2">
                                     <Thumb.Template>
                                         <ControlTemplate TargetType="Thumb">
-                                            <Border Background="#3A3061" CornerRadius="4" BorderThickness="0" />
+                                            <Border Background="#484848" CornerRadius="4" BorderThickness="0" />
                                         </ControlTemplate>
                                     </Thumb.Template>
                                 </Thumb>

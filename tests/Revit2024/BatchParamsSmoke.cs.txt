@@ -1,0 +1,39 @@
+var assembly=System.Reflection.Assembly.Load(System.IO.File.ReadAllBytes(@"D:\Codex\Project1\BimboClub\SystemTravers\bin\x64\Release\net48\BimboClub.dll"));
+var family=new FilteredElementCollector(doc).OfClass(typeof(Family)).Cast<Family>().First(f=>f.Name=="HeatLoss_Cube");
+Document familyDoc=null;
+var fop=System.IO.Path.GetTempFileName();
+var invalid=System.IO.Path.GetTempFileName();
+var original=app.Application.SharedParametersFilename;
+var checks=new List<string>();
+Action<bool,string> check=(ok,m)=>{if(!ok)throw new Exception(m);checks.Add(m);};
+try {
+familyDoc=doc.EditFamily(family);
+var guid=Guid.NewGuid(); var name="BCC_Test_"+guid.ToString("N");
+using(var tx=new Transaction(familyDoc,"Set up parameter replacement")) { tx.Start(); familyDoc.FamilyManager.AddParameter(name,GroupTypeId.Data,SpecTypeId.String.Text,true); tx.Commit(); }
+System.IO.File.WriteAllText(fop,"# This is a Revit shared parameter file.\r\n*META\tVERSION\tMINVERSION\r\nMETA\t2\t1\r\n*GROUP\tID\tNAME\r\nGROUP\t1\tTests\r\n*PARAM\tGUID\tNAME\tDATATYPE\tDATACATEGORY\tGROUP\tVISIBLE\tDESCRIPTION\tUSERMODIFIABLE\tHIDEWHENNOVALUE\r\nPARAM\t"+guid+"\t"+name+"\tTEXT\t\t1\t1\t\t1\t0\r\n");
+var itemType=assembly.GetType("BimboClub.SharedParamItem");
+var item=Activator.CreateInstance(itemType);
+Action<string,object> set=(n,v)=>itemType.GetProperty(n).SetValue(item,v,null);
+set("Guid",guid);set("Name",name);set("DataType","TEXT");set("DefaultValue","Проверка");set("IsInstance",true);
+var items=(System.Collections.IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType));items.Add(item);
+var execute=assembly.GetType("BimboClub.BatchParamsEngine").GetMethod("ExecuteBatchAddParameters");
+var result=execute.Invoke(null,new object[]{familyDoc,fop,items,null,null});
+check(app.Application.SharedParametersFilename==original,"Batch parameters restore shared file path");
+var parameter=familyDoc.FamilyManager.get_Parameter(guid);
+check(parameter!=null && parameter.IsShared,"Existing family parameter replaced with shared parameter");
+check(parameter.Formula=="\"Проверка\"","Default text formula applied to returned replacement");
+set("DefaultValue","Повтор");
+execute.Invoke(null,new object[]{familyDoc,fop,items,null,null});
+check(familyDoc.FamilyManager.get_Parameter(guid).Formula=="\"Повтор\"","Existing shared parameter updated on repeated run");
+var missing=Activator.CreateInstance(itemType); itemType.GetProperty("Name").SetValue(missing,"BCC_Missing",null); items.Add(missing);
+set("DefaultValue","Rollback");
+bool failed=false;
+try { execute.Invoke(null,new object[]{familyDoc,fop,items,null,null}); } catch(System.Reflection.TargetInvocationException) { failed=true; }
+check(failed && familyDoc.FamilyManager.get_Parameter(guid).Formula=="\"Повтор\"","Invalid batch rolls back earlier parameter changes");
+check(app.Application.SharedParametersFilename==original,"Failed batch restores shared file path");
+items.Remove(missing);
+System.IO.File.WriteAllText(invalid,"not a Revit shared parameter file");
+try { execute.Invoke(null,new object[]{familyDoc,invalid,items,null,null}); } catch(System.Reflection.TargetInvocationException) {}
+check(app.Application.SharedParametersFilename==original,"Shared file path restored after malformed input");
+return new {Passed=checks.Count,Checks=checks};
+} finally {app.Application.SharedParametersFilename=original;if(familyDoc!=null)familyDoc.Close(false);System.IO.File.Delete(fop);System.IO.File.Delete(invalid);}

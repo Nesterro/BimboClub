@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -66,6 +66,7 @@ namespace BimboClub
         public HeatLossWindow(List<FamilySymbol> symbols, int allSpacesCount, int activeViewSpacesCount)
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
             SetWindowIcon();
 
             _allSpacesCount = allSpacesCount;

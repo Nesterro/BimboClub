@@ -416,14 +416,14 @@ namespace BimboClub
 			base.MinWidth = 700.0;
 			base.MinHeight = 450.0;
 			base.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-			base.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28));
+			base.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window);
 			base.FontFamily = new FontFamily("Segoe UI");
 			base.FontSize = 13.0;
-			SolidColorBrush solidColorBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38));
-			SolidColorBrush solidColorBrush2 = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-			SolidColorBrush accentBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
-			SolidColorBrush cancelNormal = new SolidColorBrush(System.Windows.Media.Color.FromRgb(58, 58, 66));
-			SolidColorBrush cancelHover = new SolidColorBrush(System.Windows.Media.Color.FromRgb(78, 78, 88));
+			SolidColorBrush solidColorBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Surface);
+			SolidColorBrush solidColorBrush2 = new SolidColorBrush(global::BimboClub.NeutralColors.Input);
+			SolidColorBrush accentBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
+			SolidColorBrush cancelNormal = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
+			SolidColorBrush cancelHover = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
 			Style roundedButtonStyle = this.GetRoundedButtonStyle(6.0);
 			System.Windows.Controls.Grid grid = new System.Windows.Controls.Grid();
 			grid.RowDefinitions.Add(new RowDefinition
@@ -445,7 +445,7 @@ namespace BimboClub
 			base.Content = grid;
 			Border border = new Border
 			{
-				Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(179, 14, 45), 0.0),
+				Background = new LinearGradientBrush(global::BimboClub.NeutralColors.Window, global::BimboClub.NeutralColors.Accent, 0.0),
 				Padding = new Thickness(20.0, 0.0, 20.0, 0.0)
 			};
 			System.Windows.Controls.Grid.SetRow(border, 0);
@@ -567,11 +567,11 @@ namespace BimboClub
 			});
 			border2.Child = grid2;
 			Style style = new Style(typeof(TextBlock));
-			style.Setters.Add(new Setter(TextBlock.ForegroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(180, 180, 200))));
+			style.Setters.Add(new Setter(TextBlock.ForegroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Muted)));
 			style.Setters.Add(new Setter(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center));
 			style.Setters.Add(new Setter(FrameworkElement.MarginProperty, new Thickness(0.0, 0.0, 6.0, 0.0)));
 			Style style2 = new Style(typeof(System.Windows.Controls.TextBox));
-			style2.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 53))));
+			style2.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Input)));
 			style2.Setters.Add(new Setter(System.Windows.Controls.Control.ForegroundProperty, Brushes.White));
 			style2.Setters.Add(new Setter(System.Windows.Controls.Control.BorderBrushProperty, solidColorBrush2));
 			style2.Setters.Add(new Setter(System.Windows.Controls.Control.PaddingProperty, new Thickness(5.0, 3.0, 5.0, 3.0)));
@@ -579,7 +579,7 @@ namespace BimboClub
 			this.AddLabel(grid2, "Параметр:", 0, 0, 0, style);
 			this._cbParam = new System.Windows.Controls.ComboBox
 			{
-				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 53)),
+				Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
 				Foreground = Brushes.White,
 				BorderBrush = solidColorBrush2
 			};
@@ -591,7 +591,7 @@ namespace BimboClub
 			System.Windows.Controls.Grid.SetRow(this._cbParam, 0);
 			System.Windows.Controls.Grid.SetColumn(this._cbParam, 1);
 			grid2.Children.Add(this._cbParam);
-			UiThemeHelper.StyleComboBoxDark(this._cbParam, solidColorBrush, solidColorBrush2);
+			UiThemeHelper.StyleComboBoxNeutral(this._cbParam, solidColorBrush, solidColorBrush2);
 			this.AddLabel(grid2, "Префикс:", 2, 3, 0, style);
 			this._txtPrefix = new System.Windows.Controls.TextBox
 			{
@@ -615,7 +615,7 @@ namespace BimboClub
 			this.AddLabel(grid2, "Сортировка:", 2, 9, 0, style);
 			this._cbSortMode = new System.Windows.Controls.ComboBox
 			{
-				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 53)),
+				Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
 				Foreground = Brushes.White,
 				BorderBrush = solidColorBrush2,
 				Width = 140.0
@@ -627,7 +627,7 @@ namespace BimboClub
 			System.Windows.Controls.Grid.SetRow(this._cbSortMode, 2);
 			System.Windows.Controls.Grid.SetColumn(this._cbSortMode, 10);
 			grid2.Children.Add(this._cbSortMode);
-			UiThemeHelper.StyleComboBoxDark(this._cbSortMode, solidColorBrush, solidColorBrush2);
+			UiThemeHelper.StyleComboBoxNeutral(this._cbSortMode, solidColorBrush, solidColorBrush2);
 			this._btnPreview = new Button
 			{
 				Content = "Предпросмотр",
@@ -667,7 +667,7 @@ namespace BimboClub
 				Foreground = Brushes.White,
 				BorderThickness = new Thickness(0.0),
 				RowBackground = solidColorBrush,
-				AlternatingRowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(36, 36, 42)),
+				AlternatingRowBackground = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
 				GridLinesVisibility = DataGridGridLinesVisibility.Horizontal,
 				HorizontalGridLinesBrush = solidColorBrush2,
 				HeadersVisibility = DataGridHeadersVisibility.Column,
@@ -685,19 +685,19 @@ namespace BimboClub
 				Property = DataGridCell.IsSelectedProperty,
 				Value = true
 			};
-			trigger.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45))));
+			trigger.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Accent)));
 			trigger.Setters.Add(new Setter(System.Windows.Controls.Control.ForegroundProperty, Brushes.White));
 			style3.Triggers.Add(trigger);
 			this._dataGrid.CellStyle = style3;
-			this._dataGrid.Resources.Add(SystemColors.HighlightBrushKey, new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45)));
+			this._dataGrid.Resources.Add(SystemColors.HighlightBrushKey, new SolidColorBrush(global::BimboClub.NeutralColors.Accent));
 			this._dataGrid.Resources.Add(SystemColors.HighlightTextBrushKey, Brushes.White);
-			this._dataGrid.Resources.Add(SystemColors.InactiveSelectionHighlightBrushKey, new SolidColorBrush(System.Windows.Media.Color.FromRgb(58, 58, 66)));
+			this._dataGrid.Resources.Add(SystemColors.InactiveSelectionHighlightBrushKey, new SolidColorBrush(global::BimboClub.NeutralColors.Border));
 			this._dataGrid.Resources.Add(SystemColors.InactiveSelectionHighlightTextBrushKey, Brushes.White);
 			Style style4 = new Style(typeof(System.Windows.Controls.TextBox));
-			style4.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 48))));
+			style4.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Input)));
 			style4.Setters.Add(new Setter(System.Windows.Controls.Control.ForegroundProperty, Brushes.White));
 			style4.Setters.Add(new Setter(TextBoxBase.CaretBrushProperty, Brushes.White));
-			style4.Setters.Add(new Setter(System.Windows.Controls.Control.BorderBrushProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45))));
+			style4.Setters.Add(new Setter(System.Windows.Controls.Control.BorderBrushProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Accent)));
 			style4.Setters.Add(new Setter(System.Windows.Controls.Control.BorderThicknessProperty, new Thickness(1.0)));
 			style4.Setters.Add(new Setter(System.Windows.Controls.Control.PaddingProperty, new Thickness(2.0)));
 			this._dataGrid.Resources.Add(typeof(System.Windows.Controls.TextBox), style4);
@@ -706,7 +706,7 @@ namespace BimboClub
 			style5.Setters.Add(new Setter(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center));
 			this._dataGrid.Resources.Add(typeof(CheckBox), style5);
 			Style style6 = new Style(typeof(DataGridColumnHeader));
-			style6.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 50))));
+			style6.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Input)));
 			style6.Setters.Add(new Setter(System.Windows.Controls.Control.ForegroundProperty, Brushes.White));
 			style6.Setters.Add(new Setter(System.Windows.Controls.Control.FontWeightProperty, FontWeights.SemiBold));
 			style6.Setters.Add(new Setter(System.Windows.Controls.Control.PaddingProperty, new Thickness(8.0, 4.0, 8.0, 4.0)));
@@ -718,7 +718,7 @@ namespace BimboClub
 				Property = DataGridRow.IsSelectedProperty,
 				Value = true
 			};
-			trigger2.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45))));
+			trigger2.Setters.Add(new Setter(System.Windows.Controls.Control.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Accent)));
 			trigger2.Setters.Add(new Setter(System.Windows.Controls.Control.ForegroundProperty, Brushes.White));
 			style7.Triggers.Add(trigger2);
 			this._dataGrid.RowStyle = style7;

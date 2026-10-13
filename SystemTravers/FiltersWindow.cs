@@ -135,7 +135,7 @@ namespace BimboClub
                 if (btn.IsEnabled)
                     btn.Background = normalGrad;
                 else
-                    btn.Background = new SolidColorBrush(Color.FromRgb(70, 70, 82));
+                    btn.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
             };
         }
 
@@ -154,18 +154,18 @@ namespace BimboClub
             Width = 560;
             Height = 720;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window); // #18181C
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
             MinHeight = 600;
             MinWidth = 450;
 
             // Цветовая палитра
-            SolidColorBrush panelBg = new SolidColorBrush(Color.FromRgb(32, 32, 38)); // #202026
-            SolidColorBrush controlBg = new SolidColorBrush(Color.FromRgb(40, 40, 48)); // #282830
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(255, 46, 91)); // #FF2E5B (Scarlet)
-            SolidColorBrush textMuted = new SolidColorBrush(Color.FromRgb(160, 160, 170));
+            SolidColorBrush panelBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface); // #202026
+            SolidColorBrush controlBg = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #282830
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #303038
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Accent); // #FF2E5B (Scarlet)
+            SolidColorBrush textMuted = new SolidColorBrush(global::BimboClub.NeutralColors.Muted);
 
             // Стили
             Style textBoxStyle = new Style(typeof(TextBox));
@@ -202,7 +202,7 @@ namespace BimboClub
             // 0. Шапка
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(global::BimboClub.NeutralColors.Window, global::BimboClub.NeutralColors.Accent, 0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
             Grid.SetRow(headerBorder, 0);
@@ -230,7 +230,7 @@ namespace BimboClub
             sourceGrid.Children.Add(lblSource);
 
             _cbSourceView = new ComboBox { Style = comboBoxStyle, Height = 25, VerticalAlignment = VerticalAlignment.Center };
-            UiThemeHelper.StyleComboBoxDark(_cbSourceView, controlBg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_cbSourceView, controlBg, borderBrush);
             _cbSourceView.SelectionChanged += CbSourceView_SelectionChanged;
             Grid.SetRow(_cbSourceView, 1);
             sourceGrid.Children.Add(_cbSourceView);
@@ -259,12 +259,12 @@ namespace BimboClub
             filtersGrid.Children.Add(btnFiltersStack);
 
             Button btnSelectAllFilters = new Button { Content = "Выбрать все", Foreground = Brushes.White, BorderThickness = new Thickness(0), Width = 110, Height = 26, FontSize = 11, Cursor = Cursors.Hand };
-            ApplyFlatButtonStyles(btnSelectAllFilters, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnSelectAllFilters, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             btnSelectAllFilters.Click += (s, e) => SetFiltersSelection(true);
             btnFiltersStack.Children.Add(btnSelectAllFilters);
 
             Button btnDeselectAllFilters = new Button { Content = "Снять все", Foreground = Brushes.White, BorderThickness = new Thickness(0), Width = 110, Height = 26, FontSize = 11, Margin = new Thickness(8, 0, 0, 0), Cursor = Cursors.Hand };
-            ApplyFlatButtonStyles(btnDeselectAllFilters, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnDeselectAllFilters, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             btnDeselectAllFilters.Click += (s, e) => SetFiltersSelection(false);
             btnFiltersStack.Children.Add(btnDeselectAllFilters);
 
@@ -308,12 +308,12 @@ namespace BimboClub
             targetsGrid.Children.Add(btnTargetsStack);
 
             Button btnSelectAllTargets = new Button { Content = "Выбрать все", Foreground = Brushes.White, BorderThickness = new Thickness(0), Width = 110, Height = 26, FontSize = 11, Cursor = Cursors.Hand };
-            ApplyFlatButtonStyles(btnSelectAllTargets, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnSelectAllTargets, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             btnSelectAllTargets.Click += (s, e) => SetTargetsSelection(true);
             btnTargetsStack.Children.Add(btnSelectAllTargets);
 
             Button btnDeselectAllTargets = new Button { Content = "Снять все", Foreground = Brushes.White, BorderThickness = new Thickness(0), Width = 110, Height = 26, FontSize = 11, Margin = new Thickness(8, 0, 0, 0), Cursor = Cursors.Hand };
-            ApplyFlatButtonStyles(btnDeselectAllTargets, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnDeselectAllTargets, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             btnDeselectAllTargets.Click += (s, e) => SetTargetsSelection(false);
             btnTargetsStack.Children.Add(btnDeselectAllTargets);
 
@@ -338,8 +338,8 @@ namespace BimboClub
             };
             _btnCopy.Click += BtnCopy_Click;
 
-            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
-            LinearGradientBrush hoverGrad = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.Accent, global::BimboClub.NeutralColors.Accent, 90.0);
+            LinearGradientBrush hoverGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.AccentHover, global::BimboClub.NeutralColors.AccentHover, 90.0);
             ApplyButtonStyles(_btnCopy, normalGrad, hoverGrad, roundedButtonStyle);
             Grid.SetColumn(_btnCopy, 1);
             bottomGrid.Children.Add(_btnCopy);
@@ -354,7 +354,7 @@ namespace BimboClub
                 Cursor = Cursors.Hand
             };
             btnCancel.Click += (s, e) => { DialogResult = false; Close(); };
-            ApplyFlatButtonStyles(btnCancel, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnCancel, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             Grid.SetColumn(btnCancel, 2);
             bottomGrid.Children.Add(btnCancel);
         }
@@ -445,7 +445,7 @@ namespace BimboClub
                 Grid.SetColumn(txtName, 1);
                 row.Children.Add(txtName);
 
-                Border typeBorder = new Border { Background = new SolidColorBrush(Color.FromRgb(48, 48, 56)), CornerRadius = new CornerRadius(3), Padding = new Thickness(5, 1, 5, 1), HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
+                Border typeBorder = new Border { Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input), CornerRadius = new CornerRadius(3), Padding = new Thickness(5, 1, 5, 1), HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
                 TextBlock txtType = new TextBlock { Text = item.ViewType, Foreground = Brushes.Gray, FontSize = 10, FontWeight = FontWeights.SemiBold };
                 typeBorder.Child = txtType;
                 Grid.SetColumn(typeBorder, 2);
