@@ -143,8 +143,18 @@ namespace RevitServerManager.Services
                 var outTask = proc.StandardOutput.ReadToEndAsync();
                 var errTask = proc.StandardError.ReadToEndAsync();
 
-                await Task.WhenAll(outTask, errTask);
-                await proc.WaitForExitAsync(ct);
+                try
+                {
+                    await proc.WaitForExitAsync(ct);
+                    await Task.WhenAll(outTask, errTask);
+                }
+                catch (OperationCanceledException)
+                {
+                    if (!proc.HasExited) proc.Kill(entireProcessTree: true);
+                    await proc.WaitForExitAsync(CancellationToken.None);
+                    await Task.WhenAll(outTask, errTask);
+                    throw;
+                }
 
                 string output = outTask.Result;
                 string errText = errTask.Result;

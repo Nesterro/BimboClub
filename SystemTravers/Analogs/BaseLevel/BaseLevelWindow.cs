@@ -133,14 +133,14 @@ namespace BimboClub.Analogs.BaseLevel
             MinHeight = 450;
             MinWidth = 600;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28));
+            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window);
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
 
-            var bgCard = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38));
-            var borderCard = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-            var accentRed = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
-            var textMuted = new SolidColorBrush(System.Windows.Media.Color.FromRgb(180, 180, 200));
+            var bgCard = new SolidColorBrush(global::BimboClub.NeutralColors.Surface);
+            var borderCard = new SolidColorBrush(global::BimboClub.NeutralColors.Input);
+            var accentRed = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
+            var textMuted = new SolidColorBrush(global::BimboClub.NeutralColors.Muted);
 
             WpfGrid mainGrid = new WpfGrid();
             mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto }); // Header
@@ -153,8 +153,8 @@ namespace BimboClub.Analogs.BaseLevel
             Border headerBorder = new Border
             {
                 Background = new LinearGradientBrush(
-                    System.Windows.Media.Color.FromRgb(18, 18, 20),
-                    System.Windows.Media.Color.FromRgb(179, 14, 45), 0),
+                    global::BimboClub.NeutralColors.Window,
+                    global::BimboClub.NeutralColors.Accent, 0),
                 Padding = new Thickness(16, 12, 16, 12)
             };
             StackPanel headerStack = new StackPanel();
@@ -204,7 +204,7 @@ namespace BimboClub.Analogs.BaseLevel
             {
                 Height = 28,
                 VerticalAlignment = VerticalAlignment.Center,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 53)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                 Foreground = Brushes.Black,
                 Margin = new Thickness(0, 0, 10, 0)
             };
@@ -240,9 +240,9 @@ namespace BimboClub.Analogs.BaseLevel
                 ItemsSource = _ruleItems,
                 AutoGenerateColumns = false,
                 CanUserAddRows = false,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(28, 28, 34)),
-                RowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38)),
-                AlternatingRowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(36, 36, 44)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
+                RowBackground = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
+                AlternatingRowBackground = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
                 GridLinesVisibility = DataGridGridLinesVisibility.Horizontal,
@@ -304,7 +304,7 @@ namespace BimboClub.Analogs.BaseLevel
                 Content = "+ Добавить правило",
                 Height = 26,
                 Padding = new Thickness(10, 2, 10, 2),
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 52, 60)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                 Foreground = Brushes.White,
                 BorderThickness = new Thickness(0),
                 Cursor = Cursors.Hand,
@@ -325,7 +325,7 @@ namespace BimboClub.Analogs.BaseLevel
                 Content = "— Удалить правило",
                 Height = 26,
                 Padding = new Thickness(10, 2, 10, 2),
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 52, 60)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                 Foreground = Brushes.White,
                 BorderThickness = new Thickness(0),
                 Cursor = Cursors.Hand
@@ -441,7 +441,7 @@ namespace BimboClub.Analogs.BaseLevel
                 Width = 26,
                 Height = 26,
                 Margin = new Thickness(2, 0, 2, 0),
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 52, 60)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                 Foreground = Brushes.White,
                 FontWeight = FontWeights.Bold,
                 ToolTip = tooltip,
@@ -583,7 +583,7 @@ namespace BimboClub.Analogs.BaseLevel
                 SizeToContent = SizeToContent.Height,
                 ResizeMode = ResizeMode.NoResize,
                 WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
                 FontFamily = new FontFamily("Segoe UI"),
                 FontSize = 13
             };
@@ -594,7 +594,7 @@ namespace BimboClub.Analogs.BaseLevel
             System.Windows.Controls.TextBox tb = new System.Windows.Controls.TextBox
             {
                 Text = defaultText,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 53)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                 Foreground = Brushes.White,
                 Padding = new Thickness(6, 4, 6, 4),
                 Margin = new Thickness(0, 0, 0, 14)
@@ -610,7 +610,7 @@ namespace BimboClub.Analogs.BaseLevel
                 Content = "OK",
                 Width = 80,
                 Height = 28,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Accent),
                 Foreground = Brushes.White,
                 FontWeight = FontWeights.Bold
             };

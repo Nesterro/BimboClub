@@ -55,6 +55,11 @@ try
     catch (InvalidDataException) { checks++; }
     Check(original.SequenceEqual(File.ReadAllBytes(info.DllPath)), "Rejected package must not change installation.");
     Check(File.ReadAllText(Path.Combine(target, "version.txt")) == "0.0.1", "Rejected package must not change version marker.");
+    manifest.LatestVersion = version;
+    try { await new UpdateService().InstallUpdateAsync(info, manifest, manifestPath, new Progress<double>(), new CancellationToken(true)); throw new Exception("Cancelled install accepted"); }
+    catch (OperationCanceledException) { checks++; }
+    Check(File.ReadAllText(Path.Combine(target, "version.txt")) == "0.0.1", "Cancelled install must not change version marker.");
+    Check(new RevitDetectorService().GetDllVersion(Path.Combine(sandbox, "missing.dll")) == "—", "Missing DLL must have an unknown version.");
     Console.WriteLine($"PASS: {checks} update regression checks.");
 }
 finally { Directory.Delete(sandbox, true); }

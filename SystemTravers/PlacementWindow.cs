@@ -112,7 +112,7 @@ namespace BimboClub
                 if (btn.IsEnabled)
                     btn.Background = normalGrad;
                 else
-                    btn.Background = new SolidColorBrush(Color.FromRgb(70, 70, 82));
+                    btn.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
             };
         }
 
@@ -131,16 +131,16 @@ namespace BimboClub
             Width = 480;
             Height = 520;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window); // #18181C
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
             ResizeMode = ResizeMode.NoResize;
 
             // Цветовая палитра
-            SolidColorBrush panelBg = new SolidColorBrush(Color.FromRgb(32, 32, 38)); // #202026
-            SolidColorBrush controlBg = new SolidColorBrush(Color.FromRgb(40, 40, 48)); // #282830
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(255, 46, 91)); // #FF2E5B (Scarlet)
+            SolidColorBrush panelBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface); // #202026
+            SolidColorBrush controlBg = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #282830
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #303038
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Accent); // #FF2E5B (Scarlet)
 
             // Стили
             Style textBoxStyle = new Style(typeof(TextBox));
@@ -174,7 +174,7 @@ namespace BimboClub
             // 0. Шапка
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(global::BimboClub.NeutralColors.Window, global::BimboClub.NeutralColors.Accent, 0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
             Grid.SetRow(headerBorder, 0);
@@ -235,7 +235,7 @@ namespace BimboClub
             rowFamily.Children.Add(lblFamily);
 
             _cbSymbols = new ComboBox { Style = comboBoxStyle, Height = 25, VerticalAlignment = VerticalAlignment.Center };
-            UiThemeHelper.StyleComboBoxDark(_cbSymbols, controlBg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_cbSymbols, controlBg, borderBrush);
             Grid.SetColumn(_cbSymbols, 1);
             rowFamily.Children.Add(_cbSymbols);
 
@@ -277,7 +277,7 @@ namespace BimboClub
             _cbOrientationFilter.Items.Add("Только горизонтальные");
             _cbOrientationFilter.Items.Add("Только вертикальные");
             _cbOrientationFilter.SelectedIndex = 0;
-            UiThemeHelper.StyleComboBoxDark(_cbOrientationFilter, controlBg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_cbOrientationFilter, controlBg, borderBrush);
             Grid.SetColumn(_cbOrientationFilter, 1);
             rowOrientation.Children.Add(_cbOrientationFilter);
 
@@ -348,7 +348,7 @@ namespace BimboClub
             _lblSelectedStatus = new TextBlock
             {
                 Text = "Выбрано на чертеже: все по фильтру",
-                Foreground = new SolidColorBrush(Color.FromRgb(150, 150, 170)),
+                Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Muted),
                 VerticalAlignment = VerticalAlignment.Center,
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 11
@@ -365,7 +365,7 @@ namespace BimboClub
                 Cursor = Cursors.Hand
             };
             btnSelectOnDrawing.Click += BtnSelectOnDrawing_Click;
-            ApplyFlatButtonStyles(btnSelectOnDrawing, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnSelectOnDrawing, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             Grid.SetColumn(btnSelectOnDrawing, 1);
             rowSelect.Children.Add(btnSelectOnDrawing);
 
@@ -390,8 +390,8 @@ namespace BimboClub
             };
             _btnApply.Click += BtnApply_Click;
 
-            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
-            LinearGradientBrush hoverGrad = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.Accent, global::BimboClub.NeutralColors.Accent, 90.0);
+            LinearGradientBrush hoverGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.AccentHover, global::BimboClub.NeutralColors.AccentHover, 90.0);
             ApplyButtonStyles(_btnApply, normalGrad, hoverGrad, roundedButtonStyle);
             Grid.SetColumn(_btnApply, 1);
             bottomGrid.Children.Add(_btnApply);
@@ -406,7 +406,7 @@ namespace BimboClub
                 Cursor = Cursors.Hand
             };
             btnCancel.Click += (s, e) => { DialogResult = false; Close(); };
-            ApplyFlatButtonStyles(btnCancel, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnCancel, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             Grid.SetColumn(btnCancel, 2);
             bottomGrid.Children.Add(btnCancel);
         }
@@ -478,12 +478,12 @@ namespace BimboClub
             if (count > 0)
             {
                 _lblSelectedStatus.Text = $"Выбрано на чертеже: {count} шт.";
-                _lblSelectedStatus.Foreground = new SolidColorBrush(Color.FromRgb(255, 46, 91));
+                _lblSelectedStatus.Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
             }
             else
             {
                 _lblSelectedStatus.Text = "Выбрано на чертеже: все по фильтру";
-                _lblSelectedStatus.Foreground = new SolidColorBrush(Color.FromRgb(150, 150, 170));
+                _lblSelectedStatus.Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Muted);
             }
         }
 

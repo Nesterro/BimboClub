@@ -5,6 +5,8 @@ namespace BimboClub
 {
     public static class Logger
     {
+        private static readonly object Sync = new object();
+        private const long MaxLogBytes = 5 * 1024 * 1024;
         private static string GetLogPath()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -23,8 +25,14 @@ namespace BimboClub
                 string path = GetLogPath();
                 string formattedMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{level}] {message}";
                 
-                lock (typeof(Logger))
+                lock (Sync)
                 {
+                    if (File.Exists(path) && new FileInfo(path).Length >= MaxLogBytes)
+                    {
+                        string previous = path + ".1";
+                        if (File.Exists(previous)) File.Delete(previous);
+                        File.Move(path, previous);
+                    }
                     File.AppendAllText(path, formattedMessage + Environment.NewLine);
                 }
             }

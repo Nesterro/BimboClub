@@ -30,6 +30,7 @@ namespace BimboClub
         public RevitServerWindow(Autodesk.Revit.ApplicationServices.Application revitApp)
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
             SetWindowIcon();
 
             _revitApp = revitApp;

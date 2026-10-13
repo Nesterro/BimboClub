@@ -4,15 +4,15 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <!-- Colors -->
-        <SolidColorBrush x:Key="BgDarkBrush" Color="#141418" />
-        <SolidColorBrush x:Key="PanelDarkBrush" Color="#1C1C22" />
-        <SolidColorBrush x:Key="ControlDarkBrush" Color="#282832" />
-        <SolidColorBrush x:Key="BorderDarkBrush" Color="#3A3A46" />
+        <SolidColorBrush x:Key="BgDarkBrush" Color="#262626" />
+        <SolidColorBrush x:Key="PanelDarkBrush" Color="#2F2F2F" />
+        <SolidColorBrush x:Key="ControlDarkBrush" Color="#383838" />
+        <SolidColorBrush x:Key="BorderDarkBrush" Color="#484848" />
         <SolidColorBrush x:Key="TextWhiteBrush" Color="#FFFFFF" />
-        <SolidColorBrush x:Key="TextMutedBrush" Color="#A5A5B5" />
-        <SolidColorBrush x:Key="AccentScarletBrush" Color="#B30E2D" />
-        <SolidColorBrush x:Key="AccentScarletHoverBrush" Color="#E0113A" />
-        <SolidColorBrush x:Key="AccentScarletActiveBrush" Color="#FF2E5B" />
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#BBBBBB" />
+        <SolidColorBrush x:Key="AccentScarletBrush" Color="#0078D4" />
+        <SolidColorBrush x:Key="AccentScarletHoverBrush" Color="#1E8CE1" />
+        <SolidColorBrush x:Key="AccentScarletActiveBrush" Color="#0078D4" />
         <SolidColorBrush x:Key="SuccessGreenBrush" Color="#10B981" />
     </Application.Resources>
 </Application>

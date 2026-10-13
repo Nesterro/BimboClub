@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,6 +27,7 @@ namespace BimboClub
         public SchedulePackWindow(List<ViewSchedule> schedules, string defaultFolder)
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
 
             FolderTextBox.Text = defaultFolder;
             _allSchedules = schedules.Select(s => new ScheduleItemVM { Schedule = s, IsSelected = true }).ToList();

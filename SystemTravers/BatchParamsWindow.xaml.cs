@@ -30,11 +30,11 @@ namespace BimboClub
 
             try
             {
-                UiThemeHelper.ApplyDarkTheme(this);
+                UiThemeHelper.ApplyNeutralTheme(this);
             }
             catch (Exception ex)
             {
-                Logger.Log($"ApplyDarkTheme in BatchParamsWindow warning: {ex.Message}", "WARN");
+                Logger.Log($"ApplyNeutralTheme in BatchParamsWindow warning: {ex.Message}", "WARN");
             }
 
             _doc = doc;
@@ -52,7 +52,7 @@ namespace BimboClub
             if (_doc != null && _doc.IsFamilyDocument)
             {
                 ModeBadgeTextBlock.Text = "РЕЖИМ: СЕМЕЙСТВО (.rfa)";
-                ModeBadgeBorder.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 58, 36));
+                ModeBadgeBorder.Background = new System.Windows.Media.SolidColorBrush(global::BimboClub.NeutralColors.Input);
                 ModeBadgeBorder.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80));
                 ModeBadgeTextBlock.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(129, 199, 132));
 
@@ -69,7 +69,7 @@ namespace BimboClub
             else
             {
                 ModeBadgeTextBlock.Text = "РЕЖИМ: ПРОЕКТ (.rvt)";
-                ModeBadgeBorder.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(58, 30, 36));
+                ModeBadgeBorder.Background = new System.Windows.Media.SolidColorBrush(global::BimboClub.NeutralColors.Input);
                 ModeBadgeBorder.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 82, 82));
                 ModeBadgeTextBlock.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 138, 128));
 

@@ -22,7 +22,7 @@ namespace BimboClub
 			AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(this.OnAssemblyResolve);
 			Logger.Log("Запуск инициализации панели BimboClub Tools.", "INFO");
 
-			string tabName = "⚫ BimboClub";
+			string tabName = "BimboClub";
 			try
 			{
 				application.CreateRibbonTab(tabName);
@@ -388,15 +388,15 @@ namespace BimboClub
 			BitmapSource bitmapSourceParam16 = LoadImage(System.IO.Path.Combine(text, "icon_param_16.png"));
 			if (bitmapSourceParam != null)
 			{
-				pushButtonDataHeatLossBcc.LargeImage = bitmapSourceParam;
-				pushButtonDataParamRulesBcc.LargeImage = bitmapSourceParam;
+				pushButtonDataHeatLossBcc.LargeImage = RibbonIcons.FromFileName("icon_heat.png");
+				pushButtonDataParamRulesBcc.LargeImage = RibbonIcons.FromFileName("icon_rules.png");
 				pushButtonDataBatchParamsBcc.LargeImage = bitmapSourceParam;
 				pushButtonDataRevitServerBcc.LargeImage = bitmapSourceParam;
 			}
 			if (bitmapSourceParam16 != null)
 			{
-				pushButtonDataHeatLossBcc.Image = bitmapSourceParam16;
-				pushButtonDataParamRulesBcc.Image = bitmapSourceParam16;
+				pushButtonDataHeatLossBcc.Image = RibbonIcons.FromFileName("icon_heat_16.png");
+				pushButtonDataParamRulesBcc.Image = RibbonIcons.FromFileName("icon_rules_16.png");
 				pushButtonDataBatchParamsBcc.Image = bitmapSourceParam16;
 				pushButtonDataRevitServerBcc.Image = bitmapSourceParam16;
 			}
@@ -702,154 +702,13 @@ namespace BimboClub
 			}
 			catch (Exception ex) { Logger.LogError("Ошибка создания панели Аналоги", ex); }
 
-			// --- Wpf-маркер вкладки Revit (ModPlus style) ---
-			TrySetTabLogo(application, tabName);
-
 			return Result.Succeeded;
-		}
-
-		private void TrySetTabLogo(UIControlledApplication application, string tabName)
-		{
-			EventHandler<Autodesk.Revit.UI.Events.IdlingEventArgs> handler = null;
-			handler = (s, e) =>
-			{
-				try
-				{
-					application.Idling -= handler;
-				}
-				catch { }
-				ApplyTabLogoWpf(tabName);
-			};
-
-			try
-			{
-				application.Idling += handler;
-			}
-			catch { }
-
-			ApplyTabLogoWpf(tabName);
-		}
-
-		private void ApplyTabLogoWpf(string tabName)
-		{
-			try
-			{
-				Assembly adWinAsm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "AdWindows");
-				if (adWinAsm == null) return;
-
-				Type compMgrType = adWinAsm.GetType("Autodesk.Windows.ComponentManager");
-				if (compMgrType == null) return;
-
-				PropertyInfo ribbonProp = compMgrType.GetProperty("Ribbon", BindingFlags.Public | BindingFlags.Static);
-				if (ribbonProp == null) return;
-
-				object ribbonControl = ribbonProp.GetValue(null);
-				if (ribbonControl == null) return;
-
-				if (ribbonControl is System.Windows.Threading.DispatcherObject dispatcherObj)
-				{
-					dispatcherObj.Dispatcher.BeginInvoke(new Action(() =>
-					{
-						try
-						{
-							PropertyInfo tabsProp = ribbonControl.GetType().GetProperty("Tabs");
-							if (tabsProp == null) return;
-
-							var tabs = tabsProp.GetValue(ribbonControl) as IEnumerable;
-							if (tabs == null) return;
-
-							object targetTab = null;
-							foreach (var tab in tabs)
-							{
-								PropertyInfo titleProp = tab.GetType().GetProperty("Title");
-								PropertyInfo idProp = tab.GetType().GetProperty("Id");
-								string title = titleProp?.GetValue(tab)?.ToString();
-								string id = idProp?.GetValue(tab)?.ToString();
-
-								if (title == tabName || id == tabName || (title != null && title.Contains("BimboClub")))
-								{
-									targetTab = tab;
-									break;
-								}
-							}
-
-							if (targetTab == null) return;
-
-							var tabButtons = FindVisualChildren(ribbonControl as DependencyObject, "RibbonTabButton");
-							foreach (var btn in tabButtons)
-							{
-								PropertyInfo dataContextProp = btn.GetType().GetProperty("DataContext");
-								PropertyInfo contentProp = btn.GetType().GetProperty("Content");
-
-								object dc = dataContextProp?.GetValue(btn);
-								object contentVal = contentProp?.GetValue(btn);
-
-								if (dc == targetTab || (contentVal != null && contentVal.ToString().Contains("BimboClub")))
-								{
-									var stackPanel = new StackPanel
-									{
-										Orientation = Orientation.Horizontal,
-										VerticalAlignment = VerticalAlignment.Center,
-										Margin = new Thickness(0)
-									};
-
-									var redDot = new System.Windows.Shapes.Ellipse
-									{
-										Width = 8,
-										Height = 8,
-										Fill = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD700")), // Gold marker
-										Margin = new Thickness(0, 0, 6, 0),
-										VerticalAlignment = VerticalAlignment.Center,
-										SnapsToDevicePixels = true
-									};
-
-									var textBlock = new TextBlock
-									{
-										Text = tabName,
-										VerticalAlignment = VerticalAlignment.Center,
-										FontWeight = FontWeights.Bold,
-										FontSize = 11.5,
-										Margin = new Thickness(0)
-									};
-
-									stackPanel.Children.Add(redDot);
-									stackPanel.Children.Add(textBlock);
-
-									contentProp?.SetValue(btn, stackPanel);
-									break;
-								}
-							}
-						}
-						catch { }
-					}), System.Windows.Threading.DispatcherPriority.Background);
-				}
-			}
-			catch { }
-		}
-
-		private static List<DependencyObject> FindVisualChildren(DependencyObject depObj, string typeName)
-		{
-			var results = new List<DependencyObject>();
-			if (depObj == null) return results;
-
-			int count = VisualTreeHelper.GetChildrenCount(depObj);
-			for (int i = 0; i < count; i++)
-			{
-				DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-				if (child != null)
-				{
-					if (child.GetType().Name == typeName)
-					{
-						results.Add(child);
-					}
-					results.AddRange(FindVisualChildren(child, typeName));
-				}
-			}
-			return results;
 		}
 
 		private BitmapSource LoadImage(string path)
 		{
+			var vectorIcon = RibbonIcons.FromFileName(path);
+			if (vectorIcon != null) return vectorIcon;
 			if (!File.Exists(path)) return null;
 			try
 			{

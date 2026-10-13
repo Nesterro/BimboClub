@@ -69,7 +69,7 @@ namespace BimboClub.PipeClamps
             InitData(doc, _savedSettings.ActiveViewOnly);
             BuildUI();
 
-            UiThemeHelper.ApplyDarkTheme(this);
+            UiThemeHelper.ApplyNeutralTheme(this);
         }
 
         private void InitData(Document doc, bool activeViewOnly)
@@ -146,8 +146,8 @@ namespace BimboClub.PipeClamps
             Border headerBorder = new Border
             {
                 Background = new LinearGradientBrush(
-                    System.Windows.Media.Color.FromRgb(200, 20, 60),
-                    System.Windows.Media.Color.FromRgb(140, 10, 35),
+                    global::BimboClub.NeutralColors.AccentHover,
+                    global::BimboClub.NeutralColors.AccentHover,
                     45.0
                 )
             };
@@ -168,8 +168,8 @@ namespace BimboClub.PipeClamps
             // 2. Выбор области расстановки (Весь проект vs Текущий вид)
             Border scopeBorder = new Border
             {
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(20, 20, 28)),
-                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(50, 50, 65)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window),
+                BorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Border),
                 BorderThickness = new Thickness(0, 0, 0, 1),
                 Padding = new Thickness(15, 8, 15, 8)
             };
@@ -178,7 +178,7 @@ namespace BimboClub.PipeClamps
             {
                 Content = "Расставлять хомуты только на текущем виде",
                 IsChecked = _savedSettings.ActiveViewOnly,
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0)), // Яркий золотой
+                Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Accent), // Яркий золотой
                 FontWeight = FontWeights.Bold,
                 FontSize = 13,
                 VerticalAlignment = VerticalAlignment.Center
@@ -198,24 +198,24 @@ namespace BimboClub.PipeClamps
                 CanUserDeleteRows = false,
                 ItemsSource = _rowViewModels,
                 Margin = new Thickness(15, 8, 15, 8),
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(18, 18, 24)),
-                RowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(28, 28, 36)),
-                AlternatingRowBackground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(36, 36, 46)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window),
+                RowBackground = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
+                AlternatingRowBackground = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
                 Foreground = System.Windows.Media.Brushes.White,
                 FontSize = 12,
                 GridLinesVisibility = DataGridGridLinesVisibility.Horizontal,
-                HorizontalGridLinesBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 75))
+                HorizontalGridLinesBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Border)
             };
 
             // Явный стиль заголовков колонок таблицы (темно-серый фон + золотой/белый жирный текст)
             Style columnHeaderStyle = new Style(typeof(DataGridColumnHeader));
-            columnHeaderStyle.Setters.Add(new Setter(WpfControl.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 52))));
-            columnHeaderStyle.Setters.Add(new Setter(WpfControl.ForegroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0)))); // Золотой текст
+            columnHeaderStyle.Setters.Add(new Setter(WpfControl.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Input)));
+            columnHeaderStyle.Setters.Add(new Setter(WpfControl.ForegroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Accent))); // Золотой текст
             columnHeaderStyle.Setters.Add(new Setter(WpfControl.FontWeightProperty, FontWeights.Bold));
             columnHeaderStyle.Setters.Add(new Setter(WpfControl.FontSizeProperty, 12.0));
             columnHeaderStyle.Setters.Add(new Setter(WpfControl.HeightProperty, 32.0));
             columnHeaderStyle.Setters.Add(new Setter(WpfControl.PaddingProperty, new Thickness(8, 4, 8, 4)));
-            columnHeaderStyle.Setters.Add(new Setter(WpfControl.BorderBrushProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 75))));
+            columnHeaderStyle.Setters.Add(new Setter(WpfControl.BorderBrushProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Border)));
             columnHeaderStyle.Setters.Add(new Setter(WpfControl.BorderThicknessProperty, new Thickness(0, 0, 1, 1)));
 
             grid.ColumnHeaderStyle = columnHeaderStyle;
@@ -268,8 +268,8 @@ namespace BimboClub.PipeClamps
             // 4. Блок настроек параметров и 3D поворота
             Border paramBorder = new Border
             {
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(28, 28, 36)),
-                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(70, 70, 90)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Surface),
+                BorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Border),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(4),
                 Margin = new Thickness(15, 5, 15, 5),
@@ -282,7 +282,7 @@ namespace BimboClub.PipeClamps
             TextBlock secParamTitle = new TextBlock
             {
                 Text = "Перенос параметров из трубы стояка в хомут:",
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0)),
+                Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Accent),
                 FontWeight = FontWeights.Bold,
                 FontSize = 13,
                 Margin = new Thickness(0, 0, 0, 8)
@@ -343,7 +343,7 @@ namespace BimboClub.PipeClamps
             TextBlock rotTitle = new TextBlock
             {
                 Text = "Ориентация / Поворот хомута в 3D плоскостях (в градусах):",
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 215, 0)),
+                Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Accent),
                 FontWeight = FontWeights.Bold,
                 FontSize = 13,
                 Margin = new Thickness(0, 12, 0, 6)
@@ -390,8 +390,8 @@ namespace BimboClub.PipeClamps
             // 5. Подвал с кнопкой действия
             Border footerBorder = new Border
             {
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(20, 20, 28)),
-                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(50, 50, 65)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window),
+                BorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Border),
                 BorderThickness = new Thickness(0, 1, 0, 0)
             };
 
@@ -400,7 +400,7 @@ namespace BimboClub.PipeClamps
                 Content = "Расставить хомуты",
                 Width = 220,
                 Height = 38,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(200, 20, 60)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.AccentHover),
                 Foreground = System.Windows.Media.Brushes.White,
                 FontWeight = FontWeights.Bold,
                 FontSize = 14,
@@ -422,7 +422,7 @@ namespace BimboClub.PipeClamps
             {
                 Text = defaultText,
                 Height = 26,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(15, 15, 20)), // Глубокий темный фон
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window), // Глубокий темный фон
                 Foreground = System.Windows.Media.Brushes.White, // Четкий белый шрифт
                 CaretBrush = System.Windows.Media.Brushes.White,
                 BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(100, 100, 130)),

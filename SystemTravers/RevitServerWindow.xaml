@@ -5,7 +5,7 @@
         Title="вљ« BimboClub | Скачивание моделей с Revit Server" 
         Height="620" Width="820"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E2E"
+        Background="#2F2F2F"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#FFFFFF"
@@ -46,8 +46,8 @@
                     <Setter Property="Background" Value="#A50E0E"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#E0E0E0"/>
-                    <Setter Property="Foreground" Value="#888888"/>
+                    <Setter Property="Background" Value="#BBBBBB"/>
+                    <Setter Property="Foreground" Value="#BBBBBB"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -58,7 +58,7 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="32"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#B0B0B0"/>
+            <Setter Property="BorderBrush" Value="#BBBBBB"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FocusVisualStyle" Value="{StaticResource WcagFocusVisual}"/>
             <Setter Property="Template">
@@ -72,11 +72,11 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E5E5E5"/>
+                    <Setter Property="Background" Value="#BBBBBB"/>
                     <Setter Property="BorderBrush" Value="#005FB8"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Foreground" Value="#888888"/>
+                    <Setter Property="Foreground" Value="#BBBBBB"/>
                     <Setter Property="Background" Value="#F9F9F9"/>
                 </Trigger>
             </Style.Triggers>
@@ -105,9 +105,9 @@
         <!-- Custom TextBox Style -->
         <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
             <Setter Property="Height" Value="32"/>
-            <Setter Property="Background" Value="#181824"/>
+            <Setter Property="Background" Value="#2F2F2F"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#8A8A8A"/>
+            <Setter Property="BorderBrush" Value="#BBBBBB"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -121,7 +121,7 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
                                 <Setter TargetName="Border" Property="BorderBrush" Value="#005FB8"/>
-                                <Setter TargetName="Border" Property="Background" Value="#181824"/>
+                                <Setter TargetName="Border" Property="Background" Value="#2F2F2F"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -131,18 +131,18 @@
 
         <!-- TreeView Style -->
         <Style x:Key="ModernTreeViewStyle" TargetType="TreeView">
-            <Setter Property="BorderBrush" Value="#D9D9D9"/>
+            <Setter Property="BorderBrush" Value="#BBBBBB"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="#181824"/>
+            <Setter Property="Background" Value="#2F2F2F"/>
             <Setter Property="Padding" Value="5"/>
             <Setter Property="FocusVisualStyle" Value="{StaticResource WcagFocusVisual}"/>
         </Style>
 
         <!-- ListBox Style -->
         <Style x:Key="ModernListBoxStyle" TargetType="ListBox">
-            <Setter Property="BorderBrush" Value="#D9D9D9"/>
+            <Setter Property="BorderBrush" Value="#BBBBBB"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="#181824"/>
+            <Setter Property="Background" Value="#2F2F2F"/>
             <Setter Property="Padding" Value="5"/>
             <Setter Property="FocusVisualStyle" Value="{StaticResource WcagFocusVisual}"/>
         </Style>
@@ -172,13 +172,13 @@
         <!-- Title Header -->
         <Border Grid.Row="0" BorderBrush="#EAEAEA" BorderThickness="0,0,0,1" Padding="0,0,0,10" Margin="0,0,0,15">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="BimboClub" Foreground="#FFD700" FontWeight="Bold" FontSize="18"/>
+                <TextBlock Text="BimboClub" Foreground="#0078D4" FontWeight="Bold" FontSize="18"/>
                 <TextBlock Text=" | СКАЧИВАНИЕ МОДЕЛЕЙ С REVIT SERVER" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="18" Margin="5,0,0,0"/>
             </StackPanel>
         </Border>
 
         <!-- Connection Panel Card -->
-        <Border Grid.Row="1" Background="#252536" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,0,0,15">
+        <Border Grid.Row="1" Background="#383838" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="6" Padding="14" Margin="0,0,0,15">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -188,10 +188,10 @@
                     <ColumnDefinition Width="130"/>
                 </Grid.ColumnDefinitions>
                 
-                <TextBlock Text="Адрес RS:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#595959" Margin="0,0,10,0"/>
+                <TextBlock Text="Адрес RS:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#484848" Margin="0,0,10,0"/>
                 <TextBox Grid.Column="1" x:Name="ServerAddressTextBox" Style="{StaticResource ModernTextBoxStyle}" Text="127.0.0.1" VerticalAlignment="Center"/>
                 
-                <TextBlock Grid.Column="2" Text="Версия RS:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#595959" Margin="15,0,10,0"/>
+                <TextBlock Grid.Column="2" Text="Версия RS:" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#484848" Margin="15,0,10,0"/>
                 <ComboBox Grid.Column="3" x:Name="ServerVersionComboBox" VerticalAlignment="Center" Margin="0,0,10,0">
                     <ComboBoxItem Content="2026"/>
                     <ComboBoxItem Content="2025"/>
@@ -223,7 +223,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Папки сервера:" FontWeight="SemiBold" Foreground="#D0D0E0" Margin="0,0,0,6"/>
+                <TextBlock Text="Папки сервера:" FontWeight="SemiBold" Foreground="#BBBBBB" Margin="0,0,0,6"/>
                 <TreeView Grid.Row="1" x:Name="FoldersTreeView" Style="{StaticResource ModernTreeViewStyle}" SelectedItemChanged="FoldersTreeView_SelectedItemChanged">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type local:FolderViewModel}" ItemsSource="{Binding SubFolders}">
@@ -253,10 +253,10 @@
                 </Grid.RowDefinitions>
                 
                 <Grid Margin="0,0,0,6">
-                    <TextBlock Text="Модели в выбранной папке:" FontWeight="SemiBold" Foreground="#D0D0E0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Модели в выбранной папке:" FontWeight="SemiBold" Foreground="#BBBBBB" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" x:Name="SelectionHelpersPanel" Visibility="Collapsed">
                         <Button Content="Выбрать все" Style="{StaticResource LinkButtonStyle}" Click="SelectAllModels_Click"/>
-                        <TextBlock Text="|" Foreground="#CCCCCC" Margin="8,0"/>
+                        <TextBlock Text="|" Foreground="#BBBBBB" Margin="8,0"/>
                         <Button Content="Снять выбор" Style="{StaticResource LinkButtonStyle}" Click="SelectNoneModels_Click"/>
                     </StackPanel>
                 </Grid>
@@ -286,7 +286,7 @@
                                     <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
                                 </StackPanel>
                                 
-                                <TextBlock Grid.Column="2" Text="{Binding SizeFormatted}" Foreground="#888888" VerticalAlignment="Center" Margin="15,0,5,0"/>
+                                <TextBlock Grid.Column="2" Text="{Binding SizeFormatted}" Foreground="#BBBBBB" VerticalAlignment="Center" Margin="15,0,5,0"/>
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -308,14 +308,14 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
 
-                <TextBlock Grid.Row="2" x:Name="SelectedSummaryTextBlock" Text="Выбрано моделей: 0" Foreground="#D0D0E0" Margin="2,8,0,0" FontSize="12"/>
+                <TextBlock Grid.Row="2" x:Name="SelectedSummaryTextBlock" Text="Выбрано моделей: 0" Foreground="#BBBBBB" Margin="2,8,0,0" FontSize="12"/>
             </Grid>
         </Grid>
 
         <!-- Destination Folder Selector -->
-        <Border Grid.Row="3" Background="#252536" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,15">
+        <Border Grid.Row="3" Background="#383838" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="4" Padding="12" Margin="0,0,0,15">
             <StackPanel>
-                <TextBlock Text="Локальная папка для сохранения моделей:" FontWeight="SemiBold" Foreground="#D0D0E0" Margin="0,0,0,6"/>
+                <TextBlock Text="Локальная папка для сохранения моделей:" FontWeight="SemiBold" Foreground="#BBBBBB" Margin="0,0,0,6"/>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -338,8 +338,8 @@
             
             <!-- Progress Status & Bar -->
             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                <TextBlock x:Name="StatusTextBlock" Text="Готов к подключению" Foreground="#CCCCCC" FontSize="11" Margin="2,0,0,4"/>
-                <ProgressBar x:Name="DownloadProgressBar" Height="14" Minimum="0" Maximum="100" Value="0" Background="#F0F0F0" BorderBrush="#383852">
+                <TextBlock x:Name="StatusTextBlock" Text="Готов к подключению" Foreground="#BBBBBB" FontSize="11" Margin="2,0,0,4"/>
+                <ProgressBar x:Name="DownloadProgressBar" Height="14" Minimum="0" Maximum="100" Value="0" Background="#F0F0F0" BorderBrush="#484848">
                     <ProgressBar.Template>
                         <ControlTemplate TargetType="ProgressBar">
                             <Grid>

@@ -33,6 +33,8 @@ namespace BimboClubManager.Services
 
         public class UpdateManifest
         {
+            [JsonIgnore]
+            public string? SourceDirectory { get; set; }
             [JsonPropertyName("latestVersion")]
             public string LatestVersion { get; set; } = string.Empty;
 
@@ -133,6 +135,7 @@ namespace BimboClubManager.Services
                         var manifest = JsonSerializer.Deserialize<UpdateManifest>(json);
                         if (manifest != null && !string.IsNullOrEmpty(manifest.LatestVersion))
                         {
+                            manifest.SourceDirectory = Path.GetDirectoryName(Path.GetFullPath(file));
                             LastFetchError = null;
                             return manifest;
                         }
@@ -384,7 +387,7 @@ namespace BimboClubManager.Services
                 progress.Report(10); // Start download
 
                 // 2. Download / Copy package
-                string? localZip = FindLocalPackage(sourcePath, packageUrlOrPath);
+                string? localZip = FindLocalPackage(manifest.SourceDirectory ?? sourcePath, packageUrlOrPath);
                 if (!string.IsNullOrEmpty(localZip) && File.Exists(localZip))
                 {
                     progress.Report(40);

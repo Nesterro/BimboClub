@@ -51,18 +51,18 @@ namespace BimboClub
             MinHeight = 550;
             MinWidth = 800;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window); // #18181C
             FontFamily = new System.Windows.Media.FontFamily("Segoe UI");
             FontSize = 13;
-            UiThemeHelper.ApplyDarkTheme(this);
+            UiThemeHelper.ApplyNeutralTheme(this);
 
-            SolidColorBrush panelBg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38));
-            SolidColorBrush controlBg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 48));
-            SolidColorBrush borderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 46, 91));
-            SolidColorBrush textMuted = new SolidColorBrush(System.Windows.Media.Color.FromRgb(160, 160, 170));
-            SolidColorBrush scarletBtn = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
-            SolidColorBrush scarletHover = new SolidColorBrush(System.Windows.Media.Color.FromRgb(220, 20, 60));
+            SolidColorBrush panelBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface);
+            SolidColorBrush controlBg = new SolidColorBrush(global::BimboClub.NeutralColors.Input);
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input);
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
+            SolidColorBrush textMuted = new SolidColorBrush(global::BimboClub.NeutralColors.Muted);
+            SolidColorBrush scarletBtn = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
+            SolidColorBrush scarletHover = new SolidColorBrush(global::BimboClub.NeutralColors.AccentHover);
 
             // Стили
             Style textBoxStyle = new Style(typeof(System.Windows.Controls.TextBox));
@@ -88,7 +88,7 @@ namespace BimboClub
             // 1. Шапка
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(global::BimboClub.NeutralColors.Window, global::BimboClub.NeutralColors.Accent, 0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
             System.Windows.Controls.Grid.SetRow(headerBorder, 0);
@@ -127,7 +127,7 @@ namespace BimboClub
             filterGrid.Children.Add(lblCat);
 
             _cbCategoryFilter = new ComboBox { Height = 28 };
-            UiThemeHelper.StyleComboBoxDark(_cbCategoryFilter, controlBg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_cbCategoryFilter, controlBg, borderBrush);
             _cbCategoryFilter.SelectionChanged += (s, e) => ApplyCategoryFilter();
             System.Windows.Controls.Grid.SetColumn(_cbCategoryFilter, 1);
             filterGrid.Children.Add(_cbCategoryFilter);

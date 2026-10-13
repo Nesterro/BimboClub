@@ -10,15 +10,15 @@ namespace BimboClub
 {
     public static class UiThemeHelper
     {
-        public static void ApplyDarkTheme(Window window)
+        public static void ApplyNeutralTheme(Window window)
         {
             if (window == null) return;
 
-            SolidColorBrush darkBg = new SolidColorBrush(Color.FromRgb(38, 38, 44));
-            SolidColorBrush popupBg = new SolidColorBrush(Color.FromRgb(30, 30, 36));
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(60, 60, 70));
-            SolidColorBrush accentRed = new SolidColorBrush(Color.FromRgb(179, 14, 45));
-            SolidColorBrush accentRedHover = new SolidColorBrush(Color.FromRgb(199, 16, 50));
+            SolidColorBrush darkBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface);
+            SolidColorBrush popupBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface);
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
+            SolidColorBrush accentRed = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
+            SolidColorBrush accentRedHover = new SolidColorBrush(global::BimboClub.NeutralColors.AccentHover);
 
             // Overriding SystemColors resources so built-in controls use dark background and white text
             window.Resources[SystemColors.WindowBrushKey] = popupBg;
@@ -64,18 +64,18 @@ namespace BimboClub
             window.Resources[typeof(ComboBoxItem)] = itemStyle;
 
             // Global ComboBox Style
-            window.Resources[typeof(ComboBox)] = CreateDarkComboBoxStyle(darkBg, popupBg, borderBrush, accentRed);
+            window.Resources[typeof(ComboBox)] = CreateNeutralComboBoxStyle(darkBg, popupBg, borderBrush, accentRed);
 
             // Global TabItem Style (Scarlet Red contrast theme)
-            window.Resources[typeof(TabItem)] = CreateScarletTabItemStyle();
+            window.Resources[typeof(TabItem)] = CreateNeutralTabItemStyle();
         }
 
-        public static Style CreateScarletTabItemStyle()
+        public static Style CreateNeutralTabItemStyle()
         {
             Style style = new Style(typeof(TabItem));
-            SolidColorBrush unselectedBg = new SolidColorBrush(Color.FromRgb(40, 40, 48));
-            SolidColorBrush selectedBg = new SolidColorBrush(Color.FromRgb(179, 14, 45));   // Scarlet Red #B30E2D
-            SolidColorBrush hoverBg = new SolidColorBrush(Color.FromRgb(199, 16, 50));      // Bright Scarlet Red #C71032
+            SolidColorBrush unselectedBg = new SolidColorBrush(global::BimboClub.NeutralColors.Input);
+            SolidColorBrush selectedBg = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);   // Scarlet Red #B30E2D
+            SolidColorBrush hoverBg = new SolidColorBrush(global::BimboClub.NeutralColors.AccentHover);      // Bright Scarlet Red #C71032
 
             style.Setters.Add(new Setter(TabItem.BackgroundProperty, unselectedBg));
             style.Setters.Add(new Setter(TabItem.ForegroundProperty, Brushes.White));
@@ -118,7 +118,7 @@ namespace BimboClub
             return style;
         }
 
-        public static Style CreateDarkComboBoxItemStyle(SolidColorBrush popupBg, SolidColorBrush accentColor)
+        public static Style CreateNeutralComboBoxItemStyle(SolidColorBrush popupBg, SolidColorBrush accentColor)
         {
             Style itemStyle = new Style(typeof(ComboBoxItem));
             itemStyle.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, popupBg));
@@ -146,20 +146,20 @@ namespace BimboClub
             itemTemplate.VisualTree = itemBorder;
 
             Trigger isSelectedTrigger = new Trigger { Property = ComboBoxItem.IsSelectedProperty, Value = true };
-            isSelectedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, accentColor ?? new SolidColorBrush(Color.FromRgb(79, 70, 229)), "Bd"));
+            isSelectedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, accentColor ?? new SolidColorBrush(global::BimboClub.NeutralColors.Accent), "Bd"));
             isSelectedTrigger.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
             itemTemplate.Triggers.Add(isSelectedTrigger);
 
             Trigger isHighlightedTrigger = new Trigger { Property = ComboBoxItem.IsHighlightedProperty, Value = true };
-            isHighlightedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(Color.FromRgb(56, 56, 75)), "Bd"));
-            isHighlightedTrigger.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, new SolidColorBrush(Color.FromRgb(255, 215, 0))));
+            isHighlightedTrigger.Setters.Add(new Setter(Border.BackgroundProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Border), "Bd"));
+            isHighlightedTrigger.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
             itemTemplate.Triggers.Add(isHighlightedTrigger);
 
             itemStyle.Setters.Add(new Setter(ComboBoxItem.TemplateProperty, itemTemplate));
             return itemStyle;
         }
 
-        public static Style CreateDarkComboBoxStyle(SolidColorBrush bg, SolidColorBrush popupBg, SolidColorBrush borderBrush, SolidColorBrush accentRed)
+        public static Style CreateNeutralComboBoxStyle(SolidColorBrush bg, SolidColorBrush popupBg, SolidColorBrush borderBrush, SolidColorBrush accentRed)
         {
             Style cbStyle = new Style(typeof(ComboBox));
             cbStyle.Setters.Add(new Setter(ComboBox.BackgroundProperty, bg));
@@ -167,7 +167,11 @@ namespace BimboClub
             cbStyle.Setters.Add(new Setter(ComboBox.BorderBrushProperty, borderBrush));
             cbStyle.Setters.Add(new Setter(ComboBox.BorderThicknessProperty, new Thickness(1)));
             cbStyle.Setters.Add(new Setter(ComboBox.PaddingProperty, new Thickness(8, 4, 8, 4)));
-            cbStyle.Setters.Add(new Setter(ComboBox.ItemContainerStyleProperty, CreateDarkComboBoxItemStyle(popupBg, accentRed)));
+            cbStyle.Setters.Add(new Setter(ComboBox.MaxDropDownHeightProperty, 320.0));
+            var disabled = new Trigger { Property = ComboBox.IsEnabledProperty, Value = false };
+            disabled.Setters.Add(new Setter(UIElement.OpacityProperty, 0.5));
+            cbStyle.Triggers.Add(disabled);
+            cbStyle.Setters.Add(new Setter(ComboBox.ItemContainerStyleProperty, CreateNeutralComboBoxItemStyle(popupBg, accentRed)));
 
             // ToggleButton Template
             ControlTemplate toggleTemplate = new ControlTemplate(typeof(ToggleButton));
@@ -183,7 +187,7 @@ namespace BimboClub
 
             FrameworkElementFactory arrowPath = new FrameworkElementFactory(typeof(System.Windows.Shapes.Path));
             arrowPath.SetValue(System.Windows.Shapes.Path.DataProperty, Geometry.Parse("M 0 0 L 4 4 L 8 0 Z"));
-            arrowPath.SetValue(System.Windows.Shapes.Path.FillProperty, new SolidColorBrush(Color.FromRgb(200, 200, 220)));
+            arrowPath.SetValue(System.Windows.Shapes.Path.FillProperty, new SolidColorBrush(global::BimboClub.NeutralColors.Muted));
             arrowPath.SetValue(System.Windows.Shapes.Path.HorizontalAlignmentProperty, HorizontalAlignment.Right);
             arrowPath.SetValue(System.Windows.Shapes.Path.VerticalAlignmentProperty, VerticalAlignment.Center);
             arrowPath.SetValue(System.Windows.Shapes.Path.MarginProperty, new Thickness(0, 0, 10, 0));
@@ -215,6 +219,22 @@ namespace BimboClub
             contentPres.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Left);
             mainGrid.AppendChild(contentPres);
 
+            var editableText = new FrameworkElementFactory(typeof(TextBox));
+            editableText.Name = "PART_EditableTextBox";
+            editableText.SetValue(UIElement.VisibilityProperty, Visibility.Collapsed);
+            editableText.SetValue(Control.BackgroundProperty, Brushes.Transparent);
+            editableText.SetValue(Control.ForegroundProperty, Brushes.White);
+            editableText.SetValue(Control.BorderThicknessProperty, new Thickness(0));
+            editableText.SetValue(FrameworkElement.MarginProperty, new Thickness(8, 2, 26, 2));
+            editableText.SetValue(Control.VerticalContentAlignmentProperty, VerticalAlignment.Center);
+            editableText.SetValue(TextBox.TextProperty, new Binding("Text") { Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged, RelativeSource = RelativeSource.TemplatedParent });
+            editableText.SetValue(TextBox.IsReadOnlyProperty, new Binding("IsReadOnly") { RelativeSource = RelativeSource.TemplatedParent });
+            mainGrid.AppendChild(editableText);
+            var editable = new Trigger { Property = ComboBox.IsEditableProperty, Value = true };
+            editable.Setters.Add(new Setter(UIElement.VisibilityProperty, Visibility.Visible, "PART_EditableTextBox"));
+            editable.Setters.Add(new Setter(UIElement.VisibilityProperty, Visibility.Collapsed, "ContentSite"));
+            cbTemplate.Triggers.Add(editable);
+
             // Popup
             FrameworkElementFactory popup = new FrameworkElementFactory(typeof(Popup));
             popup.Name = "PART_Popup";
@@ -225,6 +245,8 @@ namespace BimboClub
 
             FrameworkElementFactory popupBorder = new FrameworkElementFactory(typeof(Border));
             popupBorder.Name = "DropDownBorder";
+            popupBorder.SetValue(FrameworkElement.MinWidthProperty, new Binding("ActualWidth") { RelativeSource = RelativeSource.TemplatedParent });
+            popupBorder.SetValue(FrameworkElement.MaxHeightProperty, new Binding("MaxDropDownHeight") { RelativeSource = RelativeSource.TemplatedParent });
             popupBorder.SetValue(Border.BackgroundProperty, popupBg);
             popupBorder.SetValue(Border.BorderBrushProperty, borderBrush);
             popupBorder.SetValue(Border.BorderThicknessProperty, new Thickness(1));
@@ -236,7 +258,7 @@ namespace BimboClub
             scrollViewer.SetValue(ScrollViewer.SnapsToDevicePixelsProperty, true);
             scrollViewer.SetValue(ScrollViewer.CanContentScrollProperty, true);
 
-            FrameworkElementFactory itemsHost = new FrameworkElementFactory(typeof(StackPanel));
+            FrameworkElementFactory itemsHost = new FrameworkElementFactory(typeof(VirtualizingStackPanel));
             itemsHost.SetValue(StackPanel.IsItemsHostProperty, true);
             itemsHost.SetValue(KeyboardNavigation.DirectionalNavigationProperty, KeyboardNavigationMode.Contained);
 
@@ -251,16 +273,16 @@ namespace BimboClub
             return cbStyle;
         }
 
-        public static void StyleComboBoxDark(ComboBox cb, SolidColorBrush bg, SolidColorBrush borderBrush)
+        public static void StyleComboBoxNeutral(ComboBox cb, SolidColorBrush bg, SolidColorBrush borderBrush)
         {
             if (cb == null) return;
 
-            SolidColorBrush popupBg = new SolidColorBrush(Color.FromRgb(30, 30, 40));
-            SolidColorBrush accentRed = new SolidColorBrush(Color.FromRgb(179, 14, 45));
-            SolidColorBrush border = borderBrush ?? new SolidColorBrush(Color.FromRgb(60, 60, 75));
-            SolidColorBrush inputBg = bg ?? new SolidColorBrush(Color.FromRgb(38, 38, 48));
+            SolidColorBrush popupBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface);
+            SolidColorBrush accentRed = new SolidColorBrush(global::BimboClub.NeutralColors.Accent);
+            SolidColorBrush border = borderBrush ?? new SolidColorBrush(global::BimboClub.NeutralColors.Border);
+            SolidColorBrush inputBg = bg ?? new SolidColorBrush(global::BimboClub.NeutralColors.Input);
 
-            cb.Style = CreateDarkComboBoxStyle(inputBg, popupBg, border, accentRed);
+            cb.Style = CreateNeutralComboBoxStyle(inputBg, popupBg, border, accentRed);
         }
     }
 }

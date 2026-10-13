@@ -1,0 +1,38 @@
+var assembly = System.Reflection.Assembly.Load(System.IO.File.ReadAllBytes(@"D:\Codex\Project1\BimboClub\SystemTravers\bin\x64\Release\net48\BimboClub.dll"));
+var test = app.Application.OpenDocumentFile(@"D:\Codex\Project1\bimboclub-review\HostSmoke.rvt");
+var warnings = new List<string>();
+EventHandler<Autodesk.Revit.DB.Events.FailuresProcessingEventArgs> onFailures = (sender,e) => { var accessor=e.GetFailuresAccessor(); if(accessor.GetDocument()!=test) return; foreach(var failure in accessor.GetFailureMessages()) { if(failure.GetSeverity()==FailureSeverity.Warning) { warnings.Add(failure.GetDescriptionText()); accessor.DeleteWarning(failure); } } };
+app.Application.FailuresProcessing += onFailures;
+var originalFop = app.Application.SharedParametersFilename;
+var openDocsBefore = app.Application.Documents.Size;
+var checks = new List<string>();
+Action<bool,string> check = (ok,m) => { if(!ok) throw new Exception(m); checks.Add(m); };
+try {
+var spaces = new FilteredElementCollector(test).OfCategory(BuiltInCategory.OST_MEPSpaces).WhereElementIsNotElementType().Cast<Autodesk.Revit.DB.Mechanical.Space>().ToList();
+var usable = spaces.Where(s=>s.Area>0).Take(2).ToList();
+check(usable.Count==2,"Two bounded spaces available");
+var oldIds = new FilteredElementCollector(test).OfClass(typeof(FamilyInstance)).OfCategory(BuiltInCategory.OST_GenericModel).ToElementIds().ToList();
+var engineType=assembly.GetType("BimboClub.HeatLossEngine");
+var engine=Activator.CreateInstance(engineType,test);
+Func<FamilySymbol> symbol=()=>new FilteredElementCollector(test).OfClass(typeof(FamilySymbol)).Cast<FamilySymbol>().First(s=>s.FamilyName=="HeatLoss_Cube" && s.Name=="Cube_Wall");
+var method=engineType.GetMethod("Run");
+Func<Autodesk.Revit.DB.Mechanical.Space,int> run = s => (int)method.Invoke(engine,new object[]{new List<Autodesk.Revit.DB.Mechanical.Space>{s},symbol(),-26.0,20.0,true,true,true,true,true,null});
+var firstCount=run(usable[0]);
+check(firstCount>0,"HeatLoss creates cubes for first space");
+var secondCount=run(usable[1]);
+check(secondCount>0,"HeatLoss creates cubes for second space");
+var schema=Autodesk.Revit.DB.ExtensibleStorage.Schema.Lookup(new Guid("FB35D824-3F51-4329-8109-99B34178766C"));
+Func<string,List<ElementId>> owned = id => new FilteredElementCollector(test).OfClass(typeof(FamilyInstance)).Where(e=>{var entity=e.GetEntity(schema); return entity.IsValid() && entity.Get<string>("SpaceUniqueId")==id;}).Select(e=>e.Id).ToList();
+var firstOld=owned(usable[0].UniqueId); var secondOld=owned(usable[1].UniqueId);
+check(firstOld.Count==firstCount && secondOld.Count==secondCount,"Generated cubes carry correct space ownership");
+var repeated=run(usable[0]);
+check(repeated==firstCount && owned(usable[0].UniqueId).Count==firstCount,"Repeat calculation replaces cubes without duplicates");
+check(firstOld.All(id=>test.GetElement(id)==null),"Repeat removes previous cubes of selected space");
+check(secondOld.All(id=>test.GetElement(id)!=null),"Repeat preserves cubes of other space");
+check(oldIds.All(id=>test.GetElement(id)!=null),"Legacy and unrelated generic models preserved");
+var empty=spaces.FirstOrDefault(s=>s.Area==0);
+if(empty!=null) check(run(empty)==0,"Unbounded space creates no cubes");
+check(app.Application.SharedParametersFilename==originalFop,"Shared parameter file restored after heat calculation");
+check(app.Application.Documents.Size==openDocsBefore,"Heat calculation closes temporary family documents");
+return new { Assembly=assembly.FullName, Passed=checks.Count, FirstCubeCount=firstCount, SecondCubeCount=secondCount, Checks=checks, Warnings=warnings };
+} catch(Exception ex) { return new { Passed=checks.Count, Checks=checks, Error=ex.ToString(), Warnings=warnings }; } finally { app.Application.FailuresProcessing -= onFailures; test.Close(false); app.Application.SharedParametersFilename=originalFop; }

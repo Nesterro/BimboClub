@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -20,6 +20,7 @@ namespace BimboClub
         public OpeningsWindow(List<FamilySymbol> gmSymbols)
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
             SetWindowIcon();
 
             var wallItems = gmSymbols.Select(s => new FamilySymbolItem(s)).OrderBy(i => i.DisplayName).ToList();

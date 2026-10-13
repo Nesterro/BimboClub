@@ -158,7 +158,7 @@ namespace BimboClub
                 if (btn.IsEnabled)
                     btn.Background = normalGrad;
                 else
-                    btn.Background = new SolidColorBrush(Color.FromRgb(70, 70, 82));
+                    btn.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
             };
         }
 
@@ -176,18 +176,18 @@ namespace BimboClub
             this.Width = 850;
             this.Height = 550;
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            this.Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            this.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window); // #18181C
             this.FontFamily = new FontFamily("Segoe UI");
             this.FontSize = 13;
             this.MinHeight = 450;
             this.MinWidth = 750;
 
             // Цветовая палитра
-            SolidColorBrush panelBg = new SolidColorBrush(Color.FromRgb(32, 32, 38)); // #202026
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(255, 46, 91)); // #FF2E5B (Scarlet)
-            SolidColorBrush cancelNormal = new SolidColorBrush(Color.FromRgb(58, 58, 66));
-            SolidColorBrush cancelHover = new SolidColorBrush(Color.FromRgb(78, 78, 88));
+            SolidColorBrush panelBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface); // #202026
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #303038
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Accent); // #FF2E5B (Scarlet)
+            SolidColorBrush cancelNormal = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
+            SolidColorBrush cancelHover = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
 
             Style checkBoxStyle = new Style(typeof(CheckBox));
             checkBoxStyle.Setters.Add(new Setter(CheckBox.ForegroundProperty, Brushes.White));
@@ -205,8 +205,8 @@ namespace BimboClub
             Border headerBorder = new Border
             {
                 Background = new LinearGradientBrush(
-                    Color.FromRgb(18, 18, 20),
-                    Color.FromRgb(179, 14, 45), // #B30E2D (Бренд алый)
+                    global::BimboClub.NeutralColors.Window,
+                    global::BimboClub.NeutralColors.Accent, // #B30E2D (Бренд алый)
                     0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
@@ -395,7 +395,7 @@ namespace BimboClub
 
             _txtFamilySearch = new TextBox
             {
-                Background = new SolidColorBrush(Color.FromRgb(45, 45, 53)),
+                Background = new SolidColorBrush(global::BimboClub.NeutralColors.Input),
                 Foreground = Brushes.White,
                 BorderBrush = borderBrush,
                 Padding = new Thickness(5, 2, 5, 2),
@@ -517,8 +517,8 @@ namespace BimboClub
             };
             _btnOk.Click += BtnOk_Click;
             
-            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
-            LinearGradientBrush hoverGrad = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.Accent, global::BimboClub.NeutralColors.Accent, 90.0);
+            LinearGradientBrush hoverGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.AccentHover, global::BimboClub.NeutralColors.AccentHover, 90.0);
             ApplyButtonStyles(_btnOk, normalGrad, hoverGrad, roundedButtonStyle);
             bottomGrid.Children.Add(_btnOk);
 

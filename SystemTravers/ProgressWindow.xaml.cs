@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -9,6 +9,7 @@ namespace BimboClub
         public ProgressWindow()
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
             SetWindowIcon();
         }
 

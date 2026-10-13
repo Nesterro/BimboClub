@@ -122,7 +122,7 @@ namespace BimboClub
                 if (btn.IsEnabled)
                     btn.Background = normalGrad;
                 else
-                    btn.Background = new SolidColorBrush(Color.FromRgb(70, 70, 82));
+                    btn.Background = new SolidColorBrush(global::BimboClub.NeutralColors.Border);
             };
         }
 
@@ -140,18 +140,18 @@ namespace BimboClub
             Width = 600;
             Height = 740;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(global::BimboClub.NeutralColors.Window); // #18181C
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
             MinHeight = 600;
             MinWidth = 550;
 
             // Цветовая палитра
-            SolidColorBrush panelBg = new SolidColorBrush(Color.FromRgb(32, 32, 38)); // #202026
-            SolidColorBrush controlBg = new SolidColorBrush(Color.FromRgb(40, 40, 48)); // #282830
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(255, 46, 91)); // #FF2E5B
-            SolidColorBrush textMuted = new SolidColorBrush(Color.FromRgb(160, 160, 170));
+            SolidColorBrush panelBg = new SolidColorBrush(global::BimboClub.NeutralColors.Surface); // #202026
+            SolidColorBrush controlBg = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #282830
+            SolidColorBrush borderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Input); // #303038
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(global::BimboClub.NeutralColors.Accent); // #FF2E5B
+            SolidColorBrush textMuted = new SolidColorBrush(global::BimboClub.NeutralColors.Muted);
 
             // Стили по умолчанию
             Style textBoxStyle = new Style(typeof(TextBox));
@@ -185,7 +185,7 @@ namespace BimboClub
             // 1. Шапка
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(global::BimboClub.NeutralColors.Window, global::BimboClub.NeutralColors.Accent, 0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
             Grid.SetRow(headerBorder, 0);
@@ -246,7 +246,7 @@ namespace BimboClub
             excelGrid.Children.Add(_txtFilePath);
 
             Button btnBrowse = new Button { Content = "Обзор...", Foreground = Brushes.White, BorderThickness = new Thickness(0), Height = 24, Cursor = Cursors.Hand };
-            ApplyFlatButtonStyles(btnBrowse, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnBrowse, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             btnBrowse.Click += BtnBrowse_Click;
             Grid.SetRow(btnBrowse, 0); Grid.SetColumn(btnBrowse, 2);
             excelGrid.Children.Add(btnBrowse);
@@ -257,7 +257,7 @@ namespace BimboClub
             excelGrid.Children.Add(lblSheet);
 
             _cbWorksheet = new ComboBox { Style = comboBoxStyle, Height = 24, Margin = new Thickness(0, 0, 5, 0) };
-            UiThemeHelper.StyleComboBoxDark(_cbWorksheet, controlBg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_cbWorksheet, controlBg, borderBrush);
             _cbWorksheet.SelectionChanged += CbWorksheet_SelectionChanged;
             Grid.SetRow(_cbWorksheet, 1); Grid.SetColumn(_cbWorksheet, 1); Grid.SetColumnSpan(_cbWorksheet, 2);
             excelGrid.Children.Add(_cbWorksheet);
@@ -268,7 +268,7 @@ namespace BimboClub
             excelGrid.Children.Add(lblRangeType);
 
             _cbRangeType = new ComboBox { Style = comboBoxStyle, Height = 24, Margin = new Thickness(0, 0, 5, 0) };
-            UiThemeHelper.StyleComboBoxDark(_cbRangeType, controlBg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_cbRangeType, controlBg, borderBrush);
             _cbRangeType.Items.Add(new ComboBoxItemTag { DisplayText = "Вся заполненная область", TagValue = "ALL" });
             _cbRangeType.Items.Add(new ComboBoxItemTag { DisplayText = "Область печати (не задана)", TagValue = null });
             _cbRangeType.Items.Add(new ComboBoxItemTag { DisplayText = "Ввести вручную...", TagValue = "CUSTOM" });
@@ -313,7 +313,7 @@ namespace BimboClub
             revitGrid.Children.Add(lblTarget);
 
             _cbTargetView = new ComboBox { Style = comboBoxStyle, Height = 24 };
-            UiThemeHelper.StyleComboBoxDark(_cbTargetView, controlBg, borderBrush);
+            UiThemeHelper.StyleComboBoxNeutral(_cbTargetView, controlBg, borderBrush);
             _cbTargetView.SelectionChanged += CbTargetView_SelectionChanged;
             Grid.SetRow(_cbTargetView, 0); Grid.SetColumn(_cbTargetView, 1);
             revitGrid.Children.Add(_cbTargetView);
@@ -358,7 +358,7 @@ namespace BimboClub
             existingGrid.Children.Add(_lstExistingLinks);
 
             _btnUpdateSelected = new Button { Content = "Обновить выбранные виды", Foreground = Brushes.White, BorderThickness = new Thickness(0), Height = 26, Cursor = Cursors.Hand, FontWeight = FontWeights.Bold };
-            ApplyFlatButtonStyles(_btnUpdateSelected, new SolidColorBrush(Color.FromRgb(179, 14, 45)), new SolidColorBrush(Color.FromRgb(210, 20, 60)), roundedButtonStyle);
+            ApplyFlatButtonStyles(_btnUpdateSelected, new SolidColorBrush(global::BimboClub.NeutralColors.Accent), new SolidColorBrush(global::BimboClub.NeutralColors.AccentHover), roundedButtonStyle);
             _btnUpdateSelected.Click += BtnUpdateSelected_Click;
             Grid.SetRow(_btnUpdateSelected, 1);
             existingGrid.Children.Add(_btnUpdateSelected);
@@ -385,8 +385,8 @@ namespace BimboClub
             };
             _btnImport.Click += BtnImport_Click;
 
-            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
-            LinearGradientBrush hoverGrad = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.Accent, global::BimboClub.NeutralColors.Accent, 90.0);
+            LinearGradientBrush hoverGrad = new LinearGradientBrush(global::BimboClub.NeutralColors.AccentHover, global::BimboClub.NeutralColors.AccentHover, 90.0);
             ApplyButtonStyles(_btnImport, normalGrad, hoverGrad, roundedButtonStyle);
             Grid.SetColumn(_btnImport, 1);
             bottomGrid.Children.Add(_btnImport);
@@ -401,7 +401,7 @@ namespace BimboClub
                 Cursor = Cursors.Hand
             };
             btnCancel.Click += (s, e) => { DialogResult = false; Close(); };
-            ApplyFlatButtonStyles(btnCancel, new SolidColorBrush(Color.FromRgb(58, 58, 66)), new SolidColorBrush(Color.FromRgb(78, 78, 88)), roundedButtonStyle);
+            ApplyFlatButtonStyles(btnCancel, new SolidColorBrush(global::BimboClub.NeutralColors.Border), new SolidColorBrush(global::BimboClub.NeutralColors.Border), roundedButtonStyle);
             Grid.SetColumn(btnCancel, 2);
             bottomGrid.Children.Add(btnCancel);
         }
@@ -479,7 +479,7 @@ namespace BimboClub
                 TextBlock txtFile = new TextBlock
                 {
                     Text = $"{excelName} [{link.SheetName}]",
-                    Foreground = new SolidColorBrush(Color.FromRgb(200, 200, 205)),
+                    Foreground = new SolidColorBrush(global::BimboClub.NeutralColors.Muted),
                     VerticalAlignment = VerticalAlignment.Center,
                     TextTrimming = TextTrimming.CharacterEllipsis,
                     ToolTip = link.ExcelPath,

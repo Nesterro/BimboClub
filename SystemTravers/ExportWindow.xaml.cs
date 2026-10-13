@@ -86,7 +86,7 @@ namespace BimboClub
         public ExportWindow(List<ViewSheet> sheets, List<ViewSheetSet> sheetSets, string defaultFolder)
         {
             InitializeComponent();
-            UiThemeHelper.ApplyDarkTheme(this);
+            UiThemeHelper.ApplyNeutralTheme(this);
             SetWindowIcon();
 
             AllSheets = sheets.Select(s => new BccExportSheetItem(s)).OrderBy(s => s.Number).ToList();

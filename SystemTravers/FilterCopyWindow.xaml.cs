@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -25,6 +25,7 @@ namespace BimboClub
         public FilterCopyWindow(Document doc, View activeView)
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
 
             _doc = doc ?? throw new ArgumentNullException(nameof(doc));
             _activeView = activeView;

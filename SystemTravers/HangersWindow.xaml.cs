@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -17,6 +17,7 @@ namespace BimboClub
         public HangersWindow(List<FamilySymbol> hangerSymbols)
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
             SetWindowIcon();
 
             var items = hangerSymbols.Select(s => new FamilySymbolItem(s)).OrderBy(i => i.DisplayName).ToList();

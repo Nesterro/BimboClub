@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
@@ -11,6 +11,7 @@ namespace BimboClub
         public HeatLossCoeffWindow(List<HeatLossCoeffItem> items)
         {
             InitializeComponent();
+            global::BimboClub.UiThemeHelper.ApplyNeutralTheme(this);
             SetWindowIcon();
 
             Items = items ?? new List<HeatLossCoeffItem>();

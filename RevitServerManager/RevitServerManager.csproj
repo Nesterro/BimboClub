@@ -18,7 +18,23 @@
     <ProjectReference Include="..\RevitServerBridge\RevitServerBridge.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <EmbeddedResource Include="..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe" Link="Bridge\RSBridge.exe" Condition="Exists('..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe')" />
-    <EmbeddedResource Include="..\RevitServerBridge\bin\$(Configuration)\net48\*.dll" Link="Bridge\%(Filename)%(Extension)" Condition="Exists('..\RevitServerBridge\bin\$(Configuration)\net48\RSBridge.exe')" />
   </ItemGroup>
+  <!-- Evaluate the payload only after the project reference has been built. -->
+  <Target Name="IncludeBridgePayload" BeforeTargets="AssignTargetPaths" DependsOnTargets="ResolveProjectReferences">
+    <MSBuild Projects="..\RevitServerBridge\RevitServerBridge.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration)">
+      <Output TaskParameter="TargetOutputs" ItemName="_BridgeTarget" />
+    </MSBuild>
+    <PropertyGroup>
+      <_BridgeDirectory>@(_BridgeTarget->'%(RootDir)%(Directory)')</_BridgeDirectory>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_BridgeDirectory)RSBridge.exe')" Text="Revit Server bridge payload is missing." />
+    <ItemGroup>
+      <_BridgePayload Include="$(_BridgeDirectory)RSBridge.exe;$(_BridgeDirectory)*.dll" />
+      <EmbeddedResource Remove="@(_BridgePayload)" />
+      <EmbeddedResource Include="@(_BridgePayload)">
+        <Link>Bridge\%(_BridgePayload.Filename)%(_BridgePayload.Extension)</Link>
+        <LogicalName>RevitServerManager.Bridge.%(_BridgePayload.Filename)%(_BridgePayload.Extension)</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+  </Target>
 </Project>

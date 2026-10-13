@@ -21,11 +21,11 @@ namespace BimboClub.SpacesFromRooms
 
             try
             {
-                UiThemeHelper.ApplyDarkTheme(this);
+                UiThemeHelper.ApplyNeutralTheme(this);
             }
             catch (Exception ex)
             {
-                Logger.Log($"ApplyDarkTheme in SpacesFromRoomsWindow warning: {ex.Message}", "WARN");
+                Logger.Log($"ApplyNeutralTheme in SpacesFromRoomsWindow warning: {ex.Message}", "WARN");
             }
 
             LoadData();

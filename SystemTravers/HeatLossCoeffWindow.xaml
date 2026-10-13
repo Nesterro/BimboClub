@@ -4,7 +4,7 @@
         Title="вљ« BimboClub | Коэффициенты теплопередачи"
         Height="500" Width="550"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E2E"
+        Background="#2F2F2F"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#FFFFFF"
@@ -47,8 +47,8 @@
                     <Setter Property="Background" Value="#A50E0E"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#E0E0E0"/>
-                    <Setter Property="Foreground" Value="#888888"/>
+                    <Setter Property="Background" Value="#BBBBBB"/>
+                    <Setter Property="Foreground" Value="#BBBBBB"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -60,7 +60,7 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="32"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#B0B0B0"/>
+            <Setter Property="BorderBrush" Value="#BBBBBB"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FocusVisualStyle" Value="{StaticResource WcagFocusVisual}"/>
             <Setter Property="Template">
@@ -78,7 +78,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E5E5E5"/>
+                    <Setter Property="Background" Value="#BBBBBB"/>
                     <Setter Property="BorderBrush" Value="#005FB8"/>
                 </Trigger>
             </Style.Triggers>
@@ -101,7 +101,7 @@
         <Border Grid.Row="0" BorderBrush="#EAEAEA" BorderThickness="0,0,0,1"
                 Padding="0,0,0,10" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="BimboClub" Foreground="#FFD700"
+                <TextBlock Text="BimboClub" Foreground="#0078D4"
                            FontWeight="Bold" FontSize="18"/>
                 <TextBlock Text=" | КОЭФФИЦИЕНТЫ ТЕПЛОПЕРЕДАЧИ (k)" Foreground="#FFFFFF"
                            FontWeight="SemiBold" FontSize="18" Margin="5,0,0,0"/>
@@ -123,11 +123,11 @@
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
                   GridLinesVisibility="Horizontal"
-                  HorizontalGridLinesBrush="#E0E0E0"
+                  HorizontalGridLinesBrush="#BBBBBB"
                   RowHeight="32"
                   HeadersVisibility="Column"
-                  Background="#1E1E2E"
-                  BorderBrush="#D9D9D9"
+                  Background="#2F2F2F"
+                  BorderBrush="#BBBBBB"
                   BorderThickness="1">
             <DataGrid.Resources>
                 <Style TargetType="DataGridColumnHeader">
@@ -136,7 +136,7 @@
                     <Setter Property="FontWeight" Value="SemiBold"/>
                     <Setter Property="Padding" Value="8,6"/>
                     <Setter Property="BorderThickness" Value="0,0,1,1"/>
-                    <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                    <Setter Property="BorderBrush" Value="#BBBBBB"/>
                 </Style>
             </DataGrid.Resources>
             <DataGrid.Columns>

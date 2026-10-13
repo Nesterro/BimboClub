@@ -35,11 +35,11 @@ namespace BimboClub
 
             try
             {
-                UiThemeHelper.ApplyDarkTheme(this);
+                UiThemeHelper.ApplyNeutralTheme(this);
             }
             catch (Exception ex)
             {
-                Logger.Log($"ApplyDarkTheme in CreateFamilyFromDxfWindow warning: {ex.Message}", "WARN");
+                Logger.Log($"ApplyNeutralTheme in CreateFamilyFromDxfWindow warning: {ex.Message}", "WARN");
             }
 
             InitCategories();
