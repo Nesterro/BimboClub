@@ -135,22 +135,7 @@ namespace BimboClubManager.Services
                     return "—";
                 }
 
-                // 1. Check version.txt in same directory
-                string? dir = Path.GetDirectoryName(dllPath);
-                if (!string.IsNullOrEmpty(dir))
-                {
-                    string verFile = Path.Combine(dir, "version.txt");
-                    if (File.Exists(verFile))
-                    {
-                        string txtVer = File.ReadAllText(verFile).Trim().TrimStart('v', 'V');
-                        if (IsValidVersion(txtVer))
-                        {
-                            return txtVer;
-                        }
-                    }
-                }
-
-                // 2. Read FileVersionInfo
+                // The installed binary is authoritative; version.txt may be stale.
                 var versionInfo = FileVersionInfo.GetVersionInfo(dllPath);
                 string? version = versionInfo.ProductVersion;
                 if (!string.IsNullOrEmpty(version))
@@ -177,7 +162,7 @@ namespace BimboClubManager.Services
                 Debug.WriteLine($"Error reading DLL version from {dllPath}: {ex.Message}");
             }
 
-            return "2.4.20";
+            return "—";
         }
 
         private static string CleanVersionString(string raw)

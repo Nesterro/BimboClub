@@ -12,7 +12,7 @@ $env:Path = "C:\Users\user\MinGit\cmd;" + $env:Path
 
 # 1. Compile BimboClub plugin
 Write-Host "--- 1. Compiling solution in Release configuration ---" -ForegroundColor Cyan
-dotnet build BimboClub.sln -c Release -p:Version=$Version
+dotnet build BimboClub.sln -c Release -p:Version=$Version -p:FileVersion=$Version -p:AssemblyVersion=$Version -p:InformationalVersion=$Version
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Solution build failed!"
     exit 1
@@ -30,6 +30,7 @@ $null = New-Item -ItemType Directory -Path $tempNet8 -Force
 
 # Copy net48 files
 Copy-Item "SystemTravers\bin\x64\Release\net48\BimboClub.dll" -Destination $tempNet48 -Force
+Get-ChildItem "SystemTravers\bin\x64\Release\net48\*.dll" | Where-Object { $_.Name -notmatch '^RevitAPI(UI)?\.dll$' } | Copy-Item -Destination $tempNet48 -Force
 Copy-Item "DuctSystemParamCopy\bin\x64\Release\net48\DuctSystemParamCopy.dll" -Destination $tempNet48 -Force
 Copy-Item "SystemTravers\BimboClub.addin" -Destination $tempNet48 -Force
 Copy-Item "SystemTravers\icon32.png" -Destination $tempNet48 -Force
@@ -38,6 +39,7 @@ Set-Content -Path "$tempNet48\version.txt" -Value $Version -Force
 
 # Copy net8 files
 Copy-Item "SystemTravers\bin\x64\Release\net8.0-windows\BimboClub.dll" -Destination $tempNet8 -Force
+Get-ChildItem "SystemTravers\bin\x64\Release\net8.0-windows\*.dll" | Where-Object { $_.Name -notmatch '^RevitAPI(UI)?\.dll$' } | Copy-Item -Destination $tempNet8 -Force
 Copy-Item "DuctSystemParamCopy\bin\x64\Release\net8.0-windows\DuctSystemParamCopy.dll" -Destination $tempNet8 -Force
 Copy-Item "SystemTravers\BimboClub.addin" -Destination $tempNet8 -Force
 Copy-Item "SystemTravers\icon32.png" -Destination $tempNet8 -Force
