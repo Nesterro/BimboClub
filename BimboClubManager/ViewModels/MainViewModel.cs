@@ -32,6 +32,7 @@ namespace BimboClubManager.ViewModels
         private string _revitWarningStatus = string.Empty;
         private RevitVersionInfo? _pendingInstallVersion;
         private bool _pendingInstallAll;
+        private UpdateService.UpdateManifest? _lastManifest;
 
         public ObservableCollection<RevitVersionInfo> RevitVersions { get; } = new();
 
@@ -220,6 +221,7 @@ namespace BimboClubManager.ViewModels
                 
                 if (manifest != null)
                 {
+                    _lastManifest = manifest;
                     LatestVersion = manifest.LatestVersion;
                     Changelog = $"Версия: {manifest.LatestVersion} ({manifest.ReleaseDate})\n\nИзменения:\n" + 
                                 string.Join("\n", manifest.Changelog);
@@ -231,9 +233,10 @@ namespace BimboClubManager.ViewModels
                 }
                 else
                 {
+                    string err = _updateService.LastFetchError ?? "Не удалось получить манифест обновлений. Проверьте настройки источника.";
                     LatestVersion = "Неизвестно";
-                    Changelog = "Ошибка проверки обновлений. Проверьте путь к источнику обновлений в настройках.";
-                    MessageBox.Show("Не удалось получить манифест обновлений. Проверьте настройки источника.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Changelog = $"Ошибка проверки обновлений:\n{err}";
+                    MessageBox.Show(err, "Ошибка получения обновлений", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             catch (Exception ex)
@@ -463,11 +466,14 @@ namespace BimboClubManager.ViewModels
 
             try
             {
-                var manifest = await _updateService.FetchManifestAsync(UpdateSource);
+                var manifest = await _updateService.FetchManifestAsync(UpdateSource) ?? _lastManifest;
                 if (manifest == null)
                 {
-                    throw new Exception("Не удалось загрузить манифест обновления.");
+                    string err = _updateService.LastFetchError ?? "Не удалось загрузить манифест обновления. Проверьте источник обновлений в настройках.";
+                    throw new Exception(err);
                 }
+
+                _lastManifest = manifest;
 
                 using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
                 await _updateService.InstallUpdateAsync(version, manifest, UpdateSource, progress, cts.Token);
@@ -500,11 +506,14 @@ namespace BimboClubManager.ViewModels
 
             try
             {
-                var manifest = await _updateService.FetchManifestAsync(UpdateSource);
+                var manifest = await _updateService.FetchManifestAsync(UpdateSource) ?? _lastManifest;
                 if (manifest == null)
                 {
-                    throw new Exception("Не удалось загрузить манифест обновления.");
+                    string err = _updateService.LastFetchError ?? "Не удалось загрузить манифест обновления. Проверьте источник обновлений в настройках.";
+                    throw new Exception(err);
                 }
+
+                _lastManifest = manifest;
 
                 int total = outdated.Count;
                 for (int i = 0; i < total; i++)

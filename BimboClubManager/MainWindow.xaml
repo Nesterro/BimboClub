@@ -525,7 +525,9 @@
                                     <TextBlock Text="РЕПОЗИТОРИЙ GITHUB" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,12" />
                                     
                                     <TextBlock Text="Источник манифеста обновлений:" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,6" />
-                                    <TextBox Text="{Binding GitHubRepo, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,16" />
+                                    <TextBox Text="{Binding GitHubRepo, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ModernTextBoxStyle}" Margin="0,0,0,8" />
+                                    <TextBlock Text="Поддерживаются: репозиторий GitHub (например, Nesterro/BimboClub), прямая ссылка на update_manifest.json, локальная папка с файлами обновлений (D:\BimboClub) или сетевой ресурс (\\server\share)." 
+                                               FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,16" Opacity="0.8" />
 
                                     <CheckBox Content="Автоматически проверять обновления при запуске" 
                                               IsChecked="{Binding AutoCheckUpdates}" 

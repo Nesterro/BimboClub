@@ -1,7 +1,9 @@
-using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -14,11 +16,19 @@ namespace BimboClubManager.Services
     public class UpdateService
     {
         private readonly HttpClient _httpClient;
+        public string? LastFetchError { get; private set; }
 
         public UpdateService()
         {
-            _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("BimboClubManager/2.0 (Windows; Revit Plugin Update Manager)");
+            var handler = new HttpClientHandler
+            {
+                UseProxy = true,
+                DefaultProxyCredentials = CredentialCache.DefaultCredentials,
+                AllowAutoRedirect = true,
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+            _httpClient = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(15) };
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("BimboClubManager/2.4 (Windows; Revit Plugin Update Manager)");
         }
 
         public class UpdateManifest
@@ -47,43 +57,236 @@ namespace BimboClubManager.Services
 
         public async Task<UpdateManifest?> FetchManifestAsync(string sourcePath)
         {
-            try
+            LastFetchError = null;
+            string clean = (sourcePath ?? string.Empty).Trim().Trim('"', '\'');
+            if (string.IsNullOrWhiteSpace(clean))
             {
-                string jsonContent;
-                if (sourcePath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || 
-                    sourcePath.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                clean = "https://raw.githubusercontent.com/Nesterro/BimboClub/main/updates/update_manifest.json";
+            }
+
+            // 1. Try as local file or network share path
+            if (IsLocalOrUncPath(clean))
+            {
+                var localManifest = await TryFetchLocalManifestAsync(clean);
+                if (localManifest != null) return localManifest;
+            }
+
+            // 2. Try as HTTP / HTTPS / GitHub URL
+            var httpManifest = await TryFetchHttpManifestAsync(clean);
+            if (httpManifest != null) return httpManifest;
+
+            // 3. Fallback to default raw GitHub repository if clean was custom and failed
+            if (!clean.Equals("https://raw.githubusercontent.com/Nesterro/BimboClub/main/updates/update_manifest.json", StringComparison.OrdinalIgnoreCase))
+            {
+                var fallbackManifest = await TryFetchHttpManifestAsync("https://raw.githubusercontent.com/Nesterro/BimboClub/main/updates/update_manifest.json");
+                if (fallbackManifest != null) return fallbackManifest;
+            }
+
+            return null;
+        }
+
+        private static bool IsLocalOrUncPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+            if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                path.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+            if (path.StartsWith(@"\\") || path.Contains(@":\") || path.Contains(@":/"))
+            {
+                return true;
+            }
+            if (Directory.Exists(path) || File.Exists(path))
+            {
+                return true;
+            }
+            return !path.Contains("github.com") && !path.Contains("/");
+        }
+
+        private async Task<UpdateManifest?> TryFetchLocalManifestAsync(string rawPath)
+        {
+            var candidates = new List<string>();
+
+            if (File.Exists(rawPath))
+            {
+                candidates.Add(rawPath);
+            }
+
+            candidates.Add(Path.Combine(rawPath, "update_manifest.json"));
+            candidates.Add(Path.Combine(rawPath, "updates", "update_manifest.json"));
+
+            string? dir = Directory.Exists(rawPath) ? rawPath : Path.GetDirectoryName(rawPath);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                candidates.Add(Path.Combine(dir, "update_manifest.json"));
+                candidates.Add(Path.Combine(dir, "updates", "update_manifest.json"));
+            }
+
+            foreach (var file in candidates.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                try
                 {
-                    string url = sourcePath;
-                    url += (url.Contains("?") ? "&" : "?") + $"_nocache={DateTime.UtcNow.Ticks}";
-                    using var request = new HttpRequestMessage(HttpMethod.Get, url);
+                    if (File.Exists(file))
+                    {
+                        string json = await File.ReadAllTextAsync(file);
+                        var manifest = JsonSerializer.Deserialize<UpdateManifest>(json);
+                        if (manifest != null && !string.IsNullOrEmpty(manifest.LatestVersion))
+                        {
+                            LastFetchError = null;
+                            return manifest;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LastFetchError = $"Ошибка чтения локального файла '{file}': {ex.Message}";
+                    Debug.WriteLine(LastFetchError);
+                }
+            }
+
+            if (string.IsNullOrEmpty(LastFetchError))
+            {
+                LastFetchError = $"Файл update_manifest.json не найден по локальному пути: {rawPath}";
+            }
+            return null;
+        }
+
+        private async Task<UpdateManifest?> TryFetchHttpManifestAsync(string input)
+        {
+            string owner = "Nesterro";
+            string repo = "BimboClub";
+            string branch = "main";
+            string relPath = "updates/update_manifest.json";
+
+            string normalized = input;
+            if (normalized.StartsWith("github.com/", StringComparison.OrdinalIgnoreCase))
+            {
+                normalized = "https://" + normalized;
+            }
+            else if (!normalized.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                     !normalized.StartsWith("https://", StringComparison.OrdinalIgnoreCase) &&
+                     normalized.Contains('/') && !normalized.Contains('\\'))
+            {
+                normalized = "https://github.com/" + normalized;
+            }
+
+            var candidateUrls = new List<string>();
+
+            if (Uri.TryCreate(normalized, UriKind.Absolute, out Uri? uri))
+            {
+                string host = uri.Host.ToLowerInvariant();
+                string[] segs = uri.AbsolutePath.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+                if (host == "github.com" || host == "raw.githubusercontent.com")
+                {
+                    if (segs.Length >= 2)
+                    {
+                        owner = segs[0];
+                        repo = segs[1];
+                    }
+
+                    if (host == "raw.githubusercontent.com")
+                    {
+                        if (segs.Length >= 3) branch = segs[2];
+                        if (segs.Length >= 4) relPath = string.Join('/', segs.Skip(3));
+                    }
+                    else if (host == "github.com")
+                    {
+                        if (segs.Length >= 4 && (segs[2] == "blob" || segs[2] == "raw" || segs[2] == "tree"))
+                        {
+                            branch = segs[3];
+                            if (segs.Length >= 5)
+                            {
+                                relPath = string.Join('/', segs.Skip(4));
+                                if (!relPath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    relPath = relPath.TrimEnd('/') + "/update_manifest.json";
+                                }
+                            }
+                        }
+                    }
+
+                    candidateUrls.Add($"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{relPath}");
+                    candidateUrls.Add($"https://github.com/{owner}/{repo}/raw/{branch}/{relPath}");
+                    candidateUrls.Add($"https://cdn.jsdelivr.net/gh/{owner}/{repo}@{branch}/{relPath}");
+                    candidateUrls.Add($"https://api.github.com/repos/{owner}/{repo}/contents/{relPath}?ref={branch}");
+                }
+                else
+                {
+                    candidateUrls.Add(normalized);
+                }
+            }
+            else
+            {
+                candidateUrls.Add(normalized);
+            }
+
+            candidateUrls.Add("https://raw.githubusercontent.com/Nesterro/BimboClub/main/updates/update_manifest.json");
+            candidateUrls.Add("https://github.com/Nesterro/BimboClub/raw/main/updates/update_manifest.json");
+            candidateUrls.Add("https://cdn.jsdelivr.net/gh/Nesterro/BimboClub@main/updates/update_manifest.json");
+            candidateUrls.Add("https://api.github.com/repos/Nesterro/BimboClub/contents/updates/update_manifest.json");
+
+            var distinctUrls = candidateUrls.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            string? lastErrMsg = null;
+
+            foreach (string rawUrl in distinctUrls)
+            {
+                try
+                {
+                    string fetchUrl = rawUrl;
+                    if (!fetchUrl.Contains("api.github.com"))
+                    {
+                        fetchUrl += (fetchUrl.Contains("?") ? "&" : "?") + $"_nocache={DateTime.UtcNow.Ticks}";
+                    }
+
+                    using var request = new HttpRequestMessage(HttpMethod.Get, fetchUrl);
                     request.Headers.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue
                     {
                         NoCache = true,
                         NoStore = true,
                         MustRevalidate = true
                     };
-                    using var response = await _httpClient.SendAsync(request);
-                    response.EnsureSuccessStatusCode();
-                    jsonContent = await response.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    // Treat as local file path or network share
-                    string manifestPath = Path.Combine(sourcePath, "update_manifest.json");
-                    if (!File.Exists(manifestPath))
-                    {
-                        return null;
-                    }
-                    jsonContent = await File.ReadAllTextAsync(manifestPath);
-                }
 
-                return JsonSerializer.Deserialize<UpdateManifest>(jsonContent);
+                    if (fetchUrl.Contains("api.github.com"))
+                    {
+                        request.Headers.Accept.Clear();
+                        request.Headers.Accept.ParseAdd("application/vnd.github.v3.raw");
+                    }
+
+                    using var response = await _httpClient.SendAsync(request);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        lastErrMsg = $"HTTP {(int)response.StatusCode} ({response.ReasonPhrase}) от {rawUrl}";
+                        continue;
+                    }
+
+                    string json = await response.Content.ReadAsStringAsync();
+                    if (string.IsNullOrWhiteSpace(json)) continue;
+
+                    string trimmed = json.Trim();
+                    if (trimmed.StartsWith("<!DOCTYPE", StringComparison.OrdinalIgnoreCase) || trimmed.StartsWith("<html", StringComparison.OrdinalIgnoreCase))
+                    {
+                        lastErrMsg = $"Ответ содержит HTML страницу вместо JSON манифеста: {rawUrl}";
+                        continue;
+                    }
+
+                    var manifest = JsonSerializer.Deserialize<UpdateManifest>(json);
+                    if (manifest != null && !string.IsNullOrEmpty(manifest.LatestVersion))
+                    {
+                        LastFetchError = null;
+                        return manifest;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    lastErrMsg = $"Ошибка загрузки из {rawUrl}: {ex.Message}";
+                    Debug.WriteLine(lastErrMsg);
+                }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error fetching update manifest: {ex.Message}");
-                return null;
-            }
+
+            LastFetchError = lastErrMsg ?? "Не удалось получить манифест обновлений ни с одного из сетевых источников.";
+            return null;
         }
 
         public bool IsRevitRunning()
@@ -181,16 +384,24 @@ namespace BimboClubManager.Services
                 progress.Report(10); // Start download
 
                 // 2. Download / Copy package
-                if (packageUrlOrPath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || 
-                    packageUrlOrPath.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                string? localZip = FindLocalPackage(sourcePath, packageUrlOrPath, versionInfo.TargetFramework);
+                if (!string.IsNullOrEmpty(localZip) && File.Exists(localZip))
                 {
-                    await DownloadFileAsync(packageUrlOrPath, tempZipPath, progress, cancellationToken);
+                    progress.Report(40);
+                    File.Copy(localZip, tempZipPath, true);
+                    progress.Report(50);
+                }
+                else if (packageUrlOrPath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || 
+                         packageUrlOrPath.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+                {
+                    await DownloadFileWithFallbacksAsync(packageUrlOrPath, tempZipPath, progress, cancellationToken);
                 }
                 else
                 {
+                    string localDir = Directory.Exists(sourcePath) ? sourcePath : (Path.GetDirectoryName(sourcePath) ?? sourcePath);
                     string localZipPath = Path.IsPathRooted(packageUrlOrPath)
                         ? packageUrlOrPath
-                        : Path.Combine(sourcePath, packageUrlOrPath);
+                        : Path.Combine(localDir, packageUrlOrPath);
 
                     if (!File.Exists(localZipPath))
                     {
@@ -285,6 +496,128 @@ namespace BimboClubManager.Services
                     Thread.Sleep(500);
                 }
             }
+        }
+
+        private static string? FindLocalPackage(string sourcePath, string packageUrlOrPath, string targetFramework)
+        {
+            string? candidateFileName = null;
+            if (Uri.TryCreate(packageUrlOrPath, UriKind.Absolute, out Uri? uri) && !string.IsNullOrEmpty(uri.AbsolutePath))
+            {
+                candidateFileName = Path.GetFileName(uri.AbsolutePath);
+            }
+            else if (!string.IsNullOrWhiteSpace(packageUrlOrPath))
+            {
+                candidateFileName = Path.GetFileName(packageUrlOrPath);
+            }
+
+            var fileNames = new List<string>();
+            if (!string.IsNullOrWhiteSpace(candidateFileName) && candidateFileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                fileNames.Add(candidateFileName);
+            }
+
+            if (targetFramework.IndexOf("8", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                fileNames.Add("bimboclub_net8.zip");
+                fileNames.Add("BimboClub_net8.zip");
+                fileNames.Add("bimboclub_net8.0.zip");
+            }
+            else
+            {
+                fileNames.Add("bimboclub_net48.zip");
+                fileNames.Add("BimboClub_net48.zip");
+            }
+
+            var directories = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(packageUrlOrPath) &&
+                !packageUrlOrPath.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+                !packageUrlOrPath.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+            {
+                if (File.Exists(packageUrlOrPath))
+                {
+                    return Path.GetFullPath(packageUrlOrPath);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(sourcePath))
+            {
+                string cleanSource = sourcePath.Trim().Trim('"', '\'');
+                if (Directory.Exists(cleanSource))
+                {
+                    directories.Add(cleanSource);
+                    directories.Add(Path.Combine(cleanSource, "updates"));
+                    directories.Add(Path.Combine(cleanSource, "bin"));
+                }
+                else if (File.Exists(cleanSource))
+                {
+                    string? dir = Path.GetDirectoryName(cleanSource);
+                    if (!string.IsNullOrEmpty(dir))
+                    {
+                        directories.Add(dir);
+                        directories.Add(Path.Combine(dir, "updates"));
+                    }
+                }
+                else
+                {
+                    string? dir = Path.GetDirectoryName(cleanSource);
+                    if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                    {
+                        directories.Add(dir);
+                    }
+                }
+            }
+
+            string appDir = AppDomain.CurrentDomain.BaseDirectory;
+            directories.Add(appDir);
+            directories.Add(Path.Combine(appDir, "updates"));
+
+            foreach (var dir in directories.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                if (!Directory.Exists(dir)) continue;
+                foreach (var fn in fileNames.Distinct(StringComparer.OrdinalIgnoreCase))
+                {
+                    string fullPath = Path.Combine(dir, fn);
+                    if (File.Exists(fullPath))
+                    {
+                        return fullPath;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private async Task DownloadFileWithFallbacksAsync(string primaryUrl, string destinationPath, IProgress<double> progress, CancellationToken cancellationToken)
+        {
+            var candidateUrls = new List<string> { primaryUrl };
+
+            if (primaryUrl.Contains("github.com", StringComparison.OrdinalIgnoreCase) && primaryUrl.Contains("/releases/download/", StringComparison.OrdinalIgnoreCase))
+            {
+                candidateUrls.Add("https://ghproxy.net/" + primaryUrl);
+                candidateUrls.Add(primaryUrl.Replace("github.com", "download.fastgit.org"));
+            }
+
+            Exception? lastException = null;
+            foreach (var url in candidateUrls.Distinct(StringComparer.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    await DownloadFileAsync(url, destinationPath, progress, cancellationToken);
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    lastException = ex;
+                    Debug.WriteLine($"Failed to download from '{url}': {ex.Message}");
+                    if (File.Exists(destinationPath))
+                    {
+                        try { File.Delete(destinationPath); } catch { }
+                    }
+                }
+            }
+
+            throw new Exception($"Не удалось скачать пакет обновления по адресу: {primaryUrl}. Ошибка: {lastException?.Message}", lastException);
         }
 
         public void UninstallPlugin(RevitVersionInfo versionInfo)
