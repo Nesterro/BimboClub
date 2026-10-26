@@ -1,6 +1,7 @@
-$appData = [Environment]::GetFolderPath('ApplicationData')
+﻿$appData = [Environment]::GetFolderPath('ApplicationData')
 $commonAppData = [Environment]::GetFolderPath('CommonApplicationData')
-$baseDir = Get-Location
+$ErrorActionPreference = 'Stop'
+$baseDir = $PSScriptRoot
 
 $versions = @('2021', '2022', '2023', '2024', '2025', '2026')
 
@@ -22,10 +23,11 @@ foreach ($ver in $versions) {
     }
 
     if (Test-Path $sourceDll) {
+        $installedVersion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($sourceDll).ProductVersion.Split('+')[0]
         Copy-Item -Path $sourceDll -Destination $targetDir -Force
         Write-Host "Скопировано: $sourceDll -> $targetDir" -ForegroundColor Green
     } else {
-        Write-Host "Не найден DLL по пути: $sourceDll" -ForegroundColor Red
+        throw "Не найден DLL по пути: $sourceDll"
     }
 
     # Copy .addin file
@@ -35,7 +37,7 @@ foreach ($ver in $versions) {
     }
 
     # Write version.txt
-    Set-Content -Path (Join-Path $targetDir "version.txt") -Value "2.4.20" -Force
+    Set-Content -Path (Join-Path $targetDir "version.txt") -Value $installedVersion -Force
 
     # Copy icons
     Get-ChildItem -Path (Join-Path $baseDir "SystemTravers") -Filter "icon*.png" | ForEach-Object {
@@ -47,7 +49,7 @@ foreach ($ver in $versions) {
     if (Test-Path $progDataDir) {
         if (Test-Path $sourceDll) { Copy-Item -Path $sourceDll -Destination $progDataDir -Force }
         if (Test-Path $addinFile) { Copy-Item -Path $addinFile -Destination $progDataDir -Force }
-        Set-Content -Path (Join-Path $progDataDir "version.txt") -Value "2.4.20" -Force
+        Set-Content -Path (Join-Path $progDataDir "version.txt") -Value $installedVersion -Force
         Get-ChildItem -Path (Join-Path $baseDir "SystemTravers") -Filter "icon*.png" | ForEach-Object {
             Copy-Item -Path $_.FullName -Destination $progDataDir -Force
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -57,6 +57,9 @@ namespace BimboClub.ExtraScheduleItems
         public static readonly string[] MarkParamNames = { "ADSK_Марка", "ADSK_Обозначение", "Марка", "Обозначение" };
         public static readonly string[] CodeParamNames = { "ADSK_Код изделия", "Код изделия", "Код" };
         public static readonly string[] ManufacturerParamNames = { "ADSK_Завод-изготовитель", "ADSK_Изготовитель", "Завод-изготовитель", "Изготовитель" };
+        // GUID из ФОП ADSK. Совпадение имени не делает параметры одной графой спецификации.
+        public static readonly Guid CodeParamGuid = new Guid("2fd9e8cb-84f3-4297-b8b8-75f444e124ed");
+        public static readonly Guid ManufacturerParamGuid = new Guid("a8cdbf7b-d60a-485e-a520-447d2055f351");
         public static readonly string[] UnitParamNames = {
             "ADSK_Единицы измерения",
             "ADSK_Единица измерения",
@@ -84,8 +87,8 @@ namespace BimboClub.ExtraScheduleItems
             new AdskParamDef { Name = "ADSK_Позиция", Guid = new Guid("6a2e4c49-0144-4861-8284-a134eb9fa388"), IsNumber = false },
             new AdskParamDef { Name = "ADSK_Наименование", Guid = new Guid("e6e0f5cd-3e26-407b-9993-4a11be2454be"), IsNumber = false },
             new AdskParamDef { Name = "ADSK_Марка", Guid = new Guid("809e51c8-c689-49c9-a548-8cf9c9162985"), IsNumber = false },
-            new AdskParamDef { Name = "ADSK_Код изделия", Guid = new Guid("a22efc36-7c9b-4e08-9dfc-91aa0350d755"), IsNumber = false },
-            new AdskParamDef { Name = "ADSK_Завод-изготовитель", Guid = new Guid("aa041857-96a2-4a0b-8526-cb17a5be5573"), IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Код изделия", Guid = CodeParamGuid, IsNumber = false },
+            new AdskParamDef { Name = "ADSK_Завод-изготовитель", Guid = ManufacturerParamGuid, IsNumber = false },
             new AdskParamDef { Name = "ADSK_Единицы измерения", Guid = new Guid("4289cb19-9517-45de-9c02-5a74ebf5c86d"), IsNumber = false },
             new AdskParamDef { Name = "ADSK_Единица измерения", Guid = new Guid("5526cb60-d264-4e4f-b620-333e144a9910"), IsNumber = false },
             new AdskParamDef { Name = "ADSK_Единицы измрения", Guid = new Guid("f12a32c4-0692-411a-a1b7-a3cf2d0e82c5"), IsNumber = false },
@@ -208,159 +211,179 @@ namespace BimboClub.ExtraScheduleItems
 
             if (itemsToSync == null) itemsToSync = new List<ExtraScheduleItem>();
 
-            // 0. Предобработка: проверяем семейства и параметры ДО открытия транзакции в doc
-            EnsureFamiliesAndBindings(doc, itemsToSync);
-
-            using (Transaction t = new Transaction(doc, "Синхронизация доп. элементов спецификации"))
+            using (TransactionGroup syncGroup = new TransactionGroup(doc, "Допы в спецификацию"))
             {
-                t.Start();
+                syncGroup.Start();
+                var syncedIds = new Dictionary<ExtraScheduleItem, int>();
 
-                // 0.1 Гарантируем, что в проекте параметры единиц измерения привязаны как параметры ЭКЗЕМПЛЯРА
-                foreach (var kvp in SupportedCategories)
-                {
-                    EnsureProjectInstanceBindings(doc, kvp.Value);
-                }
+                // 0. Предобработка: проверяем семейства и параметры ДО открытия транзакции в doc
+                EnsureFamiliesAndBindings(doc, itemsToSync);
 
-                // 1. Удаление элементов, удаленных пользователем
-                if (deletedIds != null)
+                using (Transaction t = new Transaction(doc, "Синхронизация доп. элементов спецификации"))
                 {
-                    foreach (int idVal in deletedIds)
+                    t.Start();
+
+                    // 0.1 Гарантируем, что в проекте параметры единиц измерения привязаны как параметры ЭКЗЕМПЛЯРА
+                    foreach (var kvp in SupportedCategories)
                     {
-                        if (idVal > 0)
+                        EnsureProjectInstanceBindings(doc, kvp.Value);
+                    }
+
+                    // 1. Удаление элементов, удаленных пользователем
+                    if (deletedIds != null)
+                    {
+                        foreach (int idVal in deletedIds)
                         {
-                            ElementId eid = new ElementId(idVal);
-                            Element elem = doc.GetElement(eid);
-                            if (elem != null)
+                            if (idVal > 0)
                             {
-                                doc.Delete(eid);
-                                deleted++;
+                                ElementId eid = new ElementId(idVal);
+                                Element elem = doc.GetElement(eid);
+                                if (elem != null)
+                                {
+                                    doc.Delete(eid);
+                                    deleted++;
+                                }
                             }
                         }
                     }
-                }
 
-                // 2. Кэш типоразмеров семейств по категориям
-                var symbolsCache = new Dictionary<string, FamilySymbol>(StringComparer.OrdinalIgnoreCase);
+                    // 2. Кэш типоразмеров семейств по категориям
+                    var symbolsCache = new Dictionary<string, FamilySymbol>(StringComparer.OrdinalIgnoreCase);
 
-                // Уровень для привязки (любой первый уровень)
-                Level level = new FilteredElementCollector(doc)
-                    .OfClass(typeof(Level))
-                    .Cast<Level>()
-                    .FirstOrDefault();
+                    // Уровень для привязки (любой первый уровень)
+                    Level level = new FilteredElementCollector(doc)
+                        .OfClass(typeof(Level))
+                        .Cast<Level>()
+                        .FirstOrDefault();
 
-                // Базовая координата размещения невидимых элементов:
-                // Размещаем в безопасной координате (0, 0, -50 футов) со сдвигом по X,
-                // чтобы не пересекать геометрию проекта и не мешать привязкам
-                double baseX = 0.0;
-                double baseY = 0.0;
-                double baseZ = -50.0; // под нулем проекта
+                    // Базовая координата размещения невидимых элементов:
+                    // Размещаем в безопасной координате (0, 0, -50 футов) со сдвигом по X,
+                    // чтобы не пересекать геометрию проекта и не мешать привязкам
+                    double baseX = 0.0;
+                    double baseY = 0.0;
+                    double baseZ = -50.0; // под нулем проекта
 
-                // 3. Создание новых и обновление существующих
-                int index = 0;
-                foreach (var item in itemsToSync)
-                {
-                    Element targetElem = null;
-
-                    if (item.Id > 0)
+                    // 3. Создание новых и обновление существующих
+                    int index = 0;
+                    foreach (var item in itemsToSync)
                     {
-                        // Существующий элемент
-                        targetElem = doc.GetElement(new ElementId(item.Id));
-                        if (targetElem != null)
+                        Element targetElem = null;
+
+                        if (item.Id > 0)
                         {
+                            // Существующий элемент
+                            targetElem = doc.GetElement(new ElementId(item.Id));
+                            if (targetElem != null)
+                            {
+                                string catName = string.IsNullOrWhiteSpace(item.CategoryName) ? "Обобщенные модели" : item.CategoryName;
+                                BuiltInCategory expectedBic = ResolveBuiltInCategory(catName);
+                                if (targetElem.Category == null || targetElem.Category.Id.IntegerValue != (int)expectedBic)
+                                {
+                                    doc.Delete(targetElem.Id);
+                                    targetElem = null;
+                                }
+                                else
+                                {
+                                    updated++;
+                                }
+                            }
+                        }
+
+                        if (targetElem == null)
+                        {
+                            // Определяем семейство под категорию элемента
                             string catName = string.IsNullOrWhiteSpace(item.CategoryName) ? "Обобщенные модели" : item.CategoryName;
-                            BuiltInCategory expectedBic = ResolveBuiltInCategory(catName);
-                            if (targetElem.Category == null || targetElem.Category.Id.IntegerValue != (int)expectedBic)
+                            if (!symbolsCache.TryGetValue(catName, out FamilySymbol symbol) || symbol == null)
                             {
-                                doc.Delete(targetElem.Id);
-                                targetElem = null;
+                                symbol = GetOrCreateFamilySymbol(doc, catName);
+                                if (symbol != null)
+                                {
+                                    if (!symbol.IsActive)
+                                    {
+                                        symbol.Activate();
+                                        doc.Regenerate();
+                                    }
+                                    symbolsCache[catName] = symbol;
+                                }
                             }
-                            else
+
+                            if (symbol == null)
                             {
-                                updated++;
+                                // Запасной вариант: Обобщенные модели
+                                if (!symbolsCache.TryGetValue("Обобщенные модели", out symbol) || symbol == null)
+                                {
+                                    symbol = GetOrCreateFamilySymbol(doc, "Обобщенные модели");
+                                    if (symbol != null && !symbol.IsActive)
+                                    {
+                                        symbol.Activate();
+                                        doc.Regenerate();
+                                    }
+                                    if (symbol != null) symbolsCache["Обобщенные модели"] = symbol;
+                                }
                             }
+
+                            if (symbol == null)
+                            {
+                                throw new InvalidOperationException($"Не удалось найти или создать семейство для категории '{catName}'.");
+                            }
+
+                            // Создание нового экземпляра
+                            XYZ location = new XYZ(baseX + index * 0.1, baseY, baseZ);
+                            FamilyInstance instance = null;
+                            try
+                            {
+                                instance = doc.Create.NewFamilyInstance(location, symbol, StructuralType.NonStructural);
+                                if (instance != null && level != null)
+                                {
+                                    var pLevel = instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM);
+                                    if (pLevel != null && !pLevel.IsReadOnly)
+                                    {
+                                        pLevel.Set(level.Id);
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.LogError("Ошибка размещения экземпляра немоделируемого элемента", ex);
+                            }
+
+                            if (instance == null) continue;
+
+                            // Установка метки плагина в Comments
+                            var commentParam = instance.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS);
+                            if (commentParam != null && !commentParam.IsReadOnly)
+                            {
+                                commentParam.Set(MarkerComment);
+                            }
+
+                            targetElem = instance;
+                            created++;
                         }
+
+                        // Запись параметров ADSK
+                        ApplyParametersToElement(targetElem, item);
+                        syncedIds[item] = targetElem.Id.IntegerValue;
+                        index++;
                     }
 
-                    if (targetElem == null)
+                    // Новые экземпляры возвращают старое значение до регенерации документа.
+                    doc.Regenerate();
+                    foreach (var entry in syncedIds)
                     {
-                        // Определяем семейство под категорию элемента
-                        string catName = string.IsNullOrWhiteSpace(item.CategoryName) ? "Обобщенные модели" : item.CategoryName;
-                        if (!symbolsCache.TryGetValue(catName, out FamilySymbol symbol) || symbol == null)
-                        {
-                            symbol = GetOrCreateFamilySymbol(doc, catName);
-                            if (symbol != null)
-                            {
-                                if (!symbol.IsActive)
-                                {
-                                    symbol.Activate();
-                                    doc.Regenerate();
-                                }
-                                symbolsCache[catName] = symbol;
-                            }
-                        }
-
-                        if (symbol == null)
-                        {
-                            // Запасной вариант: Обобщенные модели
-                            if (!symbolsCache.TryGetValue("Обобщенные модели", out symbol) || symbol == null)
-                            {
-                                symbol = GetOrCreateFamilySymbol(doc, "Обобщенные модели");
-                                if (symbol != null && !symbol.IsActive)
-                                {
-                                    symbol.Activate();
-                                    doc.Regenerate();
-                                }
-                                if (symbol != null) symbolsCache["Обобщенные модели"] = symbol;
-                            }
-                        }
-
-                        if (symbol == null)
-                        {
-                            throw new InvalidOperationException($"Не удалось найти или создать семейство для категории '{catName}'.");
-                        }
-
-                        // Создание нового экземпляра
-                        XYZ location = new XYZ(baseX + index * 0.1, baseY, baseZ);
-                        FamilyInstance instance = null;
-                        try
-                        {
-                            instance = doc.Create.NewFamilyInstance(location, symbol, StructuralType.NonStructural);
-                            if (instance != null && level != null)
-                            {
-                                var pLevel = instance.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM);
-                                if (pLevel != null && !pLevel.IsReadOnly)
-                                {
-                                    pLevel.Set(level.Id);
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Logger.LogError("Ошибка размещения экземпляра немоделируемого элемента", ex);
-                        }
-
-                        if (instance == null) continue;
-
-                        // Установка метки плагина в Comments
-                        var commentParam = instance.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS);
-                        if (commentParam != null && !commentParam.IsReadOnly)
-                        {
-                            commentParam.Set(MarkerComment);
-                        }
-
-                        targetElem = instance;
-                        item.Id = instance.Id.IntegerValue;
-                        item.IsNew = false;
-                        created++;
+                        var element = doc.GetElement(new ElementId(entry.Value));
+                        VerifyProductParameter(element, CodeParamGuid, CodeParamNames[0], entry.Key.Code);
+                        VerifyProductParameter(element, ManufacturerParamGuid, ManufacturerParamNames[0], entry.Key.Manufacturer);
                     }
-
-                    // Запись параметров ADSK
-                    ApplyParametersToElement(targetElem, item);
-                    item.IsModified = false;
-                    index++;
+                    if (t.Commit() != TransactionStatus.Committed)
+                        throw new InvalidOperationException("Revit отменил синхронизацию дополнительных элементов.");
                 }
-
-                t.Commit();
+                syncGroup.Assimilate();
+                foreach (var entry in syncedIds)
+                {
+                    entry.Key.Id = entry.Value;
+                    entry.Key.IsNew = false;
+                    entry.Key.IsModified = false;
+                }
             }
 
             return (created, updated, deleted);
@@ -374,12 +397,34 @@ namespace BimboClub.ExtraScheduleItems
             SetParam(elem, PositionParamNames, item.Position);
             SetParam(elem, NameParamNames, item.Name);
             SetParam(elem, MarkParamNames, item.Mark);
-            SetParam(elem, CodeParamNames, item.Code);
-            SetParam(elem, ManufacturerParamNames, item.Manufacturer);
+            SetProductParameter(elem, CodeParamNames, CodeParamGuid, item.Code);
+            SetProductParameter(elem, ManufacturerParamNames, ManufacturerParamGuid, item.Manufacturer);
             SetParam(elem, UnitParamNames, item.Unit, setAllMatches: true);
             SetParam(elem, CountParamNames, item.Count);
             SetParam(elem, WeightParamNames, item.Weight);
             SetParam(elem, NoteParamNames, item.Note);
+        }
+
+        private static void SetProductParameter(Element elem, string[] names, Guid guid, string value)
+        {
+            var parameter = elem.get_Parameter(guid);
+            string text = value ?? "";
+            if (parameter == null || parameter.IsReadOnly || parameter.StorageType != StorageType.String ||
+                (elem is FamilyInstance && parameter.Element is FamilySymbol))
+            {
+                throw new InvalidOperationException($"Не удалось записать {names[0]} у элемента {elem.Id}: " +
+                    "общий параметр ADSK отсутствует или недоступен для записи в экземпляре.");
+            }
+
+            parameter.Set(text);
+            // Обновляем также старые одноименные параметры и альтернативные поля проекта.
+            SetParam(elem, names, text, setAllMatches: true);
+        }
+
+        private static void VerifyProductParameter(Element elem, Guid guid, string name, string value)
+        {
+            if ((elem.get_Parameter(guid)?.AsString() ?? "") != (value ?? ""))
+                throw new InvalidOperationException($"Не удалось сохранить {name} у элемента {elem.Id}.");
         }
 
         public static FamilySymbol GetOrCreateFamilySymbol(Document doc, string categoryName = null)
@@ -508,6 +553,22 @@ namespace BimboClub.ExtraScheduleItems
             FamilyParameter fp = famMgr.get_Parameter(paramName);
             if (fp != null)
             {
+                if ((paramGuid == CodeParamGuid || paramGuid == ManufacturerParamGuid) &&
+                    (!fp.IsShared || fp.GUID != paramGuid))
+                {
+                    // ReplaceParameter сохраняет значения и формулы; промежуточное уникальное
+                    // имя позволяет заменить общий параметр другим общим с тем же именем.
+                    var canonical = grp?.Definitions?.get_Item(paramName) as ExternalDefinition;
+                    if (canonical == null)
+                        throw new InvalidOperationException($"Не найдено определение ADSK: {paramName}.");
+                    string temporaryName = "BCC_Migrate_" + Guid.NewGuid().ToString("N");
+                    if (fp.IsShared)
+                        fp = famMgr.ReplaceParameter(fp, temporaryName, GroupTypeId.Data, isInstance);
+                    else
+                        famMgr.RenameParameter(fp, temporaryName);
+                    fp = famMgr.ReplaceParameter(fp, canonical, GroupTypeId.Data, isInstance);
+                    modified = true;
+                }
                 if (!fp.IsInstance && isInstance)
                 {
                     try
@@ -607,21 +668,6 @@ namespace BimboClub.ExtraScheduleItems
 
                     foreach (var pDef in AdskParams)
                     {
-                        FamilyParameter fp = famMgr.get_Parameter(pDef.Name);
-                        if (fp != null)
-                        {
-                            if (!fp.IsInstance)
-                            {
-                                try
-                                {
-                                    famMgr.MakeInstance(fp);
-                                    modified = true;
-                                }
-                                catch { }
-                            }
-                            continue;
-                        }
-
                         ForgeTypeId specTypeId = pDef.IsNumber ? SpecTypeId.Number : SpecTypeId.String.Text;
                         EnsureFamilyParameter(famMgr, defGroup, pDef.Name, specTypeId, pDef.Guid, ref modified, isInstance: true);
                     }
@@ -630,6 +676,7 @@ namespace BimboClub.ExtraScheduleItems
             catch (Exception ex)
             {
                 Logger.LogError("Ошибка настройки общих параметров семейства", ex);
+                throw;
             }
             finally
             {
@@ -701,28 +748,12 @@ namespace BimboClub.ExtraScheduleItems
 
                     if (family != null && family.IsEditable)
                     {
-                        bool hasTypeUnitParam = false;
-                        foreach (ElementId symId in family.GetFamilySymbolIds())
+                        // Проверяем и загруженное семейство: исправление только RFA на диске
+                        // не меняет параметры экземпляров, уже находящихся в проекте.
+                        Document famDoc = doc.EditFamily(family);
+                        if (famDoc != null)
                         {
-                            if (doc.GetElement(symId) is FamilySymbol fs)
-                            {
-                                foreach (string uName in UnitParamNames)
-                                {
-                                    Parameter p = fs.LookupParameter(uName);
-                                    if (p != null)
-                                    {
-                                        hasTypeUnitParam = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (hasTypeUnitParam) break;
-                        }
-
-                        if (hasTypeUnitParam)
-                        {
-                            Document famDoc = doc.EditFamily(family);
-                            if (famDoc != null)
+                            try
                             {
                                 bool modified = false;
                                 using (Transaction tf = new Transaction(famDoc, "BimboClub: Параметры экземпляра"))
@@ -733,9 +764,10 @@ namespace BimboClub.ExtraScheduleItems
                                 }
 
                                 if (modified)
-                                {
                                     famDoc.LoadFamily(doc, new ExtraScheduleFamilyLoadOptions());
-                                }
+                            }
+                            finally
+                            {
                                 famDoc.Close(false);
                             }
                         }
@@ -744,6 +776,7 @@ namespace BimboClub.ExtraScheduleItems
                 catch (Exception ex)
                 {
                     Logger.Log($"Ошибка проверки параметров семейства {famName}: {ex.Message}", "WARN");
+                    throw;
                 }
             }
         }
@@ -949,15 +982,31 @@ namespace BimboClub.ExtraScheduleItems
         {
             if (elem == null) return defaultValue;
 
+            // Сначала канонический ADSK, затем все одноименные/старые параметры.
+            Guid preferredGuid = paramNames == CodeParamNames ? CodeParamGuid :
+                paramNames == ManufacturerParamNames ? ManufacturerParamGuid : Guid.Empty;
+            var preferred = preferredGuid == Guid.Empty ? null : elem.get_Parameter(preferredGuid);
+            if (preferred?.StorageType == StorageType.String && preferred.HasValue &&
+                !string.IsNullOrWhiteSpace(preferred.AsString()))
+                return preferred.AsString().Trim();
+
+            bool hasInstanceParameter = false;
             foreach (string name in paramNames)
             {
-                Parameter p = elem.LookupParameter(name);
-                if (p != null && p.HasValue)
+                foreach (Parameter p in elem.GetParameters(name))
                 {
-                    string val = p.AsString();
-                    if (!string.IsNullOrWhiteSpace(val)) return val.Trim();
+                    hasInstanceParameter = true;
+                    if (p.StorageType == StorageType.String && p.HasValue)
+                    {
+                        string val = p.AsString();
+                        if (!string.IsNullOrWhiteSpace(val)) return val.Trim();
+                    }
                 }
             }
+
+            // Старые семейства могли хранить код и изготовителя в типе.
+            if (!hasInstanceParameter && preferredGuid != Guid.Empty && elem is FamilyInstance instance)
+                return GetStringParam(instance.Symbol, paramNames, defaultValue);
 
             return defaultValue;
         }
@@ -1000,46 +1049,48 @@ namespace BimboClub.ExtraScheduleItems
             bool anySet = false;
             foreach (string name in paramNames)
             {
-                Parameter p = elem.LookupParameter(name);
-                if (p != null && !p.IsReadOnly)
+                foreach (Parameter p in elem.GetParameters(name))
                 {
-                    // ВАЖНО: Если записываем в экземпляр (FamilyInstance), параметр не должен принадлежать FamilySymbol (параметр типа)
-                    if (elem is FamilyInstance && p.Element is FamilySymbol)
+                    if (p != null && !p.IsReadOnly)
                     {
-                        continue;
-                    }
+                        // ВАЖНО: Если записываем в экземпляр (FamilyInstance), параметр не должен принадлежать FamilySymbol (параметр типа)
+                        if (elem is FamilyInstance && p.Element is FamilySymbol)
+                        {
+                            continue;
+                        }
 
-                    try
-                    {
-                        if (p.StorageType == StorageType.String)
+                        try
                         {
-                            p.Set(value.ToString());
-                            anySet = true;
-                            if (!setAllMatches) return true;
-                        }
-                        else if (p.StorageType == StorageType.Double)
-                        {
-                            if (value is double d) { p.Set(d); anySet = true; if (!setAllMatches) return true; }
-                            else if (value is int i) { p.Set((double)i); anySet = true; if (!setAllMatches) return true; }
-                            else if (double.TryParse(value.ToString().Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double parsed))
+                            if (p.StorageType == StorageType.String)
                             {
-                                p.Set(parsed);
+                                p.Set(value.ToString());
                                 anySet = true;
                                 if (!setAllMatches) return true;
                             }
-                        }
-                        else if (p.StorageType == StorageType.Integer)
-                        {
-                            if (value is int i) { p.Set(i); anySet = true; if (!setAllMatches) return true; }
-                            else if (int.TryParse(value.ToString(), out int parsed))
+                            else if (p.StorageType == StorageType.Double)
                             {
-                                p.Set(parsed);
-                                anySet = true;
-                                if (!setAllMatches) return true;
+                                if (value is double d) { p.Set(d); anySet = true; if (!setAllMatches) return true; }
+                                else if (value is int i) { p.Set((double)i); anySet = true; if (!setAllMatches) return true; }
+                                else if (double.TryParse(value.ToString().Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out double parsed))
+                                {
+                                    p.Set(parsed);
+                                    anySet = true;
+                                    if (!setAllMatches) return true;
+                                }
+                            }
+                            else if (p.StorageType == StorageType.Integer)
+                            {
+                                if (value is int i) { p.Set(i); anySet = true; if (!setAllMatches) return true; }
+                                else if (int.TryParse(value.ToString(), out int parsed))
+                                {
+                                    p.Set(parsed);
+                                    anySet = true;
+                                    if (!setAllMatches) return true;
+                                }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
                 }
             }
 
