@@ -1,13 +1,13 @@
-﻿{
-    "latestVersion":  "2.4.23",
-    "releaseDate":  "2026-10-13",
-    "changelog":  [
-                      "Исправлена загрузка манифеста обновлений и пакетов на новых ПК",
-                      "Поддержка зеркал CDN/API, репозиториев и локальных путей",
-                      "Допы в спеку: параметр ADSK_Единицы измерения создается как параметр экземпляра"
-                  ],
-    "packages":  {
-                     "net48":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.23/bimboclub_net48.zip",
-                     "net8":  "https://github.com/Nesterro/BimboClub/releases/download/v2.4.23/bimboclub_net8.zip"
-                 }
+{
+  "latestVersion": "2.4.24",
+  "releaseDate": "2026-10-26",
+  "changelog": [
+    "Допы в спецификацию: исправлены GUID ADSK_Код изделия и ADSK_Завод-изготовитель",
+    "Автоматическое обновление загруженных старых семейств с сохранением значений",
+    "Поддержка одноимённых параметров и откат синхронизации при ошибке"
+  ],
+  "packages": {
+    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.24/bimboclub_net48.zip",
+    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.24/bimboclub_net8.zip"
+  }
 }
