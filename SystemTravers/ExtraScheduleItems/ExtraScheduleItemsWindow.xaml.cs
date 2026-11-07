@@ -613,6 +613,7 @@ namespace BimboClub.ExtraScheduleItems
             catch (Exception ex)
             {
                 Logger.LogError("Ошибка синхронизации с моделью Revit", ex);
+                StatusMessageTextBlock.Text = "Синхронизация не завершена. Строки сохранены в таблице для повторного применения.";
                 MessageBox.Show($"Ошибка синхронизации с моделью Revit:\n{ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

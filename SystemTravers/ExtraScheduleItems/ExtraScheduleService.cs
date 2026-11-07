@@ -380,6 +380,10 @@ namespace BimboClub.ExtraScheduleItems
                 syncGroup.Assimilate();
                 foreach (var entry in syncedIds)
                 {
+                    // Revit удаляет крайние пробельные символы у текстовых параметров.
+                    // Обновляем строку только после успеха всей группы транзакций.
+                    entry.Key.Code = NormalizeProductText(entry.Key.Code);
+                    entry.Key.Manufacturer = NormalizeProductText(entry.Key.Manufacturer);
                     entry.Key.Id = entry.Value;
                     entry.Key.IsNew = false;
                     entry.Key.IsModified = false;
@@ -408,7 +412,7 @@ namespace BimboClub.ExtraScheduleItems
         private static void SetProductParameter(Element elem, string[] names, Guid guid, string value)
         {
             var parameter = elem.get_Parameter(guid);
-            string text = value ?? "";
+            string text = NormalizeProductText(value);
             if (parameter == null || parameter.IsReadOnly || parameter.StorageType != StorageType.String ||
                 (elem is FamilyInstance && parameter.Element is FamilySymbol))
             {
@@ -423,8 +427,30 @@ namespace BimboClub.ExtraScheduleItems
 
         private static void VerifyProductParameter(Element elem, Guid guid, string name, string value)
         {
-            if ((elem.get_Parameter(guid)?.AsString() ?? "") != (value ?? ""))
-                throw new InvalidOperationException($"Не удалось сохранить {name} у элемента {elem.Id}.");
+            var parameter = elem?.get_Parameter(guid);
+            string expected = NormalizeProductText(value);
+            string actual = parameter?.StorageType == StorageType.String ? parameter.AsString() ?? "" : null;
+            // Не нормализуем фактический результат и не игнорируем несовпадения:
+            // изменение внутренних пробелов, регистра или обрезка текста — реальная ошибка.
+            if (actual == null || !string.Equals(actual, expected, StringComparison.Ordinal))
+            {
+                string details = $"Ожидалось: {DescribeProductText(expected)}; прочитано: {DescribeProductText(actual)}.";
+                Logger.Log($"Проверка ADSK: Revit {elem?.Document.Application.VersionNumber}, " +
+                    $"элемент {elem?.Id}, параметр {name}, GUID {guid}. {details}", "ERROR");
+                throw new InvalidOperationException($"Не удалось сохранить {name} у элемента {elem?.Id}.\n{details}");
+            }
+        }
+
+        private static string NormalizeProductText(string value) => (value ?? "").Trim();
+
+        private static string DescribeProductText(string value)
+        {
+            if (value == null) return "<параметр отсутствует или не является текстовым>";
+            string preview = value.Length > 160 ? value.Substring(0, 160) + "…" : value;
+            preview = preview.Replace("\\", "\\\\").Replace("\"", "\\\"")
+                .Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t")
+                .Replace("\0", "\\0").Replace("\u00a0", "\\u00A0");
+            return $"\"{preview}\" (длина {value.Length})";
         }
 
         public static FamilySymbol GetOrCreateFamilySymbol(Document doc, string categoryName = null)

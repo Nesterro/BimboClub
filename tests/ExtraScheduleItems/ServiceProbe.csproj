@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>10.0</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RevitYear Condition="'$(RevitYear)' == ''">2023</RevitYear>
+    <AssemblyName>ExtraScheduleServiceProbe</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>C:/Program Files/Autodesk/Revit $(RevitYear)/RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Compile Include="../../SystemTravers/ExtraScheduleItems/ExtraScheduleService.cs" Link="ExtraScheduleService.cs" />
+    <Compile Include="../../SystemTravers/ExtraScheduleItems/ExtraScheduleItem.cs" Link="ExtraScheduleItem.cs" />
+    <Compile Include="../../SystemTravers/Logger.cs" Link="Logger.cs" />
+  </ItemGroup>
+</Project>
