@@ -1,13 +1,13 @@
 {
-  "latestVersion": "2.4.25",
+  "latestVersion": "2.4.26",
   "releaseDate": "2026-11-07",
   "changelog": [
-    "Допы в спецификацию: исправлена ошибка сохранения изготовителя и кода изделия из-за пробелов по краям текста",
-    "Корректная обработка табуляции, неразрывных пробелов и пустых значений; внутренние пробелы и ведущие нули сохраняются",
-    "Проверено в Revit 2023.1; при настоящей ошибке сохранены откат и несохранённые строки, добавлены подробности расхождения"
+    "Допы в спецификацию: исправлены GUID наименования, марки, группирования, позиции, количества, массы и примечания ADSK",
+    "Исправление параметров существующих семейств BimboClub; запись по GUID и проверка всех десяти полей каждой строки перед сохранением",
+    "Проверено без моделей: автоматические тесты net48/net8 и компиляция с API Revit 2023; проверка в работающем Revit не выполнялась"
   ],
   "packages": {
-    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.25/bimboclub_net48.zip",
-    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.25/bimboclub_net8.zip"
+    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.26/bimboclub_net48.zip",
+    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.26/bimboclub_net8.zip"
   }
 }
