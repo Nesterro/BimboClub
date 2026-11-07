@@ -1,13 +1,13 @@
 {
-  "latestVersion": "2.4.24",
-  "releaseDate": "2026-10-26",
+  "latestVersion": "2.4.25",
+  "releaseDate": "2026-11-07",
   "changelog": [
-    "Допы в спецификацию: исправлены GUID ADSK_Код изделия и ADSK_Завод-изготовитель",
-    "Автоматическое обновление загруженных старых семейств с сохранением значений",
-    "Поддержка одноимённых параметров и откат синхронизации при ошибке"
+    "Допы в спецификацию: исправлена ошибка сохранения изготовителя и кода изделия из-за пробелов по краям текста",
+    "Корректная обработка табуляции, неразрывных пробелов и пустых значений; внутренние пробелы и ведущие нули сохраняются",
+    "Проверено в Revit 2023.1; при настоящей ошибке сохранены откат и несохранённые строки, добавлены подробности расхождения"
   ],
   "packages": {
-    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.24/bimboclub_net48.zip",
-    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.24/bimboclub_net8.zip"
+    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.25/bimboclub_net48.zip",
+    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.25/bimboclub_net8.zip"
   }
 }
