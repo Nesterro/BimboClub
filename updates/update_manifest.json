@@ -7,7 +7,7 @@
     "315 проверок на каждой платформе, включая производственный цикл миграции на имитаторе API; сборка с API Revit 2023. Без запуска Revit и моделей"
   ],
   "packages": {
-    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.27/bimboclub_net48.zip",
-    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.27/bimboclub_net8.zip"
+    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/7b57e32342382a96a9909cfa3b0c3bf824b52e9f/updates/packages/2.4.27/bimboclub_net48.zip",
+    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/7b57e32342382a96a9909cfa3b0c3bf824b52e9f/updates/packages/2.4.27/bimboclub_net8.zip"
   }
 }
