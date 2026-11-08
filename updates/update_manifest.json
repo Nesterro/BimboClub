@@ -1,13 +1,13 @@
 {
-  "latestVersion": "2.4.26",
-  "releaseDate": "2026-11-07",
+  "latestVersion": "2.4.27",
+  "releaseDate": "2026-11-08",
   "changelog": [
-    "Допы в спецификацию: исправлены GUID наименования, марки, группирования, позиции, количества, массы и примечания ADSK",
-    "Исправление параметров существующих семейств BimboClub; запись по GUID и проверка всех десяти полей каждой строки перед сохранением",
-    "Проверено без моделей: автоматические тесты net48/net8 и компиляция с API Revit 2023; проверка в работающем Revit не выполнялась"
+    "Допы в спецификацию: исправлена ошибка BuiltInParameter при применении строк в Revit, возникшая в версии 2.4.26",
+    "Встроенные параметры исключены из преобразования; в экземпляр переводятся только распознанные пользовательские поля ADSK",
+    "315 проверок на каждой платформе, включая производственный цикл миграции на имитаторе API; сборка с API Revit 2023. Без запуска Revit и моделей"
   ],
   "packages": {
-    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.26/bimboclub_net48.zip",
-    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.26/bimboclub_net8.zip"
+    "net48": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.27/bimboclub_net48.zip",
+    "net8": "https://github.com/Nesterro/BimboClub/releases/download/v2.4.27/bimboclub_net8.zip"
   }
 }
