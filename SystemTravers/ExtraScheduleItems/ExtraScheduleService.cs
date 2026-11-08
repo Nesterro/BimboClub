@@ -496,6 +496,7 @@ namespace BimboClub.ExtraScheduleItems
             FamilyParameter fp = famMgr.Parameters.Cast<FamilyParameter>()
                 .FirstOrDefault(p => p.IsShared && p.GUID == paramGuid)
                 ?? famMgr.get_Parameter(paramName);
+            ExtraScheduleFamilyMigration.RequireCustomParameter(fp);
             var canonical = grp?.Definitions?.get_Item(paramName) as ExternalDefinition;
             if (canonical == null)
                 throw new InvalidOperationException($"Не найдено определение ADSK: {paramName}.");
@@ -529,15 +530,7 @@ namespace BimboClub.ExtraScheduleItems
         private static void EnsureFamilyParameters(Autodesk.Revit.ApplicationServices.Application app, FamilyManager famMgr, ref bool modified)
         {
             if (famMgr == null) throw new InvalidOperationException("Недоступны параметры семейства BimboClub.");
-            // Keep existing legacy schedule columns independent per row as well.
-            foreach (var parameter in famMgr.Parameters.Cast<FamilyParameter>().ToList())
-            {
-                if (!parameter.IsInstance && AdskParams.Any(f => f.Names.Contains(parameter.Definition.Name)))
-                {
-                    famMgr.MakeInstance(parameter);
-                    modified = true;
-                }
-            }
+            modified |= ExtraScheduleFamilyMigration.MakeLegacyFieldsInstance(famMgr);
             string origShared = app.SharedParametersFilename;
             try
             {

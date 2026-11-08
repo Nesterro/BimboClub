@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../../SystemTravers/ExtraScheduleItems/ExtraScheduleParameterSchema.cs" Link="ExtraScheduleParameterSchema.cs" />
+    <Compile Include="../../../SystemTravers/ExtraScheduleItems/ExtraScheduleFamilyMigration.cs" Link="ExtraScheduleFamilyMigration.cs" />
     <Compile Include="../../../SystemTravers/ExtraScheduleItems/ExtraScheduleItem.cs" Link="ExtraScheduleItem.cs" />
   </ItemGroup>
 </Project>

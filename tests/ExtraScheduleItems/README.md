@@ -1,5 +1,24 @@
 # ExtraScheduleItems regression
 
+## 2.4.27: built-in family parameter regression (2026-11-08)
+
+The 2.4.26 legacy conversion loop also matched short aliases (`Описание`, `Марка`).
+Those names can refer to built-in type parameters, causing `MakeInstance` to throw
+the user's reported `A BuiltInParameter cannot be changed... familyParameter`.
+`ExtraScheduleFamilyMigration.cs` now rejects built-ins using
+`InternalDefinition.BuiltInParameter`, limits legacy conversion to recognized
+ADSK names, and guards canonical replacement against built-ins too. Autodesk
+documents [built-in identification here](https://help.autodesk.com/cloudhelp/2026/ENU/Revit-API-MainReference/files/html/31c4b24f-c65a-8541-3fa8-c513563321cf.htm).
+
+The offline suite links the **production migration loop** against `FamilyApiStub.cs`.
+The old selection reproduces the exception in that test double; the fixed loop
+skips Russian/English built-ins (even a built-in with an ADSK-like name), converts
+ten custom fields and a legacy unit, preserves unrelated aliases and existing
+instances, is idempotent, and propagates real custom-field conversion failures.
+Both net48/net8 passed 315 assertions each, including the previous 306 schema checks.
+The service compiles against Revit 2023 API. No running Revit/model was accessed;
+the test double is not a claim of runtime validation in Autodesk Revit.
+
 ## 2.4.26: all ADSK fields, code-only validation (2026-11-07)
 
 The old schema used incorrect GUIDs for name, mark, group, position, quantity,

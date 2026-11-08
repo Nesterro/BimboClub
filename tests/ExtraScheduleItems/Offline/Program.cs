@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BimboClub.ExtraScheduleItems;
+using Autodesk.Revit.DB;
 
 internal static class Program
 {
@@ -24,6 +25,7 @@ internal static class Program
 
     private static void Main()
     {
+        TestFamilyMigration();
         // Independent fixture transcribed from the published ADSK table, not generated
         // from the implementation. Ordering deliberately differs from the schema.
         var expectedGuids = new Dictionary<string, Guid>
@@ -112,5 +114,44 @@ internal static class Program
         var numberField = fields.Single(f => f.Name == "ADSK_Количество");
         Check(!numberField.Matches(1.0, double.NaN) && !numberField.Matches(1.0, double.PositiveInfinity), "Reject non-finite result");
         Console.WriteLine($"PASS: {checks} assertions; 19 distinct rows, 10 fields. No Revit API or models loaded.");
+    }
+
+    private static void TestFamilyMigration()
+    {
+        var manager = new FamilyManager();
+        foreach (string name in new[] { "Описание", "Марка", "Description", "Type Mark", "ADSK_Наименование" })
+            manager.Parameters.Add(new FamilyParameter { Definition = new InternalDefinition
+            { Name = name, BuiltInParameter = BuiltInParameter.ALL_MODEL_DESCRIPTION } });
+        foreach (var field in ExtraScheduleParameterSchema.Fields)
+            manager.Parameters.Add(new FamilyParameter { Definition = new InternalDefinition { Name = field.Name } });
+        var legacyUnit = new FamilyParameter { Definition = new InternalDefinition { Name = "ADSK_Единицы измрения" } };
+        var customDescription = new FamilyParameter { Definition = new InternalDefinition { Name = "Описание" } };
+        var unrelated = new FamilyParameter { Definition = new InternalDefinition { Name = "ADSK_Чужой параметр" } };
+        var existingInstance = new FamilyParameter { Definition = new InternalDefinition { Name = "ADSK_Единицы измерения" }, IsInstance = true };
+        manager.Parameters.AddRange(new[] { legacyUnit, customDescription, unrelated, existingInstance });
+
+        // Reproduce the old alias selection against a built-in type parameter.
+        bool reproduced = false;
+        try
+        {
+            foreach (var parameter in manager.Parameters)
+                if (!parameter.IsInstance && ExtraScheduleParameterSchema.Fields.Any(f => f.Names.Contains(parameter.Definition.Name)))
+                    manager.MakeInstance(parameter);
+        }
+        catch (ArgumentException ex) { reproduced = ex.ParamName == "familyParameter"; }
+        Check(reproduced, "2.4.26 selection reproduces built-in conversion failure in the test double");
+
+        Check(ExtraScheduleFamilyMigration.MakeLegacyFieldsInstance(manager), "Custom ADSK fields converted");
+        Check(manager.Converted.Count == 11 && legacyUnit.IsInstance, "Ten standard fields and legacy unit converted");
+        Check(manager.Parameters.Take(5).All(p => !p.IsInstance), "Built-ins untouched regardless of language/name");
+        Check(!customDescription.IsInstance && !unrelated.IsInstance, "Unrelated custom aliases untouched");
+        Check(!manager.Converted.Contains(existingInstance), "Instance parameters not converted again");
+        Check(!ExtraScheduleFamilyMigration.MakeLegacyFieldsInstance(manager), "Repeated preparation makes no changes");
+        Reject(() => ExtraScheduleFamilyMigration.RequireCustomParameter(manager.Parameters[0]), "Описание");
+        ExtraScheduleFamilyMigration.RequireCustomParameter(customDescription);
+        ExtraScheduleFamilyMigration.RequireCustomParameter(null);
+        legacyUnit.IsInstance = false;
+        manager.FailOn = legacyUnit;
+        Reject(() => ExtraScheduleFamilyMigration.MakeLegacyFieldsInstance(manager), "Real ADSK conversion failure");
     }
 }

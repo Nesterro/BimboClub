@@ -15,6 +15,7 @@
     <Compile Include="../../SystemTravers/ExtraScheduleItems/ExtraScheduleService.cs" Link="ExtraScheduleService.cs" />
     <Compile Include="../../SystemTravers/ExtraScheduleItems/ExtraScheduleItem.cs" Link="ExtraScheduleItem.cs" />
     <Compile Include="../../SystemTravers/ExtraScheduleItems/ExtraScheduleParameterSchema.cs" Link="ExtraScheduleParameterSchema.cs" />
+    <Compile Include="../../SystemTravers/ExtraScheduleItems/ExtraScheduleFamilyMigration.cs" Link="ExtraScheduleFamilyMigration.cs" />
     <Compile Include="../../SystemTravers/Logger.cs" Link="Logger.cs" />
   </ItemGroup>
 </Project>
