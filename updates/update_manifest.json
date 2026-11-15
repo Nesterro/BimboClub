@@ -1,13 +1,14 @@
 {
-  "latestVersion": "2.4.27",
-  "releaseDate": "2026-11-08",
+  "latestVersion": "2.4.28",
+  "releaseDate": "2026-11-16",
   "changelog": [
-    "Допы в спецификацию: исправлена ошибка BuiltInParameter при применении строк в Revit, возникшая в версии 2.4.26",
-    "Встроенные параметры исключены из преобразования; в экземпляр переводятся только распознанные пользовательские поля ADSK",
-    "315 проверок на каждой платформе, включая производственный цикл миграции на имитаторе API; сборка с API Revit 2023. Без запуска Revit и моделей"
+    "Пакетные параметры: исправлена запись заполненных значений в редакторе семейства (.rfa)",
+    "Значения записываются во все типоразмеры; при их отсутствии создаётся Тип 1. Исправлены повторное применение, замена параметров и приоритет сохранённой формулы",
+    "Ошибки записи больше не скрываются: значения проверяются, при ошибке пакет отменяется. Сохранены предыдущие исправления ADSK",
+    "39 проверок записи и 315 ADSK-проверок на каждой платформе; компиляция с API Revit 2023. Без запуска Revit и моделей"
   ],
   "packages": {
-    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/7b57e32342382a96a9909cfa3b0c3bf824b52e9f/updates/packages/2.4.27/bimboclub_net48.zip",
-    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/7b57e32342382a96a9909cfa3b0c3bf824b52e9f/updates/packages/2.4.27/bimboclub_net8.zip"
+    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/086e919ff86af5a004596e483a5e154f35070067/updates/packages/2.4.28/bimboclub_net48.zip",
+    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/086e919ff86af5a004596e483a5e154f35070067/updates/packages/2.4.28/bimboclub_net8.zip"
   }
 }
