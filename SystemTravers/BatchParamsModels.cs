@@ -166,14 +166,25 @@ namespace BimboClub
         public string DefaultValue
         {
             get => _defaultValue;
-            set { _defaultValue = value; OnPropertyChanged(); }
+            set { _defaultValue = value; OnPropertyChanged(); OnPropertyChanged(nameof(ValueOrFormula)); }
         }
 
         [DataMember]
         public string Formula
         {
             get => _formula;
-            set { _formula = value; OnPropertyChanged(); }
+            set { _formula = value; OnPropertyChanged(); OnPropertyChanged(nameof(ValueOrFormula)); }
+        }
+
+        // Presets may store Formula separately; the edited cell must show and replace that value.
+        public string ValueOrFormula
+        {
+            get => !string.IsNullOrWhiteSpace(Formula) ? "=" + Formula.Trim().TrimStart('=') : DefaultValue;
+            set
+            {
+                Formula = "";
+                DefaultValue = value;
+            }
         }
 
         [DataMember]
@@ -297,7 +308,7 @@ namespace BimboClub
             foreach (var p in items)
             {
                 string isInstStr = p.BindingTypeName;
-                string val = !string.IsNullOrEmpty(p.Formula) ? p.Formula : p.DefaultValue;
+                string val = p.ValueOrFormula;
                 sb.AppendLine($"\"{p.Name}\";\"{p.Guid}\";\"{p.GroupName}\";\"{p.DataType}\";\"{p.BindingGroupName}\";\"{isInstStr}\";\"{val}\"");
             }
 

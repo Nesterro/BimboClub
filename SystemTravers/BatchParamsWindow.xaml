@@ -556,7 +556,7 @@
                                             </Style>
                                         </DataGridTextColumn.ElementStyle>
                                     </DataGridTextColumn>
-                                    <DataGridTextColumn Header="Значение / Формула" Binding="{Binding DefaultValue, UpdateSourceTrigger=PropertyChanged}" Width="1.8*"/>
+                                    <DataGridTextColumn Header="Значение / Формула" Binding="{Binding ValueOrFormula, UpdateSourceTrigger=PropertyChanged}" Width="1.8*"/>
 
                                     <!-- Delete Button Column -->
                                     <DataGridTemplateColumn Header="Удалить" Width="68">
@@ -705,7 +705,7 @@
                     <StackPanel>
                         <TextBlock Text="ДОБАВЛЕНИЕ В СЕМЕЙСТВО (.rfa)" FontSize="13" FontWeight="Bold" Foreground="#81C784" Margin="0,0,0,6"/>
                         <TextBlock x:Name="FamilyCategoryTextBlock" Text="Категория семейства: -" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,8"/>
-                        <TextBlock Text="Подготовленные параметры из таблицы будут созданы в семействе через FamilyManager с привязанными значениями/формулами." TextWrapping="Wrap" Foreground="#E0E0E0" Margin="0,0,0,10"/>
+                        <TextBlock Text="Значения заполняются во всех типоразмерах семейства. Для формулы начните ввод с =. Пустая ячейка оставляет значение без изменений. Если типоразмеров нет, будет создан «Тип 1»." TextWrapping="Wrap" Foreground="#E0E0E0" Margin="0,0,0,10"/>
 
                         <Border Background="#1E2E24" BorderBrush="#2E7D32" BorderThickness="1" CornerRadius="4" Padding="8">
                             <TextBlock Text="Выбор категорий не требуется (семейство имеет фиксированную категорию)." TextWrapping="Wrap" Foreground="#A5D6A7" FontWeight="Bold" FontSize="12"/>

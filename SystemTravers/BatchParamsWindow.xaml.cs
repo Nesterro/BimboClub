@@ -598,7 +598,7 @@ namespace BimboClub
             var targetRows = GetTargetStagedParams();
             foreach (var item in targetRows)
             {
-                item.DefaultValue = val;
+                item.ValueOrFormula = val;
             }
             ProgressStatusTextBlock.Text = $"Значение / формула назначена для {targetRows.Count} параметров.";
         }
@@ -733,6 +733,12 @@ namespace BimboClub
 
         private async void Execute_Click(object sender, RoutedEventArgs e)
         {
+            if (!StagedParamsDataGrid.CommitEdit(DataGridEditingUnit.Cell, true) ||
+                !StagedParamsDataGrid.CommitEdit(DataGridEditingUnit.Row, true))
+            {
+                MessageBox.Show(this, "Завершите исправление значения в таблице перед записью.", "Проверка ввода", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             var selectedParams = _stagedParams.Where(p => p.IsSelected).ToList();
             if (selectedParams.Count == 0)
             {

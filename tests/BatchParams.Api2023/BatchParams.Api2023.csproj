@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <PlatformTarget>x64</PlatformTarget>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <RevitApiPath Condition="'$(RevitApiPath)' == ''">C:/Program Files/Autodesk/Revit 2023/RevitAPI.dll</RevitApiPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="RevitAPI"><HintPath>$(RevitApiPath)</HintPath><Private>false</Private></Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Compile Include="../../SystemTravers/BatchFamilyValueWriter.cs" Link="BatchFamilyValueWriter.cs" />
+    <Compile Include="../../SystemTravers/BatchParamsEngine.cs" Link="BatchParamsEngine.cs" />
+    <Compile Include="../../SystemTravers/BatchParamsModels.cs" Link="BatchParamsModels.cs" />
+  </ItemGroup>
+</Project>
