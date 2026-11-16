@@ -283,11 +283,12 @@ namespace BimboClub
 
             // A shared AHU can have a comma-separated system-name value. Keep every
             // existing full value containing the selected exact name, not a substring.
-            var provider = new ParameterValueProvider(filterParamId);
+            _doc.Regenerate();
+            var reader = new SchemeParameterReader(_doc, filterParamId);
             var parameterValues = new FilteredElementCollector(_doc)
                 .WherePasses(new ElementMulticategoryFilter(mepCategories))
                 .WhereElementIsNotElementType()
-                .Select(element => provider.GetStringValue(element));
+                .Select(element => reader.Read(element)).ToList();
             var matchingValues = SchemeSystemMembership.GetMatchingValues(systemName, parameterValues);
             // Hide only when the value differs from ALL accepted values (AND).
             var hideRules = matchingValues.Select(value =>

@@ -14,5 +14,6 @@
     <Compile Include="../../SystemTravers/VentilationSchemeVisibility.cs" Link="VentilationSchemeVisibility.cs" />
     <Compile Include="../../SystemTravers/SchemeSystemMembership.cs" Link="SchemeSystemMembership.cs" />
     <Compile Include="../../SystemTravers/SchemeGenerator.cs" Link="SchemeGenerator.cs" />
+    <Compile Include="../../SystemTravers/SchemeParameterReader.cs" Link="SchemeParameterReader.cs" />
   </ItemGroup>
 </Project>
