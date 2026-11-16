@@ -1,14 +1,14 @@
 {
-  "latestVersion": "2.4.30",
+  "latestVersion": "2.4.31",
   "releaseDate": "2026-11-16",
   "changelog": [
-    "3D-схемы: отключаются оси и уровни; ПВ-установки с несколькими системами сохраняются на схеме каждой своей системы",
-    "Имена в списке сопоставляются целиком: В7.3 не совпадает с В7.30. Учитываются пробелы и повторения",
-    "После обновления повторите создание схем с прежними именами. При последующем изменении состава систем установки повторите создание для обновления фильтра",
-    "29 проверок на каждой платформе; сборки обоих пакетов и компиляция генератора с API Revit 2023 прошли. Без запуска Revit и моделей"
+    "3D-схемы: устранён вызов FilterableValueProvider.GetStringValue, вызывавший внутреннюю ошибку Revit в версии 2.4.30",
+    "Параметры читаются напрямую с проверкой типа и наличия значения, включая параметры типоразмера",
+    "Сохранены общие ПВ-установки, скрытие осей, уровней и связей. После обновления повторите создание нужных схем",
+    "15 проверок чтения и 29 проверок принадлежности на каждой платформе; сборки пакетов и компиляция с API Revit 2023 прошли. Без запуска Revit и моделей"
   ],
   "packages": {
-    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/03c271dbaf6e5ac0b2aad584357a35610732c742/updates/packages/2.4.30/bimboclub_net48.zip",
-    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/03c271dbaf6e5ac0b2aad584357a35610732c742/updates/packages/2.4.30/bimboclub_net8.zip"
+    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/c83199379ecd7d7e61e2078f2a9acd0d6ddb6705/updates/packages/2.4.31/bimboclub_net48.zip",
+    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/c83199379ecd7d7e61e2078f2a9acd0d6ddb6705/updates/packages/2.4.31/bimboclub_net8.zip"
   }
 }
