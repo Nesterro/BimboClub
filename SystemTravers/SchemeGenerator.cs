@@ -19,7 +19,8 @@ namespace BimboClub
             string prefix, 
             string suffix, 
             List<ViewParameterConfig> parameters,
-            ElementId filterParamId)
+            ElementId filterParamId,
+            bool isVentilation = false)
         {
             // 1. Получаем или создаем изометрический 3D-вид с именем системы
             View3D view3d = GetOrCreate3DView(systemName, prefix, suffix);
@@ -29,6 +30,10 @@ namespace BimboClub
 
             // 3. Настраиваем единственный обратный фильтр видимости и скрываем не-MEP категории
             SetupViewFilters(view3d, systemName, filterParamId);
+
+            // Category visibility is independent of system-name/parameter filters.
+            if (isVentilation)
+                VentilationSchemeVisibility.Apply(_doc, view3d);
 
             // 4. Блокируем созданный 3D-вид для возможности нанесения аннотаций
             Lock3DView(view3d);
@@ -42,7 +47,7 @@ namespace BimboClub
             View3D existingView = new FilteredElementCollector(_doc)
                 .OfClass(typeof(View3D))
                 .Cast<View3D>()
-                .FirstOrDefault(v => v.Name.Equals(viewName, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefault(v => !v.IsTemplate && v.Name.Equals(viewName, StringComparison.OrdinalIgnoreCase));
 
             if (existingView != null)
             {

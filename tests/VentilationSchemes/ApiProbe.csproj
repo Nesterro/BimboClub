@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>10.0</LangVersion>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+    <RevitYear Condition="'$(RevitYear)' == ''">2023</RevitYear>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>C:/Program Files/Autodesk/Revit $(RevitYear)/RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Compile Include="../../SystemTravers/VentilationSchemeVisibility.cs" Link="VentilationSchemeVisibility.cs" />
+  </ItemGroup>
+</Project>

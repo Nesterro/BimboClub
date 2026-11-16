@@ -175,7 +175,8 @@ namespace BimboClub
                             window.ViewPrefix, 
                             window.ViewSuffix, 
                             window.ViewParameters,
-                            window.SelectedFilterParamId
+                            window.SelectedFilterParamId,
+                            systemObj is MechanicalSystem
                         );
                         processedCount++;
                     }
