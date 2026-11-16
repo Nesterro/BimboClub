@@ -241,8 +241,7 @@ namespace BimboClub
                     string val = param.AsString();
                     if (!string.IsNullOrEmpty(val))
                     {
-                        if (val.IndexOf(sysName, StringComparison.OrdinalIgnoreCase) >= 0 || 
-                            sysName.IndexOf(val, StringComparison.OrdinalIgnoreCase) >= 0)
+                        if (SchemeSystemMembership.ContainsSystem(val, sysName))
                         {
                             elements.Add(elem);
                         }

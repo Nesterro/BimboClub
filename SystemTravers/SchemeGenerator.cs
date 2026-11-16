@@ -281,9 +281,18 @@ namespace BimboClub
                 catch { }
             }
 
-            // Создаем единственный ОБРАТНЫЙ фильтр
-            FilterRule mepRule = ParameterFilterRuleFactory.CreateNotEqualsRule(filterParamId, systemName);
-            ElementParameterFilter mepEPF = new ElementParameterFilter(mepRule);
+            // A shared AHU can have a comma-separated system-name value. Keep every
+            // existing full value containing the selected exact name, not a substring.
+            var provider = new ParameterValueProvider(filterParamId);
+            var parameterValues = new FilteredElementCollector(_doc)
+                .WherePasses(new ElementMulticategoryFilter(mepCategories))
+                .WhereElementIsNotElementType()
+                .Select(element => provider.GetStringValue(element));
+            var matchingValues = SchemeSystemMembership.GetMatchingValues(systemName, parameterValues);
+            // Hide only when the value differs from ALL accepted values (AND).
+            var hideRules = matchingValues.Select(value =>
+                ParameterFilterRuleFactory.CreateNotEqualsRule(filterParamId, value)).ToList();
+            ElementParameterFilter mepEPF = new ElementParameterFilter(hideRules);
 
             string mepFilterName = SanitizeName("Скрыть_все_кроме_" + systemName);
             ParameterFilterElement mepFilter = GetOrCreateFilter(mepFilterName, mepCategories, mepEPF);
@@ -312,16 +321,13 @@ namespace BimboClub
                 }
             }
 
-            // Отключаем категорию аннотаций "Уровни" (OST_Levels)
-            try
+            // Hide datums in both new and reused scheme views.
+            foreach (var datumCategory in new[] { BuiltInCategory.OST_Grids, BuiltInCategory.OST_Levels })
             {
-                ElementId levelsCatId = new ElementId(BuiltInCategory.OST_Levels);
-                if (view.CanCategoryBeHidden(levelsCatId))
-                {
-                    view.SetCategoryHidden(levelsCatId, true);
-                }
+                Category category = Category.GetCategory(_doc, datumCategory);
+                if (category != null && view.CanCategoryBeHidden(category.Id))
+                    view.SetCategoryHidden(category.Id, true);
             }
-            catch { }
         }
 
         private ParameterFilterElement GetOrCreateFilter(string name, List<ElementId> categories, ElementParameterFilter filterRule)

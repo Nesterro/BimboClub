@@ -12,5 +12,7 @@
       <Private>false</Private>
     </Reference>
     <Compile Include="../../SystemTravers/VentilationSchemeVisibility.cs" Link="VentilationSchemeVisibility.cs" />
+    <Compile Include="../../SystemTravers/SchemeSystemMembership.cs" Link="SchemeSystemMembership.cs" />
+    <Compile Include="../../SystemTravers/SchemeGenerator.cs" Link="SchemeGenerator.cs" />
   </ItemGroup>
 </Project>
