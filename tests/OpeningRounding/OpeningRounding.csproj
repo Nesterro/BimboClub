@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../SystemTravers/OpeningRoundingOptions.cs" Link="OpeningRoundingOptions.cs" />
+    <Compile Include="../../SystemTravers/OpeningRoundingService.cs" Link="OpeningRoundingService.cs" />
+  </ItemGroup>
+</Project>

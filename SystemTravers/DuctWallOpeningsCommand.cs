@@ -20,6 +20,8 @@ using Autodesk.Revit.UI.Selection;
 using CheckBox = System.Windows.Controls.CheckBox;
 using ComboBox = System.Windows.Controls.ComboBox;
 using TextBox = System.Windows.Controls.TextBox;
+using ScrollViewer = System.Windows.Controls.ScrollViewer;
+using ScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility;
 using TextBlock = System.Windows.Controls.TextBlock;
 using Button = System.Windows.Controls.Button;
 using Grid = System.Windows.Controls.Grid;
@@ -247,9 +249,14 @@ namespace DuctWallOpenings
                                         if (intersectPoint == null) continue;
                                     }
 
+                                    using (var placement = new SubTransaction(doc))
+                                    {
+                                    placement.Start();
+                                    Level openingLevel = OpeningRoundingService.FindLevel(doc, intersectPoint.Z);
                                     FamilyInstance opening = doc.Create.NewFamilyInstance(
                                         intersectPoint,
                                         openingSymbol,
+                                        openingLevel,
                                         StructuralType.NonStructural);
                                     if (opening == null) { skippedCount++; continue; }
 
@@ -289,7 +296,10 @@ namespace DuctWallOpenings
                                     if (hostThickness > 0)
                                         SetParam(opening, depthParamName, hostThickness + depthOffset);
 
+                                    OpeningRoundingService.Apply(doc, opening, widthParamName, heightParamName, depthParamName, window.Rounding, openingLevel);
+                                    if (placement.Commit() != TransactionStatus.Committed) throw new InvalidOperationException("Расстановка отверстия отменена.");
                                     createdCount++;
+                                    }
                                 }
                                 catch (Exception exInner)
                                 {
@@ -851,7 +861,7 @@ namespace DuctWallOpenings
 									symbol.Activate();
 									document.Regenerate();
 								}
-								OpeningsRunner.MergeSelectedFamilyInstances(document, list3, symbol, detectedWidthParam, detectedHeightParam, detectedDepthParam, offset, depthOffset, kind);
+								OpeningsRunner.MergeSelectedFamilyInstances(document, list3, symbol, detectedWidthParam, detectedHeightParam, detectedDepthParam, offset, depthOffset, kind, mergeOpeningsWindow.Rounding);
 								transaction.Commit();
 							}
 							TaskDialog.Show("Готово", string.Format("Объединено выбранных элементов: {0}", list3.Count));
@@ -1059,7 +1069,7 @@ namespace DuctWallOpenings
 								{
 									if (current3.Count >= 2)
 									{
-										OpeningsRunner.MergeSelectedFamilyInstances(document, current3, selectedSymbol, widthParamName, heightParam, depthParamName, offset, depthOffset, kind);
+										OpeningsRunner.MergeSelectedFamilyInstances(document, current3, selectedSymbol, widthParamName, heightParam, depthParamName, offset, depthOffset, kind, mergeOpeningsWindow.Rounding);
 										num++;
 										num2 += current3.Count;
 									}
@@ -1081,7 +1091,7 @@ namespace DuctWallOpenings
 			}
 		}
 
-        private static void MergeSelectedFamilyInstances(Document doc, List<FamilyInstance> selectedFamilies, FamilySymbol openingSymbol, string widthParamName, string heightParamName, string depthParamName, double offset, double depthOffset, OpeningsRunner.HostKind kind)
+        private static void MergeSelectedFamilyInstances(Document doc, List<FamilyInstance> selectedFamilies, FamilySymbol openingSymbol, string widthParamName, string heightParamName, string depthParamName, double offset, double depthOffset, OpeningsRunner.HostKind kind, OpeningRoundingOptions rounding)
         {
             FamilyInstance familyInstance = selectedFamilies[0];
             LocationPoint lp1 = familyInstance.Location as LocationPoint;
@@ -1180,14 +1190,15 @@ namespace DuctWallOpenings
                 }
             }
 
+            Level openingLevel = OpeningRoundingService.FindLevel(doc, xYZ5.Z, familyInstance.LevelId);
             FamilyInstance familyInstance2 = null;
             if (hostElem != null)
             {
-                familyInstance2 = doc.Create.NewFamilyInstance(xYZ5, openingSymbol, hostElem, StructuralType.NonStructural);
+                familyInstance2 = doc.Create.NewFamilyInstance(xYZ5, openingSymbol, hostElem, openingLevel, StructuralType.NonStructural);
             }
             else
             {
-                familyInstance2 = doc.Create.NewFamilyInstance(xYZ5, openingSymbol, StructuralType.NonStructural);
+                familyInstance2 = doc.Create.NewFamilyInstance(xYZ5, openingSymbol, openingLevel, StructuralType.NonStructural);
             }
 
             if (familyInstance2 == null)
@@ -1248,6 +1259,8 @@ namespace DuctWallOpenings
                 OpeningsRunner.SetParam(familyInstance2, heightParamName, value2);
                 OpeningsRunner.SetParam(familyInstance2, depthParamName, value3);
             }
+
+            OpeningRoundingService.Apply(doc, familyInstance2, widthParamName, heightParamName, depthParamName, rounding, openingLevel);
 
             foreach (FamilyInstance current3 in selectedFamilies)
             {
@@ -1465,6 +1478,8 @@ namespace DuctWallOpenings
         private ComboBox _comboDepth;
         private TextBox _offsetBox;
         private TextBox _depthOffsetBox;
+        private readonly OpeningRoundingPanel _roundingPanel = new OpeningRoundingPanel();
+        public OpeningRoundingOptions Rounding { get; private set; } = new OpeningRoundingOptions();
         private TextBox _searchBox;
         private CheckBox _chkSelectedOnly;
         private CheckBox _chkCurrentView;
@@ -1518,7 +1533,8 @@ namespace DuctWallOpenings
             _doc = doc;
             Title = "Параметры расстановки отверстий " + titleSuffix + " - BimboClub Tools";
             Width = 620;
-            Height = 650;
+            Height = 740;
+            MaxHeight = SystemParameters.WorkArea.Height;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.NoResize;
 
@@ -1586,8 +1602,9 @@ namespace DuctWallOpenings
 
             // 2. Сетка полей ввода
             Grid grid = new Grid { Margin = new Thickness(15) };
-            Grid.SetRow(grid, 1);
-            mainGrid.Children.Add(grid);
+            var fieldsScroll = new ScrollViewer { Content = grid, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+            Grid.SetRow(fieldsScroll, 1);
+            mainGrid.Children.Add(fieldsScroll);
 
             for (int i = 0; i < 13; i++)
                 grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -1709,6 +1726,10 @@ namespace DuctWallOpenings
             _chkSelectedOnly.Checked += (s, e) => { if (_chkCurrentView != null) _chkCurrentView.IsChecked = false; };
             _chkCurrentView.Checked += (s, e) => { if (_chkSelectedOnly != null) _chkSelectedOnly.IsChecked = false; };
 
+            Grid.SetRow(_roundingPanel, row++);
+            Grid.SetColumnSpan(_roundingPanel, 2);
+            grid.Children.Add(_roundingPanel);
+
             StackPanel buttons = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
@@ -1809,6 +1830,8 @@ namespace DuctWallOpenings
 
         private void OkBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (!_roundingPanel.TryGetOptions(out var rounding)) return;
+            Rounding = rounding;
             var item = _comboFamily.SelectedItem as SymbolItem;
             if (item == null)
             {
@@ -1917,6 +1940,8 @@ namespace DuctWallOpenings
         public FamilySymbol SourceSymbol { get; private set; }
         public bool UseCurrentViewOnly { get; private set; }
         public double MergeDistanceMm { get; private set; }
+        private readonly OpeningRoundingPanel _roundingPanel = new OpeningRoundingPanel();
+        public OpeningRoundingOptions Rounding { get; private set; } = new OpeningRoundingOptions();
 
         public MergeOpeningsWindow(Document doc, List<FamilySymbol> symbols, string titleSuffix, OpeningsRunner.HostKind kind)
         {
@@ -1925,7 +1950,7 @@ namespace DuctWallOpenings
             _doc = doc;
             Title = "Объединение отверстий " + titleSuffix + " - BimboClub Tools";
             Width = 620.0;
-            Height = 480.0;
+            Height = 600.0;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.NoResize;
             Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28));
@@ -1987,7 +2012,7 @@ namespace DuctWallOpenings
             Grid grid2 = new Grid();
             grid2.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(200.0) });
             grid2.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
-            contentBorder.Child = grid2;
+            contentBorder.Child = new ScrollViewer { Content = grid2, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
 
             Style style = new Style(typeof(TextBox));
             style.Setters.Add(new Setter(TextBox.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36))));
@@ -2036,6 +2061,10 @@ namespace DuctWallOpenings
             grid2.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             grid2.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
             grid2.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            Grid.SetRow(_roundingPanel, num++);
+            Grid.SetColumnSpan(_roundingPanel, 2);
+            grid2.Children.Add(_roundingPanel);
 
             this.AddSectionHeader(grid2, "ВАРИАНТ 1: ВЫБРАТЬ ВРУЧНУЮ НА ВИДЕ", num);
             num++;
@@ -2264,6 +2293,8 @@ namespace DuctWallOpenings
 
         private void SelectBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (!_roundingPanel.TryGetOptions(out var rounding)) return;
+            Rounding = rounding;
             this.ResultAction = MergeAction.ManualPick;
             this.DialogResult = true;
             this.Close();
@@ -2271,6 +2302,8 @@ namespace DuctWallOpenings
 
         private void BatchBtn_Click(object sender, RoutedEventArgs e)
         {
+            if (!_roundingPanel.TryGetOptions(out var rounding)) return;
+            Rounding = rounding;
             SymbolItem symbolItem = this._comboSourceFamily.SelectedItem as SymbolItem;
             if (symbolItem == null)
             {

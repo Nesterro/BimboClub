@@ -1,6 +1,7 @@
 <Window x:Class="BimboClub.OpeningsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:BimboClub"
         Title="вљ« BimboClub | Задание на отверстия" 
         Height="580" Width="470"
         WindowStartupLocation="CenterScreen"
@@ -165,6 +166,8 @@
                         <TextBox x:Name="ClearanceTextBox" Style="{StaticResource ModernTextBoxStyle}" Text="50"/>
                     </StackPanel>
                 </Border>
+
+                <local:OpeningRoundingPanel x:Name="RoundingPanel"/>
 
                 <!-- Parameters Mapping Card -->
                 <Border Background="#252536" BorderBrush="#EAEAEA" BorderThickness="1" CornerRadius="6" Padding="14">

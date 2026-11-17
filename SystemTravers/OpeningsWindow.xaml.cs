@@ -13,6 +13,7 @@ namespace BimboClub
         public bool IntersectWalls => WallsCheckBox.IsChecked == true;
         public bool IntersectFloors => FloorsCheckBox.IsChecked == true;
         public double ClearanceMm { get; private set; }
+        public OpeningRoundingOptions Rounding { get; private set; } = new OpeningRoundingOptions();
         public string WidthParam => WidthParamTextBox.Text.Trim();
         public string HeightParam => HeightParamTextBox.Text.Trim();
         public string DepthParam => DepthParamTextBox.Text.Trim();
@@ -67,6 +68,8 @@ namespace BimboClub
 
         private void Run_Click(object sender, RoutedEventArgs e)
         {
+            if (!RoundingPanel.TryGetOptions(out var rounding)) return;
+            Rounding = rounding;
             if (IntersectWalls)
             {
                 var wallItem = WallOpeningComboBox.SelectedItem as FamilySymbolItem;

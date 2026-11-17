@@ -168,10 +168,12 @@ namespace BimboClub
 
                                             if (symbolToPlace == null) continue;
 
+                                            Level openingLevel = OpeningRoundingService.FindLevel(doc, point.Z);
                                             // Place instance
                                             FamilyInstance opening = doc.Create.NewFamilyInstance(
                                                 point, 
                                                 symbolToPlace, 
+                                                openingLevel,
                                                 Autodesk.Revit.DB.Structure.StructuralType.NonStructural
                                             );
 
@@ -206,6 +208,7 @@ namespace BimboClub
                                                 catch { }
                                             }
 
+                                            OpeningRoundingService.Apply(doc, opening, widthParamName, heightParamName, depthParamName, window.Rounding, openingLevel);
                                             placedCount++;
                                         }
                                     }
