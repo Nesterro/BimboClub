@@ -1,14 +1,14 @@
 {
-  "latestVersion": "2.4.31",
-  "releaseDate": "2026-11-16",
+  "latestVersion": "2.4.32",
+  "releaseDate": "2026-11-17",
   "changelog": [
-    "3D-схемы: устранён вызов FilterableValueProvider.GetStringValue, вызывавший внутреннюю ошибку Revit в версии 2.4.30",
-    "Параметры читаются напрямую с проверкой типа и наличия значения, включая параметры типоразмера",
-    "Сохранены общие ПВ-установки, скрытие осей, уровней и связей. После обновления повторите создание нужных схем",
-    "15 проверок чтения и 29 проверок принадлежности на каждой платформе; сборки пакетов и компиляция с API Revit 2023 прошли. Без запуска Revit и моделей"
+    "Отверстия: добавлены отдельные настройки округления размеров вверх и отметки низа от уровня вниз",
+    "Шаг по умолчанию 10 мм; 0 отключает округление. Применяется при расстановке, ручном и пакетном объединении",
+    "При опускании низа высота увеличивается для сохранения проёма; размеры и вертикальные границы проверяются до удаления исходных отверстий",
+    "75 проверок на каждой платформе, сборки пакетов и компиляция с API Revit 2023 прошли. Без запуска Revit и моделей"
   ],
   "packages": {
-    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/c83199379ecd7d7e61e2078f2a9acd0d6ddb6705/updates/packages/2.4.31/bimboclub_net48.zip",
-    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/c83199379ecd7d7e61e2078f2a9acd0d6ddb6705/updates/packages/2.4.31/bimboclub_net8.zip"
+    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/aa1f8c0593f691370a1fcdd184227319902cf0ab/updates/packages/2.4.32/bimboclub_net48.zip",
+    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/aa1f8c0593f691370a1fcdd184227319902cf0ab/updates/packages/2.4.32/bimboclub_net8.zip"
   }
 }
