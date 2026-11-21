@@ -210,6 +210,8 @@ namespace BimboClub.Analogs.CopyElements
             _modelElements = new ObservableCollection<ModelElementItem>();
             _targetDocs = new ObservableCollection<TargetDocumentItem>();
 
+            UiThemeHelper.ApplyDarkComboBoxes(this);
+            UiThemeHelper.ApplyDarkButtons(this);
             InitializeUi();
             PopulateSourceDocs();
             LoadModelSelection();

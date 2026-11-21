@@ -58,12 +58,12 @@ try {
         }
         $manifest = [ordered]@{
             latestVersion = $version
-            changelog = if ($version -eq '3.0.2') {
+            changelog = @(if ($version -eq '3.0.2') {
                 @('Единая команда копирования фильтров видов и шаблонов с переносом состояния «Включён».',
                   'Новые пиктограммы на ленте Revit.')
             } else {
                 @('Тестовая версия единого интерфейса и обновления без закрытия Revit')
-            }
+            })
             packages = $packages
         }
         $manifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $release 'update_manifest.json') -Encoding utf8NoBOM

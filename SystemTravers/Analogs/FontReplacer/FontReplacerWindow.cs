@@ -106,6 +106,8 @@ namespace BimboClub.Analogs.FontReplacer
         public FontReplacerWindow(Document doc)
         {
             _doc = doc;
+            UiThemeHelper.ApplyDarkComboBoxes(this);
+            UiThemeHelper.ApplyDarkButtons(this);
             InitializeUi();
             LoadProjectStyles();
         }
@@ -302,7 +304,7 @@ namespace BimboClub.Analogs.FontReplacer
             _cbTargetFont = new ComboBox
             {
                 Height = 30,
-                Foreground = Brushes.Black,
+                Foreground = Brushes.White,
                 Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 53)),
                 FontSize = 13,
                 FontWeight = FontWeights.SemiBold
@@ -365,7 +367,7 @@ namespace BimboClub.Analogs.FontReplacer
                 Width = 140,
                 Height = 26,
                 VerticalAlignment = VerticalAlignment.Center,
-                Foreground = Brushes.Black,
+                Foreground = Brushes.White,
                 Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 53))
             };
             _cbColor.Items.Add("Черный");

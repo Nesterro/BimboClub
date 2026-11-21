@@ -66,6 +66,7 @@ namespace BimboClub
         public HeatLossWindow(List<FamilySymbol> symbols, int allSpacesCount, int activeViewSpacesCount)
         {
             InitializeComponent();
+            UiThemeHelper.ApplyDarkComboBoxes(this);
             SetWindowIcon();
 
             _allSpacesCount = allSpacesCount;

@@ -45,7 +45,7 @@
                     <Setter Property="Background" Value="#AE5D76"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#E0E0E0"/>
+                    <Setter Property="Background" Value="#24242B"/>
                     <Setter Property="Foreground" Value="#AAA6B5"/>
                 </Trigger>
             </Style.Triggers>
@@ -53,7 +53,7 @@
 
         <!-- Secondary Button Style -->
         <Style x:Key="SecondaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#F2F2F2"/>
+            <Setter Property="Background" Value="#2D2D36"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="32"/>
@@ -72,7 +72,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E5E5E5"/>
+                    <Setter Property="Background" Value="#383843"/>
                     <Setter Property="BorderBrush" Value="#9D4D66"/>
                 </Trigger>
             </Style.Triggers>

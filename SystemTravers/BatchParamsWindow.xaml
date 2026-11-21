@@ -732,7 +732,7 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Закрыть" Style="{StaticResource SecondaryButtonStyle}" Width="110" Margin="0" Click="Cancel_Click" AutomationProperties.Name="Закрыть окно"/>
-            <Button Grid.Column="2" x:Name="DeleteButton" Content="УДАЛИТЬ ОТМЕЧЕННЫЕ ИЗ МОДЕЛИ" Style="{StaticResource SecondaryButtonStyle}" Foreground="#C17E96" BorderBrush="#9D4D66" FontWeight="Bold" Height="40" Padding="14,0" Click="ExecuteDelete_Click" AutomationProperties.Name="Пакетное удаление отмеченных параметров из модели"/>
+            <Button Grid.Column="2" x:Name="DeleteButton" Content="УДАЛИТЬ ОТМЕЧЕННЫЕ ИЗ МОДЕЛИ" Style="{StaticResource SecondaryButtonStyle}" Foreground="#E2A9BE" BorderBrush="#9D4D66" FontWeight="Bold" Height="40" Padding="14,0" Click="ExecuteDelete_Click" AutomationProperties.Name="Пакетное удаление отмеченных параметров из модели"/>
             <Button Grid.Column="4" x:Name="ExecuteButton" Content="ЗАПИСАТЬ ПОДГОТОВЛЕННЫЕ ПАРАМЕТРЫ В МОДЕЛЬ" Style="{StaticResource PrimaryButtonStyle}" Height="40" Padding="16,0" Click="Execute_Click" AutomationProperties.Name="Выполнить пакетную запись подготовленных параметров в модель"/>
         </Grid>
     </Grid>

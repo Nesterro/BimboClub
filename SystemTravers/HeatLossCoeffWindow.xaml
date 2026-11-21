@@ -47,7 +47,7 @@
                     <Setter Property="Background" Value="#AE5D76"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#E0E0E0"/>
+                    <Setter Property="Background" Value="#24242B"/>
                     <Setter Property="Foreground" Value="#AAA6B5"/>
                 </Trigger>
             </Style.Triggers>
@@ -55,7 +55,7 @@
 
         <!-- Secondary Button -->
         <Style x:Key="SecondaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#F2F2F2"/>
+            <Setter Property="Background" Value="#2D2D36"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="32"/>
@@ -78,7 +78,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E5E5E5"/>
+                    <Setter Property="Background" Value="#383843"/>
                     <Setter Property="BorderBrush" Value="#9D4D66"/>
                 </Trigger>
             </Style.Triggers>
@@ -127,11 +127,14 @@
                   RowHeight="32"
                   HeadersVisibility="Column"
                   Background="#19191E"
+                  RowBackground="#24242B"
+                  AlternatingRowBackground="#2D2D36"
+                  Foreground="#FFFFFF"
                   BorderBrush="#D9D9D9"
                   BorderThickness="1">
             <DataGrid.Resources>
                 <Style TargetType="DataGridColumnHeader">
-                    <Setter Property="Background" Value="#F5F5F5"/>
+                    <Setter Property="Background" Value="#2D2D36"/>
                     <Setter Property="Foreground" Value="#FFFFFF"/>
                     <Setter Property="FontWeight" Value="SemiBold"/>
                     <Setter Property="Padding" Value="8,6"/>
@@ -165,11 +168,14 @@
                             <Setter Property="HorizontalAlignment" Value="Center"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="Foreground" Value="#9D4D66"/>
+                            <Setter Property="Foreground" Value="#E2A9BE"/>
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                     <DataGridTextColumn.EditingElementStyle>
                         <Style TargetType="TextBox">
+                            <Setter Property="Background" Value="#19191E"/>
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                            <Setter Property="CaretBrush" Value="#FFFFFF"/>
                             <Setter Property="HorizontalContentAlignment" Value="Center"/>
                             <Setter Property="VerticalContentAlignment" Value="Center"/>
                         </Style>

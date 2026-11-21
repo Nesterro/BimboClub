@@ -349,6 +349,7 @@ namespace BimboClub.Analogs.MepAlign
 
         public MepMultiRouteWindow()
         {
+            UiThemeHelper.ApplyDarkButtons(this);
             InitializeUi();
         }
 

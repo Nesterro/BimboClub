@@ -66,6 +66,8 @@ namespace BimboClub.Analogs.BaseLevel
             _storage = BaseLevelStorage.Load();
             _ruleItems = new ObservableCollection<BaseLevelRuleItem>();
 
+            UiThemeHelper.ApplyDarkComboBoxes(this);
+            UiThemeHelper.ApplyDarkButtons(this);
             InitializeUi(hasPreselected);
             LoadConfigurationsToUi();
         }
@@ -205,7 +207,7 @@ namespace BimboClub.Analogs.BaseLevel
                 Height = 28,
                 VerticalAlignment = VerticalAlignment.Center,
                 Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 53)),
-                Foreground = Brushes.Black,
+                Foreground = Brushes.White,
                 Margin = new Thickness(0, 0, 10, 0)
             };
             _cbConfigurations.SelectionChanged += (s, e) => OnConfigurationSelected();
@@ -277,6 +279,7 @@ namespace BimboClub.Analogs.BaseLevel
                 SelectedItemBinding = new System.Windows.Data.Binding("BaseLevel"),
                 Width = new DataGridLength(1, DataGridLengthUnitType.Star)
             };
+            UiThemeHelper.StyleComboBoxColumnDark(colBase);
             _dgRules.Columns.Add(colBase);
 
             // Столбец: Верхний уровень
@@ -288,6 +291,7 @@ namespace BimboClub.Analogs.BaseLevel
                 SelectedItemBinding = new System.Windows.Data.Binding("TopLevel"),
                 Width = new DataGridLength(1, DataGridLengthUnitType.Star)
             };
+            UiThemeHelper.StyleComboBoxColumnDark(colTop);
             _dgRules.Columns.Add(colTop);
 
             WpfGrid.SetRow(_dgRules, 0);
@@ -588,6 +592,7 @@ namespace BimboClub.Analogs.BaseLevel
                 FontSize = 13
             };
 
+            UiThemeHelper.ApplyDarkButtons(promptWin);
             StackPanel sp = new StackPanel { Margin = new Thickness(14) };
             sp.Children.Add(new TextBlock { Text = prompt, Foreground = Brushes.White, Margin = new Thickness(0, 0, 0, 8) });
 

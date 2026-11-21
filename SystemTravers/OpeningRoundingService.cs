@@ -18,36 +18,42 @@ namespace BimboClub
                 ?? levels.FirstOrDefault() ?? throw new InvalidOperationException("В проекте нет уровня для размещения отверстия.");
         }
 
-        internal static void Apply(Document doc, FamilyInstance opening, string widthName, string heightName,
-            string depthName, OpeningRoundingOptions options, Level referenceLevel)
+        internal static void Apply(Document doc, FamilyInstance opening, string widthName, string verticalSizeName,
+            string otherSizeName, OpeningRoundingOptions options, Level referenceLevel)
         {
             if (options == null || (options.SizeStepMm == 0 && options.BottomStepMm == 0)) return;
             double sizeStep = options.SizeStepMm / 304.8;
             double bottomStep = options.BottomStepMm / 304.8;
-            var names = new[] { widthName, heightName, depthName }.Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().ToList();
-            var parameters = names.ToDictionary(name => name, name => GetLength(opening, name));
             doc.Regenerate();
+            var names = new[] { widthName, verticalSizeName, otherSizeName }.Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().ToList();
+            var parameters = names.ToDictionary(name => name, name => GetLength(opening, name));
             double originalBottom = 0, originalTop = 0, targetBottom = 0;
             if (bottomStep > 0)
             {
                 GetBounds(opening, out originalBottom, out originalTop);
                 var level = doc.GetElement(opening.LevelId) as Level ?? referenceLevel;
                 if (level == null) throw new InvalidOperationException("Не определён уровень отверстия для округления низа.");
-                targetBottom = level.ProjectElevation + OpeningRoundingOptions.Down(originalBottom - level.ProjectElevation, bottomStep);
-                if (string.IsNullOrWhiteSpace(heightName) || !parameters.ContainsKey(heightName))
+                targetBottom = level.ProjectElevation + OpeningRoundingOptions.Down(originalBottom - level.ProjectElevation, bottomStep, Tolerance);
+                if (string.IsNullOrWhiteSpace(verticalSizeName) || !parameters.ContainsKey(verticalSizeName))
                     throw new InvalidOperationException("Для округления низа выберите параметр вертикальной высоты отверстия.");
             }
 
+            double bottomDrop = originalBottom - targetBottom;
             var expectedValues = new Dictionary<string, double>();
             foreach (var pair in parameters)
             {
                 double value = pair.Value.AsDouble();
-                if (bottomStep > 0 && pair.Key == heightName)
-                    value += Math.Max(0, originalBottom - targetBottom);
-                double expected = OpeningRoundingOptions.Up(value, sizeStep);
-                expectedValues.Add(pair.Key, expected);
-                Write(pair.Value, expected, pair.Key);
+                if (pair.Key == verticalSizeName && bottomDrop > Tolerance)
+                    value += bottomDrop;
+                expectedValues.Add(pair.Key, OpeningRoundingOptions.Up(value, sizeStep, Tolerance));
             }
+            foreach (var pair in parameters)
+            {
+                double expected = expectedValues[pair.Key];
+                if (Math.Abs(pair.Value.AsDouble() - expected) > Tolerance && !pair.Value.Set(expected))
+                    throw new InvalidOperationException($"Не удалось записать размер «{pair.Key}».");
+            }
+            // Revit can defer dimension changes until regeneration, even when Set returns true.
             doc.Regenerate();
             if (bottomStep > 0)
             {
@@ -60,11 +66,11 @@ namespace BimboClub
                 if (Math.Abs(finalBottom - targetBottom) > Tolerance || finalTop < originalTop - Tolerance)
                     throw new InvalidOperationException("Семейство не сохранило требуемые границы отверстия. Проверьте вертикальный параметр высоты и ограничения размещения.");
             }
-            foreach (var pair in parameters)
+            foreach (var expected in expectedValues)
             {
-                double actual = pair.Value.AsDouble();
-                if (Math.Abs(actual - expectedValues[pair.Key]) > Tolerance)
-                    throw new InvalidOperationException($"Размер «{pair.Key}» не сохранил округление.");
+                double actual = GetLength(opening, expected.Key).AsDouble();
+                if (Math.Abs(actual - expected.Value) > Tolerance)
+                    throw new InvalidOperationException($"Размер «{expected.Key}» не сохранил округление.");
             }
         }
 
@@ -74,14 +80,6 @@ namespace BimboClub
             if (matches.Count != 1 || matches[0].IsReadOnly || !matches[0].HasValue || matches[0].Definition.GetDataType() != SpecTypeId.Length)
                 throw new InvalidOperationException($"Параметр «{name}» должен быть однозначным доступным для записи размером экземпляра.");
             return matches[0];
-        }
-
-        private static void Write(Parameter parameter, double value, string name)
-        {
-            if (Math.Abs(parameter.AsDouble() - value) > Tolerance && !parameter.Set(value))
-                throw new InvalidOperationException($"Не удалось записать размер «{name}».");
-            if (Math.Abs(parameter.AsDouble() - value) > Tolerance)
-                throw new InvalidOperationException($"Размер «{name}» не сохранился.");
         }
 
         private static void GetBounds(Element element, out double bottom, out double top)

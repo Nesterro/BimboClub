@@ -16,8 +16,22 @@ namespace Autodesk.Revit.DB
         public bool HasValue = true;
         public Definition Definition = new Definition();
         public double Value;
+        public bool IgnoreAcceptedWrites;
+        private double? _pendingValue;
         public double AsDouble() => Value;
-        public bool Set(double value) { if(Reject) return false; Value=value; return true; }
+        public bool Set(double value)
+        {
+            if (Reject) return false;
+            if (!IgnoreAcceptedWrites) _pendingValue = value;
+            return true;
+        }
+
+        public void Regenerate()
+        {
+            if (!_pendingValue.HasValue) return;
+            Value = _pendingValue.Value;
+            _pendingValue = null;
+        }
     }
     public class XYZ { public double X,Y,Z; public XYZ(double x,double y,double z) {X=x;Y=y;Z=z;} }
     public class Options { public ViewDetailLevel DetailLevel; }
@@ -63,7 +77,11 @@ namespace Autodesk.Revit.DB
     {
         public List<Element> Elements=new List<Element>();
         public Element GetElement(ElementId id)=>id==null?null:Elements.FirstOrDefault(e=>e.Id.Value==id.Value);
-        public void Regenerate() { }
+        public void Regenerate()
+        {
+            foreach (var parameter in Elements.OfType<FamilyInstance>().SelectMany(instance => instance.Parameters.Values))
+                parameter.Regenerate();
+        }
     }
     public class FilteredElementCollector : IEnumerable<Element>
     {

@@ -15,11 +15,11 @@ namespace BimboClub
             grid.ColumnDefinitions.Add(new ColumnDefinition());
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(100) });
             for (int i = 0; i < 3; i++) grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            Add(grid, new TextBlock { Text = "Размеры вверх, шаг (мм):", Foreground = Brushes.White, VerticalAlignment = VerticalAlignment.Center }, 0, 0);
+            Add(grid, new TextBlock { Text = "Округление размеров вверх (шаг, мм)", Foreground = Brushes.White, VerticalAlignment = VerticalAlignment.Center }, 0, 0);
             Add(grid, _size, 0, 1);
-            Add(grid, new TextBlock { Text = "Низ от уровня вниз, шаг (мм):", Foreground = Brushes.White, VerticalAlignment = VerticalAlignment.Center }, 1, 0);
+            Add(grid, new TextBlock { Text = "Округление отметки низа вниз (шаг, мм)", Foreground = Brushes.White, VerticalAlignment = VerticalAlignment.Center }, 1, 0);
             Add(grid, _bottom, 1, 1);
-            var hint = new TextBlock { Text = "0 — без округления. Высота увеличивается для сохранения проёма.", Foreground = Brushes.LightGray, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) };
+            var hint = new TextBlock { Text = "Отметка низа отсчитывается от уровня отверстия. При округлении низа высота увеличивается, чтобы сохранить проём. 0 отключает округление для этого поля.", Foreground = Brushes.LightGray, FontSize = 11, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 4, 0, 0) };
             Add(grid, hint, 2, 0);
             Grid.SetColumnSpan(hint, 2);
             foreach (var box in new[] { _size, _bottom })

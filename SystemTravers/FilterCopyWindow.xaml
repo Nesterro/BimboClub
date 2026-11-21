@@ -51,7 +51,13 @@
                 </ContentPresenter>
                 <Path x:Name="Arrow" Grid.Column="1" Fill="#E0E0E0" HorizontalAlignment="Center" VerticalAlignment="Center" Data="M 0 0 L 4 4 L 8 0 Z" Margin="0,0,4,0"/>
                 <ToggleButton x:Name="ToggleButton" Grid.ColumnSpan="2" Background="Transparent" BorderThickness="0"
-                              Focusable="False" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                              Focusable="False" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                    <ToggleButton.Template>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border Background="{TemplateBinding Background}"/>
+                        </ControlTemplate>
+                    </ToggleButton.Template>
+                </ToggleButton>
                 <Popup x:Name="PART_Popup" AllowsTransparency="True" Grid.ColumnSpan="2" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}">
                     <Border x:Name="DropDownBorder" Background="#24242B" BorderBrush="#41414D" BorderThickness="1" Margin="0,2,0,0" CornerRadius="3">
                         <ScrollViewer Margin="2" SnapsToDevicePixels="True">
@@ -104,11 +110,19 @@
         <Style TargetType="GroupBox">
             <Setter Property="BorderBrush" Value="#41414D"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Foreground" Value="#9D4D66"/>
+            <Setter Property="Foreground" Value="#E2A9BE"/>
             <Setter Property="Padding" Value="8"/>
         </Style>
 
+        <ControlTemplate x:Key="ActionButtonTemplate" TargetType="Button">
+            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" CornerRadius="4">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+            </Border>
+        </ControlTemplate>
+
         <Style TargetType="Button" x:Key="PrimaryButtonStyle">
+            <Setter Property="Template" Value="{StaticResource ActionButtonTemplate}"/>
             <Setter Property="Background" Value="#9D4D66"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
@@ -117,16 +131,17 @@
             <Setter Property="Cursor" Value="Hand"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#E51919"/>
+                    <Setter Property="Background" Value="#AE5D76"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#555555"/>
-                    <Setter Property="Foreground" Value="#AAA6B5"/>
+                    <Setter Property="Background" Value="#24242B"/>
+                    <Setter Property="Foreground" Value="#BBB6C4"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <Style TargetType="Button" x:Key="SecondaryButtonStyle">
+            <Setter Property="Template" Value="{StaticResource ActionButtonTemplate}"/>
             <Setter Property="Background" Value="#333337"/>
             <Setter Property="Foreground" Value="#E0E0E0"/>
             <Setter Property="Padding" Value="12,6"/>
@@ -230,7 +245,7 @@
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="Background" Value="#333337"/>
-                                <Setter Property="Foreground" Value="#9D4D66"/>
+                                <Setter Property="Foreground" Value="#E2A9BE"/>
                                 <Setter Property="FontWeight" Value="Bold"/>
                                 <Setter Property="Padding" Value="8,6"/>
                                 <Setter Property="BorderThickness" Value="0,0,1,1"/>
@@ -315,7 +330,7 @@
                         <DataGrid.Resources>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="Background" Value="#333337"/>
-                                <Setter Property="Foreground" Value="#9D4D66"/>
+                                <Setter Property="Foreground" Value="#E2A9BE"/>
                                 <Setter Property="FontWeight" Value="Bold"/>
                                 <Setter Property="Padding" Value="8,6"/>
                                 <Setter Property="BorderThickness" Value="0,0,1,1"/>

@@ -72,7 +72,7 @@ namespace BimboClub
             textBoxStyle.Setters.Add(new Setter(System.Windows.Controls.TextBox.PaddingProperty, new Thickness(6, 3, 6, 3)));
             textBoxStyle.Setters.Add(new Setter(System.Windows.Controls.TextBox.VerticalContentAlignmentProperty, VerticalAlignment.Center));
 
-            Style buttonStyle = new Style(typeof(System.Windows.Controls.Button));
+            Style buttonStyle = new Style(typeof(System.Windows.Controls.Button), Resources[typeof(System.Windows.Controls.Button)] as Style);
             buttonStyle.Setters.Add(new Setter(System.Windows.Controls.Button.BackgroundProperty, controlBg));
             buttonStyle.Setters.Add(new Setter(System.Windows.Controls.Button.ForegroundProperty, System.Windows.Media.Brushes.White));
             buttonStyle.Setters.Add(new Setter(System.Windows.Controls.Button.BorderBrushProperty, borderBrush));

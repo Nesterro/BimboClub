@@ -35,6 +35,7 @@ namespace BimboClub
         public PlaceByXyzWindow(Document doc)
         {
             InitializeComponent();
+            UiThemeHelper.ApplyDarkComboBoxes(this);
             _doc = doc;
 
             PopulateLevels();

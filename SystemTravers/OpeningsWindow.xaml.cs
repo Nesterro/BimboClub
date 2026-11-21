@@ -21,6 +21,7 @@ namespace BimboClub
         public OpeningsWindow(List<FamilySymbol> gmSymbols)
         {
             InitializeComponent();
+            UiThemeHelper.ApplyDarkComboBoxes(this);
             SetWindowIcon();
 
             var wallItems = gmSymbols.Select(s => new FamilySymbolItem(s)).OrderBy(i => i.DisplayName).ToList();

@@ -15,6 +15,9 @@ internal static class Program
         Check(Near(OpeningRoundingOptions.Down(-1,10),-10),"Negative bottom floors, not truncates");
         Check(Near(OpeningRoundingOptions.Down(-10.00000000001,10),-10),"Exact negative multiple tolerance");
         Check(Near(OpeningRoundingOptions.Up(25.5,0),25.5),"Zero disables rounding");
+        Check(Near(OpeningRoundingOptions.Up(120.00012,10,0.0003),120),"Dimension noise does not add a full step");
+        Check(Near(OpeningRoundingOptions.Down(2459.99988,10,0.0003),2460),"Geometry noise does not lower the bottom by a full step");
+        Check(Near(OpeningRoundingOptions.Up(120.001,10,0.0003),130),"A measurable excess still rounds up");
         foreach(var text in new[]{"10","2.5","2,5","0"}) Check(OpeningRoundingOptions.TryParseStep(text,out _),"Valid step");
         foreach(var text in new[]{"-1","NaN","Infinity","","abc"}) Check(!OpeningRoundingOptions.TryParseStep(text,out _),"Reject invalid step");
         var doc=new Document(); var level=new Level {Id=new ElementId(1),ProjectElevation=7.123}; doc.Elements.Add(level);
@@ -42,7 +45,10 @@ internal static class Program
         Fails(()=>OpeningRoundingService.Apply(doc,unsupported,"W","H","D",new OpeningRoundingOptions(),level),"Readonly parameter must abort");
         unsupported.Parameters["H"].IsReadOnly=false;unsupported.Parameters["H"].Reject=true;unsupported.Parameters["H"].Value=1.01;
         Fails(()=>OpeningRoundingService.Apply(doc,unsupported,"W","H","D",new OpeningRoundingOptions(),level),"Rejected write must abort");
-        unsupported.Parameters["H"].Reject=false;unsupported.RejectMove=true;unsupported.Z=8.123;
+        unsupported.Parameters["H"].Reject=false;
+        unsupported.Parameters["H"].IgnoreAcceptedWrites=true;
+        Fails(()=>OpeningRoundingService.Apply(doc,unsupported,"W","H","D",new OpeningRoundingOptions {BottomStepMm=0},level),"An accepted write must still be verified after regeneration");
+        unsupported.Parameters["H"].IgnoreAcceptedWrites=false;unsupported.RejectMove=true;unsupported.Z=8.123;
         Fails(()=>OpeningRoundingService.Apply(doc,unsupported,"W","H","D",new OpeningRoundingOptions(),level),"Constrained placement must not report rounded bottom");
         Check(OpeningRoundingService.FindLevel(doc,0)==level,"Below all levels uses lowest project level");
         Check(OpeningRoundingService.FindLevel(doc,20,level.Id)==level,"Preserves preferred level");

@@ -201,6 +201,7 @@ namespace BimboClub
 		}
 		public CropOffsetWindow()
 		{
+			UiThemeHelper.ApplyDarkButtons(this);
 			this.OffsetMm = 500.0;
 			base.Title = "Область подрезки";
 			base.Width = 320.0;

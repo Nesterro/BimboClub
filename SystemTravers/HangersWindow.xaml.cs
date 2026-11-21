@@ -17,6 +17,7 @@ namespace BimboClub
         public HangersWindow(List<FamilySymbol> hangerSymbols)
         {
             InitializeComponent();
+            UiThemeHelper.ApplyDarkComboBoxes(this);
             SetWindowIcon();
 
             var items = hangerSymbols.Select(s => new FamilySymbolItem(s)).OrderBy(i => i.DisplayName).ToList();

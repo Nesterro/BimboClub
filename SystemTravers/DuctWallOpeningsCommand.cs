@@ -296,7 +296,10 @@ namespace DuctWallOpenings
                                     if (hostThickness > 0)
                                         SetParam(opening, depthParamName, hostThickness + depthOffset);
 
-                                    OpeningRoundingService.Apply(doc, opening, widthParamName, heightParamName, depthParamName, window.Rounding, openingLevel);
+                                    // In a floor opening the depth parameter is the vertical dimension.
+                                    string verticalSize = kind == HostKind.Floor ? depthParamName : heightParamName;
+                                    string otherSize = kind == HostKind.Floor ? heightParamName : depthParamName;
+                                    OpeningRoundingService.Apply(doc, opening, widthParamName, verticalSize, otherSize, window.Rounding, openingLevel);
                                     if (placement.Commit() != TransactionStatus.Committed) throw new InvalidOperationException("Расстановка отверстия отменена.");
                                     createdCount++;
                                     }
@@ -782,25 +785,11 @@ namespace DuctWallOpenings
             
             try
             {
-                List<FamilySymbol> list = new FilteredElementCollector(document)
-                    .OfClass(typeof(FamilySymbol))
-                    .Cast<FamilySymbol>()
-                    .Where(s => s != null && s.Family != null)
-                    .OrderBy(s => s.Family.Name)
-                    .ThenBy(s => s.Name)
-                    .ToList();
-
-                if (list.Count == 0)
-                {
-                    TaskDialog.Show("Ошибка", "В проекте нет загруженных семейств.");
-                    return Result.Failed;
-                }
-
                 string titleSuffix = (kind == OpeningsRunner.HostKind.Wall) ? "в стенах" : "в полах";
                 bool flag = true;
                 while (flag)
                 {
-                    MergeOpeningsWindow mergeOpeningsWindow = new MergeOpeningsWindow(document, list, titleSuffix, kind);
+                    MergeOpeningsWindow mergeOpeningsWindow = new MergeOpeningsWindow(document, titleSuffix, kind);
                     new WindowInteropHelper(mergeOpeningsWindow).Owner = application.MainWindowHandle;
                     if (!mergeOpeningsWindow.ShowDialog().GetValueOrDefault() || mergeOpeningsWindow.ResultAction == MergeAction.Cancel)
                     {
@@ -870,215 +859,45 @@ namespace DuctWallOpenings
 					}
 					else if (mergeOpeningsWindow.ResultAction == MergeAction.BatchMerge)
 					{
-						FamilySymbol sourceSymbol = mergeOpeningsWindow.SourceSymbol;
-						double mergeDistanceMm = mergeOpeningsWindow.MergeDistanceMm;
-						bool useCurrentViewOnly = mergeOpeningsWindow.UseCurrentViewOnly;
-						double mergeThresholdFeet = mergeDistanceMm / 304.8;
+                        double maxGap = UnitUtils.ConvertToInternalUnits(mergeOpeningsWindow.MergeDistanceMm, UnitTypeId.Millimeters);
+                        var candidates = OpeningMergeBatch.GetOpenings(document, kind, mergeOpeningsWindow.UseCurrentViewOnly, selectedSymbol.Id);
+                        if (candidates.Count < 2)
+                        {
+                            string scope = mergeOpeningsWindow.UseCurrentViewOnly ? "на текущем виде" : "в проекте";
+                            TaskDialog.Show("Информация", $"Тип «{selectedSymbol.Name}» {scope}: найдено {candidates.Count}. Для объединения нужны два отверстия.");
+                            continue;
+                        }
 
-						var allInstances = (useCurrentViewOnly 
-							? new FilteredElementCollector(document, document.ActiveView.Id) 
-							: new FilteredElementCollector(document))
-							.OfClass(typeof(FamilyInstance))
-							.Cast<FamilyInstance>()
-							.Where(fi => fi.Symbol.Id == sourceSymbol.Id)
-							.ToList();
+                        var groups = OpeningMergeBatch.FindGroups(candidates, kind, maxGap);
+                        if (groups.Count == 0)
+                        {
+                            TaskDialog.Show("Информация", $"Найдено отверстий: {candidates.Count}. Нет пар в одной стене или перекрытии с зазором до {mergeOpeningsWindow.MergeDistanceMm:g} мм.");
+                            continue;
+                        }
 
-						List<FamilyInstance> list4 = new List<FamilyInstance>();
-						foreach (FamilyInstance current2 in allInstances)
-						{
-							XYZ handOrientation = current2.HandOrientation;
-							XYZ facingOrientation = current2.FacingOrientation;
-							XYZ xYZ = (handOrientation != null && facingOrientation != null) ? handOrientation.CrossProduct(facingOrientation).Normalize() : null;
-							
-							bool flag2 = kind == OpeningsRunner.HostKind.Wall;
-							if (current2.Host != null && (current2.Host is Wall || current2.Host is Floor || current2.Host is Ceiling || 
-								(current2.Host.Category != null && (current2.Host.Category.Id.IntegerValue == -2000032 || current2.Host.Category.Id.IntegerValue == -2000038))))
-							{
-								flag2 = (current2.Host is Wall);
-							}
-							else
-							{
-								string famName = current2.Symbol?.Family?.Name?.ToLowerInvariant() ?? "";
-								string symName = current2.Symbol?.Name?.ToLowerInvariant() ?? "";
-								
-								bool flag3 = famName.Contains("стен") || famName.Contains("wall") || symName.Contains("стен") || symName.Contains("wall");
-								bool flag4 = famName.Contains("пол") || famName.Contains("перекрыт") || famName.Contains("floor") || famName.Contains("slab") || famName.Contains("ceiling") || 
-											 symName.Contains("пол") || symName.Contains("перекрыт") || symName.Contains("floor") || symName.Contains("slab") || symName.Contains("ceiling");
-								if (flag3 && !flag4)
-								{
-									flag2 = true;
-								}
-								else if (flag4 && !flag3)
-								{
-									flag2 = false;
-								}
-								else
-								{
-									if (xYZ != null)
-									{
-										flag2 = (Math.Abs(xYZ.Z) < 0.5);
-									}
-									else if (facingOrientation != null)
-									{
-										flag2 = (Math.Abs(facingOrientation.Z) < 0.5);
-									}
-								}
-							}
-							
-							if (kind == OpeningsRunner.HostKind.Wall && flag2)
-							{
-								list4.Add(current2);
-							}
-							else if (kind == OpeningsRunner.HostKind.Floor && !flag2)
-							{
-								list4.Add(current2);
-							}
-						}
+                        using (var transaction = new Transaction(document, "Пакетное объединение отверстий"))
+                        {
+                            transaction.Start();
+                            if (!selectedSymbol.IsActive)
+                            {
+                                selectedSymbol.Activate();
+                                document.Regenerate();
+                            }
 
-						if (list4.Count < 2)
-						{
-							TaskDialog.Show("Информация", "Не найдено достаточного количества отверстий выбранного типа для объединения.");
-						}
-						else
-						{
-							int num = 0;
-							int num2 = 0;
-							
-							Func<FamilyInstance, FamilyInstance, bool> areConnected = (fi1, fi2) =>
-							{
-								LocationPoint lp1 = fi1.Location as LocationPoint;
-								XYZ pt1 = (lp1 != null ? lp1.Point : XYZ.Zero);
-								LocationPoint lp2 = fi2.Location as LocationPoint;
-								XYZ pt2 = (lp2 != null ? lp2.Point : XYZ.Zero);
-								
-								if (kind == OpeningsRunner.HostKind.Wall)
-								{
-									XYZ facing1 = fi1.FacingOrientation ?? XYZ.BasisY;
-									XYZ facing2 = fi2.FacingOrientation ?? XYZ.BasisY;
-									if (Math.Abs(facing1.DotProduct(facing2)) < 0.9)
-									{
-										return false;
-									}
-									if (Math.Abs((pt2 - pt1).DotProduct(facing1)) > 3.0)
-									{
-										return false;
-									}
-									XYZ hand1 = fi1.HandOrientation ?? XYZ.BasisX;
-									XYZ up1 = XYZ.BasisZ;
-									
-									Func<FamilyInstance, OpeningsRunner.LocalRect> getLocalRect = fi =>
-									{
-										double w = 0.0;
-										double d = 0.0;
-										Parameter wp = string.IsNullOrEmpty(widthParamName) ? null : fi.LookupParameter(widthParamName);
-										if (wp != null && wp.HasValue) w = wp.AsDouble();
-										Parameter dp = string.IsNullOrEmpty(depthParamName) ? null : fi.LookupParameter(depthParamName);
-										if (dp != null && dp.HasValue) d = dp.AsDouble();
-										
-										if (w <= 0.0 || d <= 0.0)
-										{
-											BoundingBoxXYZ bbox = fi.get_BoundingBox(null);
-											if (bbox != null)
-											{
-												w = Math.Abs(bbox.Max.X - bbox.Min.X);
-												d = Math.Abs(bbox.Max.Z - bbox.Min.Z);
-											}
-										}
-										LocationPoint lp = fi.Location as LocationPoint;
-										XYZ offsetVec = (lp != null ? lp.Point : XYZ.Zero) - pt1;
-										double u = offsetVec.DotProduct(hand1);
-										double v = offsetVec.DotProduct(up1);
-										return new OpeningsRunner.LocalRect
-										{
-											UMin = u - w / 2.0,
-											UMax = u + w / 2.0,
-											VMin = v - d / 2.0,
-											VMax = v + d / 2.0
-										};
-									};
-									
-									return getLocalRect(fi1).DistanceTo(getLocalRect(fi2)) < mergeThresholdFeet;
-								}
-								else
-								{
-									if (Math.Abs(pt1.Z - pt2.Z) > 1.5)
-									{
-										return false;
-									}
-									XYZ hand1 = fi1.HandOrientation ?? XYZ.BasisX;
-									if (Math.Abs(hand1.Z) > 0.9)
-									{
-										hand1 = XYZ.BasisX;
-									}
-									XYZ dirU1 = new XYZ(hand1.X, hand1.Y, 0.0);
-									if (dirU1.GetLength() < 1E-09)
-									{
-										dirU1 = XYZ.BasisX;
-									}
-									else
-									{
-										dirU1 = dirU1.Normalize();
-									}
-									XYZ dirV1 = XYZ.BasisZ.CrossProduct(dirU1).Normalize();
-									
-									Func<FamilyInstance, OpeningsRunner.LocalRect> getLocalRectFloor = fi =>
-									{
-										double w = 0.0;
-										double d = 0.0;
-										Parameter wp = string.IsNullOrEmpty(widthParamName) ? null : fi.LookupParameter(widthParamName);
-										if (wp != null && wp.HasValue) w = wp.AsDouble();
-										Parameter dp = string.IsNullOrEmpty(depthParamName) ? null : fi.LookupParameter(depthParamName);
-										if (dp != null && dp.HasValue) d = dp.AsDouble();
-										
-										if (w <= 0.0 || d <= 0.0)
-										{
-											BoundingBoxXYZ bbox = fi.get_BoundingBox(null);
-											if (bbox != null)
-											{
-												w = Math.Abs(bbox.Max.X - bbox.Min.X);
-												d = Math.Abs(bbox.Max.Y - bbox.Min.Y);
-											}
-										}
-										LocationPoint lp = fi.Location as LocationPoint;
-										XYZ offsetVec = (lp != null ? lp.Point : XYZ.Zero) - pt1;
-										double u = offsetVec.DotProduct(dirU1);
-										double v = offsetVec.DotProduct(dirV1);
-										return new OpeningsRunner.LocalRect
-										{
-											UMin = u - w / 2.0,
-											UMax = u + w / 2.0,
-											VMin = v - d / 2.0,
-											VMax = v + d / 2.0
-										};
-									};
-									
-									return getLocalRectFloor(fi1).DistanceTo(getLocalRectFloor(fi2)) < mergeThresholdFeet;
-								}
-							};
+                            foreach (var group in groups)
+                            {
+                                MergeSelectedFamilyInstances(document, group, selectedSymbol, widthParamName, heightParam, depthParamName, offset, depthOffset, kind, mergeOpeningsWindow.Rounding);
+                            }
 
-							List<List<FamilyInstance>> connectedComponents = OpeningsRunner.GetConnectedComponents<FamilyInstance>(list4, areConnected);
-							using (Transaction transaction2 = new Transaction(document, "Пакетное объединение отверстий"))
-							{
-								transaction2.Start();
-								if (!selectedSymbol.IsActive)
-								{
-									selectedSymbol.Activate();
-									document.Regenerate();
-								}
-								foreach (List<FamilyInstance> current3 in connectedComponents)
-								{
-									if (current3.Count >= 2)
-									{
-										OpeningsRunner.MergeSelectedFamilyInstances(document, current3, selectedSymbol, widthParamName, heightParam, depthParamName, offset, depthOffset, kind, mergeOpeningsWindow.Rounding);
-										num++;
-										num2 += current3.Count;
-									}
-								}
-								transaction2.Commit();
-							}
-							TaskDialog.Show("Готово", string.Format("Пакетное объединение завершено.\nСоздано объединенных отверстий: {0}\nУдалено исходных отверстий: {1}", num, num2));
-							flag = false;
-						}
+                            if (transaction.Commit() != TransactionStatus.Committed)
+                            {
+                                message = "Revit не сохранил объединённые отверстия.";
+                                return Result.Failed;
+                            }
+                        }
+
+                        TaskDialog.Show("Готово", $"Создано объединённых отверстий: {groups.Count}\nИсходных отверстий в этих группах: {groups.Sum(group => group.Count)}");
+                        flag = false;
 					}
 				}
 				return Result.Succeeded;
@@ -1128,21 +947,7 @@ namespace DuctWallOpenings
             List<XYZ> list = new List<XYZ>();
             foreach (FamilyInstance current in selectedFamilies)
             {
-                List<XYZ> geometryVertices = OpeningsRunner.GetGeometryVertices(current);
-                if (geometryVertices.Count == 0)
-                {
-                    BoundingBoxXYZ bbox = current.get_BoundingBox(null);
-                    if (bbox != null)
-                    {
-                        geometryVertices.Add(bbox.Min);
-                        geometryVertices.Add(bbox.Max);
-                        geometryVertices.Add(new XYZ(bbox.Min.X, bbox.Max.Y, bbox.Min.Z));
-                        geometryVertices.Add(new XYZ(bbox.Max.X, bbox.Min.Y, bbox.Min.Z));
-                        geometryVertices.Add(new XYZ(bbox.Min.X, bbox.Min.Y, bbox.Max.Z));
-                        geometryVertices.Add(new XYZ(bbox.Max.X, bbox.Max.Y, bbox.Max.Z));
-                    }
-                }
-                list.AddRange(geometryVertices);
+                list.AddRange(GetOpeningGeometryPoints(current));
             }
 
             if (list.Count == 0)
@@ -1268,7 +1073,7 @@ namespace DuctWallOpenings
             }
         }
 
-        private static List<List<T>> GetConnectedComponents<T>(List<T> items, Func<T, T, bool> areConnected)
+        internal static List<List<T>> GetConnectedComponents<T>(List<T> items, Func<T, T, bool> areConnected)
         {
             List<List<T>> list = new List<List<T>>();
             HashSet<int> hashSet = new HashSet<int>();
@@ -1297,36 +1102,6 @@ namespace DuctWallOpenings
                 }
             }
             return list;
-        }
-
-        private class LocalRect
-        {
-            public double UMin;
-            public double UMax;
-            public double VMin;
-            public double VMax;
-            public double DistanceTo(OpeningsRunner.LocalRect other)
-            {
-                double num = 0.0;
-                if (this.UMax < other.UMin)
-                {
-                    num = other.UMin - this.UMax;
-                }
-                else if (other.UMax < this.UMin)
-                {
-                    num = this.UMin - other.UMax;
-                }
-                double num2 = 0.0;
-                if (this.VMax < other.VMin)
-                {
-                    num2 = other.VMin - this.VMax;
-                }
-                else if (other.VMax < this.VMin)
-                {
-                    num2 = this.VMin - other.VMax;
-                }
-                return Math.Sqrt(num * num + num2 * num2);
-            }
         }
 
         public static void AutoDetectParamNames(Document doc, FamilySymbol symbol, string uiWidthParam, string uiHeightParam, string uiDepthParam, out string widthParamName, out string heightParamName, out string depthParamName)
@@ -1391,6 +1166,22 @@ namespace DuctWallOpenings
             {
                 depthParamName = "Толщина";
             }
+        }
+
+        internal static List<XYZ> GetOpeningGeometryPoints(FamilyInstance instance)
+        {
+            var points = GetGeometryVertices(instance);
+            if (points.Count > 0) return points;
+
+            var box = instance.get_BoundingBox(null);
+            if (box == null) return points;
+
+            var transform = box.Transform;
+            foreach (double x in new[] { box.Min.X, box.Max.X })
+                foreach (double y in new[] { box.Min.Y, box.Max.Y })
+                    foreach (double z in new[] { box.Min.Z, box.Max.Z })
+                        points.Add(transform.OfPoint(new XYZ(x, y, z)));
+            return points;
         }
 
         private static List<XYZ> GetGeometryVertices(Element element)
@@ -1922,13 +1713,15 @@ namespace DuctWallOpenings
             public override string ToString() => Display;
         }
 
-        private Document _doc;
+        private readonly Document _doc;
+        private readonly OpeningsRunner.HostKind _kind;
         private TextBox _searchBox;
         private ComboBox _comboSourceFamily;
         private CheckBox _chkCurrentView;
         private CheckBox _chkAllProject;
         private TextBox _txtMergeDistance;
-        private List<SymbolItem> _allItems;
+        private List<SymbolItem> _viewTypes;
+        private List<SymbolItem> _projectTypes;
 
         public FamilySymbol SelectedSymbol { get; private set; }
         public double OffsetMm { get; private set; }
@@ -1943,11 +1736,12 @@ namespace DuctWallOpenings
         private readonly OpeningRoundingPanel _roundingPanel = new OpeningRoundingPanel();
         public OpeningRoundingOptions Rounding { get; private set; } = new OpeningRoundingOptions();
 
-        public MergeOpeningsWindow(Document doc, List<FamilySymbol> symbols, string titleSuffix, OpeningsRunner.HostKind kind)
+        public MergeOpeningsWindow(Document doc, string titleSuffix, OpeningsRunner.HostKind kind)
         {
             UseCurrentViewOnly = true;
             MergeDistanceMm = 200.0;
             _doc = doc;
+            _kind = kind;
             Title = "Объединение отверстий " + titleSuffix + " - BimboClub Tools";
             Width = 620.0;
             Height = 600.0;
@@ -2113,42 +1907,12 @@ namespace DuctWallOpenings
             };
             UiThemeHelper.StyleComboBoxDark(this._comboSourceFamily, panelBg, borderBrush);
 
-            this._allItems = symbols.Select(s => new SymbolItem
-            {
-                Symbol = s,
-                Display = s.Family.Name + " : " + s.Name
-            }).ToList();
-            this._comboSourceFamily.ItemsSource = this._allItems;
-
-            SymbolItem symbolItem = this._allItems.FirstOrDefault(i =>
-                i.Display.ToLower().Contains("отверстие") || i.Display.ToLower().Contains("opening"));
-            if (symbolItem != null)
-            {
-                this._comboSourceFamily.SelectedItem = symbolItem;
-            }
-            else if (this._allItems.Count > 0)
-            {
-                this._comboSourceFamily.SelectedIndex = 0;
-            }
-
             Grid.SetRow(this._comboSourceFamily, num);
             Grid.SetColumn(this._comboSourceFamily, 1);
             grid2.Children.Add(this._comboSourceFamily);
             num++;
 
-            this._searchBox.TextChanged += (s, e) =>
-            {
-                string text = this._searchBox.Text.ToLower();
-                List<SymbolItem> itemsSource = string.IsNullOrWhiteSpace(text) ? this._allItems : (
-                    from i in this._allItems
-                    where i.Display.ToLower().Contains(text)
-                    select i).ToList();
-                this._comboSourceFamily.ItemsSource = itemsSource;
-                if (this._comboSourceFamily.Items.Count > 0)
-                {
-                    this._comboSourceFamily.SelectedIndex = 0;
-                }
-            };
+            this._searchBox.TextChanged += (sender, args) => RefreshBatchTypes();
 
             this.AddLabel(grid2, "Область поиска:", num);
             StackPanel stackPanel = new StackPanel
@@ -2169,20 +1933,9 @@ namespace DuctWallOpenings
                 Content = "Во всем проекте",
                 IsChecked = false
             };
-            this._chkCurrentView.Checked += (s, ev) =>
-            {
-                if (this._chkAllProject != null)
-                {
-                    this._chkAllProject.IsChecked = false;
-                }
-            };
-            this._chkAllProject.Checked += (s, ev) =>
-            {
-                if (this._chkCurrentView != null)
-                {
-                    this._chkCurrentView.IsChecked = false;
-                }
-            };
+            this._chkCurrentView.Click += (sender, args) => SelectBatchScope(true);
+            this._chkAllProject.Click += (sender, args) => SelectBatchScope(false);
+            RefreshBatchTypes();
             stackPanel.Children.Add(this._chkCurrentView);
             stackPanel.Children.Add(this._chkAllProject);
             Grid.SetRow(stackPanel, num);
@@ -2190,7 +1943,7 @@ namespace DuctWallOpenings
             grid2.Children.Add(stackPanel);
             num++;
 
-            this.AddLabel(grid2, "Расстояние менее (мм):", num);
+            this.AddLabel(grid2, "Макс. зазор (мм):", num);
             this._txtMergeDistance = new TextBox
             {
                 Style = style,
@@ -2214,8 +1967,8 @@ namespace DuctWallOpenings
                 Margin = new Thickness(0.0, 0.0, 0.0, 10.0),
                 Style = roundedButtonStyle
             };
-            SolidColorBrush normalBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 120, 240));
-            SolidColorBrush hoverBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(68, 140, 255));
+            SolidColorBrush normalBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(42, 105, 220));
+            SolidColorBrush hoverBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(47, 112, 231));
             this.ApplyFlatButtonStyles(button2, normalBrush, hoverBrush, roundedButtonStyle);
             button2.Click += new RoutedEventHandler(this.BatchBtn_Click);
             Grid.SetRow(button2, num);
@@ -2300,6 +2053,50 @@ namespace DuctWallOpenings
             this.Close();
         }
 
+        private void SelectBatchScope(bool currentViewOnly)
+        {
+            _chkCurrentView.IsChecked = currentViewOnly;
+            _chkAllProject.IsChecked = !currentViewOnly;
+            RefreshBatchTypes();
+        }
+
+        private void RefreshBatchTypes()
+        {
+            bool viewOnly = _chkCurrentView.IsChecked == true;
+            var types = viewOnly ? (_viewTypes ??= FindBatchTypes(true)) : (_projectTypes ??= FindBatchTypes(false));
+            string search = _searchBox.Text.Trim();
+            var matches = types.Where(item => item.Display.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+            var previous = _comboSourceFamily.SelectedItem as SymbolItem;
+
+            _comboSourceFamily.ItemsSource = matches;
+            _comboSourceFamily.SelectedItem = matches.FirstOrDefault(item => item.Symbol.Id == previous?.Symbol.Id)
+                ?? matches.FirstOrDefault(item => IsNamedOpening(item.Display));
+        }
+
+        private List<SymbolItem> FindBatchTypes(bool currentViewOnly)
+        {
+            return OpeningMergeBatch.GetOpenings(_doc, _kind, currentViewOnly)
+                .GroupBy(instance => instance.GetTypeId())
+                .Where(group => group.Count() >= 2)
+                .Select(group =>
+                {
+                    var symbol = group.First().Symbol;
+                    return new SymbolItem
+                    {
+                        Symbol = symbol,
+                        Display = $"{symbol.Family.Name} : {symbol.Name} ({group.Count()})"
+                    };
+                })
+                .OrderBy(item => item.Display)
+                .ToList();
+        }
+
+        private static bool IsNamedOpening(string name)
+        {
+            return new[] { "отверст", "проём", "проем", "opening", "penetration", "void" }
+                .Any(term => name.IndexOf(term, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
         private void BatchBtn_Click(object sender, RoutedEventArgs e)
         {
             if (!_roundingPanel.TryGetOptions(out var rounding)) return;
@@ -2307,7 +2104,10 @@ namespace DuctWallOpenings
             SymbolItem symbolItem = this._comboSourceFamily.SelectedItem as SymbolItem;
             if (symbolItem == null)
             {
-                MessageBox.Show("Выберите семейство для объединения в Варианте 2.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                string guidance = _comboSourceFamily.Items.Count == 0
+                    ? "В выбранной области нет подходящих типов с двумя отверстиями. Измените область поиска или выберите отверстия вручную."
+                    : "Выберите тип отверстия для объединения.";
+                MessageBox.Show(guidance, "Внимание", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
             this.SourceSymbol = symbolItem.Symbol;
@@ -2321,8 +2121,7 @@ namespace DuctWallOpenings
             this.DepthParam = depthParam;
             this.OffsetMm = 0.0;
             this.DepthOffsetMm = 0.0;
-            double num;
-            if (double.TryParse(this._txtMergeDistance.Text.Replace('.', ','), out num) && num >= 0.0)
+            if (OpeningRoundingOptions.TryParseStep(_txtMergeDistance.Text, out double num))
             {
                 this.MergeDistanceMm = num;
                 this.UseCurrentViewOnly = this._chkCurrentView?.IsChecked == true;

@@ -30,6 +30,7 @@ namespace BimboClub
         public RevitServerWindow(Autodesk.Revit.ApplicationServices.Application revitApp)
         {
             InitializeComponent();
+            UiThemeHelper.ApplyDarkComboBoxes(this);
             SetWindowIcon();
 
             _revitApp = revitApp;

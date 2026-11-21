@@ -45,6 +45,8 @@ namespace BimboClub.Analogs.InteriorPlanDimensions
                 .OrderBy(dt => dt.Name)
                 .ToList();
 
+            UiThemeHelper.ApplyDarkComboBoxes(this);
+            UiThemeHelper.ApplyDarkButtons(this);
             InitializeUi(hasSelection);
         }
 

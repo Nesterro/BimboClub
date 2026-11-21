@@ -25,6 +25,7 @@ namespace BimboClub
         public LevelingWindow(Document doc, bool hasSelectedElements)
         {
             InitializeComponent();
+            UiThemeHelper.ApplyDarkComboBoxes(this);
             _doc = doc;
 
             SelectedElementsRadioButton.IsEnabled = hasSelectedElements;

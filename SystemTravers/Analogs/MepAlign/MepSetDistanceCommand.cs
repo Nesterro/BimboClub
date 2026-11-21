@@ -220,6 +220,7 @@ namespace BimboClub.Analogs.MepAlign
 
         public MepSetDistanceWindow()
         {
+            UiThemeHelper.ApplyDarkButtons(this);
             InitializeUi();
         }
 

@@ -238,6 +238,7 @@ namespace BimboClub.PipeClamps
                 DisplayMemberPath = "DisplayName",
                 Width = new DataGridLength(1, DataGridLengthUnitType.Star)
             };
+            UiThemeHelper.StyleComboBoxColumnDark(colSymbol);
             if (_rowViewModels.Count > 0)
             {
                 colSymbol.ItemsSource = _rowViewModels[0].AvailableSymbols;

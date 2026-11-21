@@ -12,23 +12,26 @@ namespace BimboClub
             double.TryParse((text ?? "").Trim().Replace(',', '.'), NumberStyles.Float,
                 CultureInfo.InvariantCulture, out value) && !double.IsNaN(value) && !double.IsInfinity(value) && value >= 0;
 
-        internal static double Up(double value, double step)
+        internal static double Up(double value, double step, double tolerance = 0)
         {
             Validate(value, step);
             if (step == 0) return value;
-            return Math.Ceiling(Snap(value / step)) * step;
+            return Math.Ceiling(Snap(value / step, tolerance / step)) * step;
         }
 
-        internal static double Down(double value, double step)
+        internal static double Down(double value, double step, double tolerance = 0)
         {
             Validate(value, step);
             if (step == 0) return value;
-            return Math.Floor(Snap(value / step)) * step;
+            return Math.Floor(Snap(value / step, tolerance / step)) * step;
         }
 
-        // Avoid adding a whole step to an exact multiple after feet/mm conversion.
-        private static double Snap(double quotient) => Math.Abs(quotient - Math.Round(quotient)) < 1e-9
-            ? Math.Round(quotient) : quotient;
+        // Ignore conversion and model precision noise at a step boundary.
+        private static double Snap(double quotient, double tolerance)
+        {
+            double nearest = Math.Round(quotient);
+            return Math.Abs(quotient - nearest) <= Math.Max(1e-9, tolerance) ? nearest : quotient;
+        }
 
         private static void Validate(double value, double step)
         {

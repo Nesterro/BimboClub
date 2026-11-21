@@ -99,6 +99,8 @@ namespace BimboClub.Analogs.CopySheets
             _sourceSheets = new ObservableCollection<SheetItem>();
             _targetDocs = new ObservableCollection<TargetDocItem>();
 
+            UiThemeHelper.ApplyDarkComboBoxes(this);
+            UiThemeHelper.ApplyDarkButtons(this);
             InitializeUi();
             PopulateSourceDocs();
         }
