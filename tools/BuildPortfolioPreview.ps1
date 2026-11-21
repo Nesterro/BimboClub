@@ -1,7 +1,13 @@
 param(
-    [Parameter(Mandatory=$true)][string]$OutputDirectory
+    [Parameter(Mandatory=$true)][string]$OutputDirectory,
+    [string[]]$Versions = @('3.0.0','3.0.1'),
+    [switch]$SkipManager,
+    [switch]$PublicRelease
 )
 $ErrorActionPreference = 'Stop'
+if ($PublicRelease -and $Versions.Count -ne 1) {
+    throw 'Specify exactly one version with -Versions for a public release.'
+}
 $project = Split-Path -Parent $PSScriptRoot
 $output = [IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Path $output -Force | Out-Null
@@ -13,14 +19,24 @@ function Invoke-Dotnet([string[]]$Arguments) {
 
 Push-Location $project
 try {
-    Invoke-Dotnet @('publish', 'BimboClubManager/BimboClubManager.csproj', '-c', 'Release',
-        '-r', 'win-x64', '--self-contained', 'false', '-p:PublishSingleFile=true', '-p:Version=3.0.0',
-        '-p:AssemblyVersion=3.0.0.0', '-p:FileVersion=3.0.0.0', '-p:InformationalVersion=3.0.0-preview',
-        '-o', (Join-Path $output 'Manager'), '--nologo', '-v:q')
-    foreach ($version in @('3.0.0','3.0.1')) {
+    if (!$SkipManager) {
+        $managerVersion = if ($PublicRelease) { $Versions[0] } else { '3.0.0' }
+        $managerInfo = if ($PublicRelease) { $managerVersion } else { "$managerVersion-preview" }
+        $publishArgs = @('publish', 'BimboClubManager/BimboClubManager.csproj', '-c', 'Release',
+            '-r', 'win-x64', '--self-contained', $PublicRelease.IsPresent.ToString().ToLowerInvariant(),
+            '-p:PublishSingleFile=true', "-p:Version=$managerVersion", "-p:AssemblyVersion=$managerVersion.0",
+            "-p:FileVersion=$managerVersion.0", "-p:InformationalVersion=$managerInfo",
+            '-o', (Join-Path $output 'Manager'), '--nologo', '-v:q')
+        if ($PublicRelease) {
+            $publishArgs += @('-p:EnableCompressionInSingleFile=true', '-p:IncludeNativeLibrariesForSelfExtract=true')
+        }
+        Invoke-Dotnet $publishArgs
+    }
+    foreach ($version in $Versions) {
+        $productVersion = if ($PublicRelease) { $version } else { "$version-preview" }
         Invoke-Dotnet @('build', 'SystemTravers/BimboClub.csproj', '-c', 'Release', '-p:Platform=x64',
             '-p:BimboClubLive=true', '-p:CopyLocalLockFileAssemblies=true', "-p:Version=$version",
-            "-p:AssemblyVersion=$version.0", "-p:FileVersion=$version.0", "-p:InformationalVersion=$version-preview", '--nologo', '-v:q')
+            "-p:AssemblyVersion=$version.0", "-p:FileVersion=$version.0", "-p:InformationalVersion=$productVersion", '--nologo', '-v:q')
         Invoke-Dotnet @('build', 'DuctSystemParamCopy/DuctSystemParamCopy.csproj', '-c', 'Release',
             '-p:Platform=x64', '--nologo', '-v:q')
         $release = Join-Path $output $version
@@ -34,7 +50,7 @@ try {
                 Where-Object { $_.Name -notmatch '^(BimboClub\.Tools\.V|RevitAPI(UI)?\.dll$)' } |
                 Copy-Item -Destination $stage -Force
             Copy-Item "DuctSystemParamCopy/bin/x64/Release/$framework/DuctSystemParamCopy.dll" -Destination $stage -Force
-            Copy-Item 'SystemTravers/icon32.png','SystemTravers/icon_*.png' -Destination $stage -Force
+            Copy-Item 'SystemTravers/BimboClub.addin','SystemTravers/icon32.png','SystemTravers/icon_*.png' -Destination $stage -Force
             [IO.File]::WriteAllText((Join-Path $stage 'version.txt'), $version)
             $archive = "bimboclub_$name.zip"
             Compress-Archive -Path (Join-Path $stage '*') -DestinationPath (Join-Path $release $archive) -Force
@@ -42,7 +58,12 @@ try {
         }
         $manifest = [ordered]@{
             latestVersion = $version
-            changelog = @('Тестовая версия единого интерфейса и обновления без закрытия Revit')
+            changelog = if ($version -eq '3.0.2') {
+                @('Единая команда копирования фильтров видов и шаблонов с переносом состояния «Включён».',
+                  'Новые пиктограммы на ленте Revit.')
+            } else {
+                @('Тестовая версия единого интерфейса и обновления без закрытия Revit')
+            }
             packages = $packages
         }
         $manifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $release 'update_manifest.json') -Encoding utf8NoBOM

@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Ellipse = System.Windows.Shapes.Ellipse;
 using Autodesk.Revit.UI;
 
 namespace BimboClub
@@ -15,9 +16,15 @@ namespace BimboClub
             Title = "О плагине BimboClub Tools";
             Width = 460;
             Height = 360;
-            WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            WindowStartupLocation = WindowStartupLocation.CenterOwner;
             ResizeMode = ResizeMode.NoResize;
-            Background = new SolidColorBrush(Color.FromRgb(30, 30, 46)); // Dark #1E1E2E
+            Background = new SolidColorBrush(Color.FromRgb(25, 25, 30));
+            var surface = new SolidColorBrush(Color.FromRgb(36, 36, 43));
+            var raisedSurface = new SolidColorBrush(Color.FromRgb(45, 45, 54));
+            var outline = new SolidColorBrush(Color.FromRgb(65, 65, 77));
+            var mutedText = new SolidColorBrush(Color.FromRgb(170, 166, 181));
+            var primaryText = new SolidColorBrush(Color.FromRgb(245, 237, 241));
+            var accent = new SolidColorBrush(Color.FromRgb(157, 77, 102));
 
             string currentVer = InfoCommand.GetCurrentVersion();
             string revitVer = uiApp.Application.VersionNumber;
@@ -31,15 +38,15 @@ namespace BimboClub
             // Header Banner
             var headerBorder = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(40, 40, 58)),
+                Background = surface,
                 Padding = new Thickness(20, 15, 20, 15)
             };
             var headerStack = new StackPanel { Orientation = Orientation.Horizontal };
-            var headerIcon = new TextBlock
+            var headerIcon = new Ellipse
             {
-                Text = "⚫",
-                FontSize = 24,
-                Foreground = new SolidColorBrush(Color.FromRgb(255, 215, 0)), // Gold
+                Width = 12,
+                Height = 12,
+                Fill = UiThemeHelper.BrandPink,
                 Margin = new Thickness(0, 0, 12, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -49,13 +56,13 @@ namespace BimboClub
                 Text = "BimboClub Tools",
                 FontSize = 18,
                 FontWeight = FontWeights.Bold,
-                Foreground = new SolidColorBrush(Color.FromRgb(255, 215, 0))
+                Foreground = primaryText
             };
             var subtitleBlock = new TextBlock
             {
                 Text = $"Набор профессиональных плагинов MEP для Revit {revitVer}",
                 FontSize = 11,
-                Foreground = new SolidColorBrush(Color.FromRgb(180, 180, 200))
+                Foreground = mutedText
             };
             headerTextStack.Children.Add(titleBlock);
             headerTextStack.Children.Add(subtitleBlock);
@@ -71,7 +78,9 @@ namespace BimboClub
             // Version Card
             var verCard = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(45, 45, 63)),
+                Background = surface,
+                BorderBrush = outline,
+                BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(6),
                 Padding = new Thickness(15),
                 Margin = new Thickness(0, 0, 0, 15)
@@ -85,20 +94,20 @@ namespace BimboClub
             {
                 Text = "Установленная версия плагина:",
                 FontSize = 12,
-                Foreground = new SolidColorBrush(Color.FromRgb(200, 200, 220))
+                Foreground = mutedText
             });
             verLabelStack.Children.Add(new TextBlock
             {
                 Text = $"Версия v{currentVer}",
                 FontSize = 16,
                 FontWeight = FontWeights.Bold,
-                Foreground = Brushes.White,
+                Foreground = primaryText,
                 Margin = new Thickness(0, 3, 0, 0)
             });
 
             var statusBadge = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(40, 167, 69)),
+                Background = new SolidColorBrush(Color.FromRgb(36, 60, 51)),
                 CornerRadius = new CornerRadius(4),
                 Padding = new Thickness(8, 4, 8, 4),
                 VerticalAlignment = VerticalAlignment.Center
@@ -108,7 +117,7 @@ namespace BimboClub
                 Text = "Активен",
                 FontSize = 11,
                 FontWeight = FontWeights.SemiBold,
-                Foreground = Brushes.White
+                Foreground = new SolidColorBrush(Color.FromRgb(139, 198, 170))
             };
             Grid.SetColumn(statusBadge, 1);
 
@@ -125,7 +134,7 @@ namespace BimboClub
                        $"• Поддержка версий Revit: 2021 – 2026\n" +
                        $"• Репозиторий: github.com/Nesterro/BimboClub",
                 FontSize = 12,
-                Foreground = new SolidColorBrush(Color.FromRgb(210, 210, 225)),
+                Foreground = primaryText,
                 LineHeight = 20
             };
             contentStack.Children.Add(infoText);
@@ -136,7 +145,7 @@ namespace BimboClub
             // Footer / Actions
             var footerBorder = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(35, 35, 50)),
+                Background = surface,
                 Padding = new Thickness(20, 10, 20, 10)
             };
             var footerStack = new StackPanel
@@ -147,12 +156,13 @@ namespace BimboClub
 
             var btnManager = new Button
             {
-                Content = "⚙️ Менеджер обновлений",
+                Content = "Менеджер обновлений",
                 Width = 190,
                 Height = 34,
-                Background = new SolidColorBrush(Color.FromRgb(255, 215, 0)),
-                Foreground = new SolidColorBrush(Color.FromRgb(20, 20, 30)),
-                FontWeight = FontWeights.Bold,
+                Background = accent,
+                Foreground = Brushes.White,
+                BorderBrush = accent,
+                FontWeight = FontWeights.SemiBold,
                 FontSize = 12,
                 Margin = new Thickness(0, 0, 10, 0),
                 Cursor = System.Windows.Input.Cursors.Hand
@@ -164,8 +174,9 @@ namespace BimboClub
                 Content = "Закрыть",
                 Width = 90,
                 Height = 34,
-                Background = new SolidColorBrush(Color.FromRgb(60, 60, 80)),
-                Foreground = Brushes.White,
+                Background = raisedSurface,
+                Foreground = primaryText,
+                BorderBrush = outline,
                 FontSize = 12,
                 Cursor = System.Windows.Input.Cursors.Hand
             };

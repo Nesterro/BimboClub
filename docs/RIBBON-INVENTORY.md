@@ -15,8 +15,7 @@
 | Печать чертежей | `cmdPrintMaster` | `BimboClub.PrintCommand` |
 | Пакет спецификаций | `cmdSchedulePackBcc` | `BimboClub.SchedulePackCommand` |
 | Умная трассировка | `cmdRouter` | `BimboClub.RouterCommand` |
-| Фильтры внутри проекта | `cmdFilters` | `BimboClub.FiltersCommand` |
-| Фильтры между проектами | `cmdFilterCopyBcc` | `BimboClub.FilterCopyCommand` |
+| Копировать фильтры | `cmdFilterCopyBcc` | `BimboClub.FilterCopyCommand` |
 | Переименовать семейство | `cmdRenameFamily` | `BimboClub.RenameFamilyCommand` |
 | Параметры в семействах | `cmdDeleteFamilyParams` | `BimboClub.DeleteFamilyParamsCommand` |
 | Расстановка по сети | `cmdNetworkPlacement` | `BimboClub.PlacementCommand` |

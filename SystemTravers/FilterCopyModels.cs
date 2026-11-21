@@ -25,6 +25,7 @@ namespace BimboClub
         public ElementId FilterId { get; set; }
         public string FilterName { get; set; }
         public bool IsVisible { get; set; }
+        public bool IsEnabled { get; set; } = true;
         public bool IsHalftone { get; set; }
         public OverrideGraphicSettings GraphicOverrides { get; set; }
         public string OverridesSummary { get; set; }
@@ -110,6 +111,7 @@ namespace BimboClub
         public bool IncludeViewsWithTemplate { get; set; } = true;
         public bool CopyGraphicOverrides { get; set; } = true;
         public bool CopyVisibility { get; set; } = true;
+        public bool CopyEnabledState { get; set; } = true;
         public bool CopyHalftone { get; set; } = true;
     }
 }

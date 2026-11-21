@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Interop;
 
 namespace BimboClub
 {
@@ -18,6 +19,7 @@ namespace BimboClub
             try
             {
                 var window = new InfoWindow(commandData.Application);
+                new WindowInteropHelper(window).Owner = commandData.Application.MainWindowHandle;
                 window.ShowDialog();
                 return Result.Succeeded;
             }

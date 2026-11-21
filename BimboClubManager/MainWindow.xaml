@@ -36,7 +36,7 @@
 
                     <!-- Application Title & Icon -->
                     <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" Margin="16,0,0,0">
-                        <Image Source="icon_manager.png" Width="24" Height="24" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <Ellipse Fill="{StaticResource BrandPinkBrush}" Width="10" Height="10" Margin="0,0,10,0" VerticalAlignment="Center" />
                         <TextBlock Text="BimboClub Tools" FontWeight="Bold" FontSize="15" Foreground="{StaticResource TextPrimaryBrush}" VerticalAlignment="Center" />
 
                     </StackPanel>
@@ -335,8 +335,7 @@
 
                                                         <!-- Update Button -->
                                                         <Button Content="Обновить" 
-                                                                Background="{StaticResource WarningGradientBrush}"
-                                                                Foreground="#121020" FontWeight="Bold"
+                                                                FontWeight="Bold"
                                                                 Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                 CommandParameter="{Binding}" 
                                                                 Height="32" FontSize="12" Padding="14,0" Margin="0,0,6,0">
@@ -451,8 +450,7 @@
                                         <!-- Update All Button if updates are available -->
                                         <Button Content="{Binding UpdateAllButtonText}"
                                                 Command="{Binding UpdateAllCommand}"
-                                                Background="{StaticResource WarningGradientBrush}"
-                                                Foreground="#121020" FontWeight="Bold"
+                                                FontWeight="Bold"
                                                 Height="38" FontSize="13" Margin="0,0,0,14">
                                             <Button.Style>
                                                 <Style TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">

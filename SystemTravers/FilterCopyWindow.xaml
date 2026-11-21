@@ -348,6 +348,7 @@
                 <CheckBox x:Name="CopyToAppliedTemplatesCheckBox" Content="Применять к Шаблону вида (если вид с шаблоном)" IsChecked="True" Margin="0,0,20,0" ToolTip="Фильтр скопируется непосредственно в Шаблон вида, примененный к выбранному виду."/>
                 <CheckBox x:Name="CopyGraphicOverridesCheckBox" Content="Копировать переопределения графики" IsChecked="True" Margin="0,0,20,0"/>
                 <CheckBox x:Name="CopyVisibilityCheckBox" Content="Копировать видимость" IsChecked="True" Margin="0,0,20,0"/>
+                <CheckBox x:Name="CopyEnabledStateCheckBox" Content="Копировать состояние «Включён»" IsChecked="True" Margin="0,0,20,0"/>
             </WrapPanel>
         </Border>
 

@@ -16,49 +16,22 @@ namespace BimboClub
 
         public List<SourceViewItem> GetSourceViews()
         {
-            List<SourceViewItem> list = new List<SourceViewItem>();
-
-            List<View> allViews = new FilteredElementCollector(_doc)
+            return new FilteredElementCollector(_doc)
                 .OfClass(typeof(View))
                 .Cast<View>()
-                .Where(v => !v.IsTemplate && IsValidViewType(v.ViewType))
-                .Where(v => v.GetFilters().Count > 0)
-                .OrderBy(v => v.Name)
-                .ToList();
-
-            foreach (View v in allViews)
-            {
-                list.Add(new SourceViewItem
+                .Where(v => v.AreGraphicsOverridesAllowed())
+                .Select(v => new SourceViewItem
                 {
                     ViewId = v.Id,
                     ViewName = v.Name,
                     ViewType = v.ViewType,
-                    IsTemplate = false,
+                    IsTemplate = v.IsTemplate,
                     FilterCount = v.GetFilters().Count
-                });
-            }
-
-            List<View> templates = new FilteredElementCollector(_doc)
-                .OfClass(typeof(View))
-                .Cast<View>()
-                .Where(v => v.IsTemplate && IsValidViewType(v.ViewType))
-                .Where(v => v.GetFilters().Count > 0)
-                .OrderBy(v => v.Name)
+                })
+                .Where(v => v.FilterCount > 0)
+                .OrderBy(v => v.IsTemplate)
+                .ThenBy(v => v.ViewName)
                 .ToList();
-
-            foreach (View t in templates)
-            {
-                list.Add(new SourceViewItem
-                {
-                    ViewId = t.Id,
-                    ViewName = t.Name,
-                    ViewType = t.ViewType,
-                    IsTemplate = true,
-                    FilterCount = t.GetFilters().Count
-                });
-            }
-
-            return list;
         }
 
         public List<BccFilterCopyItem> GetViewFilters(ElementId sourceViewId)
@@ -67,24 +40,26 @@ namespace BimboClub
             if (sourceViewId == null || sourceViewId == ElementId.InvalidElementId) return list;
 
             View sourceView = _doc.GetElement(sourceViewId) as View;
-            if (sourceView == null) return list;
+            if (sourceView == null || !sourceView.AreGraphicsOverridesAllowed()) return list;
 
             ICollection<ElementId> filterIds = sourceView.GetFilters();
             foreach (ElementId fId in filterIds)
             {
-                ParameterFilterElement filterElem = _doc.GetElement(fId) as ParameterFilterElement;
+                Element filterElem = _doc.GetElement(fId);
                 if (filterElem == null) continue;
 
                 bool isVisible = sourceView.GetFilterVisibility(fId);
+                bool isEnabled = sourceView.GetIsFilterEnabled(fId);
                 OverrideGraphicSettings overrides = sourceView.GetFilterOverrides(fId);
                 bool isHalftone = overrides != null ? overrides.Halftone : false;
-                string summary = BuildOverridesSummary(overrides, isVisible, isHalftone);
+                string summary = BuildOverridesSummary(overrides, isVisible, isEnabled, isHalftone);
 
                 list.Add(new BccFilterCopyItem
                 {
                     FilterId = fId,
                     FilterName = filterElem.Name,
                     IsVisible = isVisible,
+                    IsEnabled = isEnabled,
                     IsHalftone = isHalftone,
                     GraphicOverrides = overrides,
                     OverridesSummary = summary,
@@ -102,7 +77,7 @@ namespace BimboClub
             List<View> views = new FilteredElementCollector(_doc)
                 .OfClass(typeof(View))
                 .Cast<View>()
-                .Where(v => v.Id != excludeSourceId && IsValidViewType(v.ViewType))
+                .Where(v => v.Id != excludeSourceId && v.AreGraphicsOverridesAllowed())
                 .OrderBy(v => v.IsTemplate ? 1 : 0)
                 .ThenBy(v => v.Name)
                 .ToList();
@@ -140,10 +115,30 @@ namespace BimboClub
             FilterCopyOptions options)
         {
             FilterCopyResult result = new FilterCopyResult();
-            if (sourceViewId == null || selectedFilters == null || selectedFilters.Count == 0 || selectedTargets == null || selectedTargets.Count == 0)
+            if (sourceViewId == null || selectedFilters == null || selectedTargets == null)
             {
-                result.Success = false;
-                result.Message = "Не вырезаны фильтры или целевые виды.";
+                result.Message = "Выберите источник, фильтры и целевые виды.";
+                return result;
+            }
+
+            List<BccFilterCopyItem> filters = selectedFilters.Where(filter => filter.IsSelected).ToList();
+            HashSet<ElementId> targetIds = new HashSet<ElementId>();
+            foreach (BccTargetViewItem item in selectedTargets.Where(target => target.IsSelected))
+            {
+                if (!(_doc.GetElement(item.ViewId) is View view)) continue;
+
+                targetIds.Add(view.Id);
+                if (options.CopyToAppliedTemplates && !view.IsTemplate)
+                {
+                    targetIds.Add(view.ViewTemplateId);
+                }
+            }
+
+            targetIds.Remove(sourceViewId);
+            targetIds.Remove(ElementId.InvalidElementId);
+            if (filters.Count == 0 || targetIds.Count == 0)
+            {
+                result.Message = "Выберите фильтры и целевые виды.";
                 return result;
             }
 
@@ -151,107 +146,91 @@ namespace BimboClub
             {
                 tx.Start();
 
-                HashSet<ElementId> processedViews = new HashSet<ElementId>();
-
-                foreach (BccTargetViewItem targetItem in selectedTargets)
+                foreach (ElementId viewId in targetIds)
                 {
-                    if (!targetItem.IsSelected) continue;
+                    if (!(_doc.GetElement(viewId) is View view) || !view.AreGraphicsOverridesAllowed()) continue;
 
-                    View targetView = _doc.GetElement(targetItem.ViewId) as View;
-                    if (targetView == null) continue;
-
-                    // Если у вида применен шаблон и включена опция применяться к шаблону
-                    List<View> viewsToApply = new List<View>();
-                    viewsToApply.Add(targetView);
-
-                    if (targetItem.HasTemplateApplied && !targetItem.IsTemplate && options.CopyToAppliedTemplates)
+                    ICollection<ElementId> existingFilters = view.GetFilters();
+                    foreach (BccFilterCopyItem filter in filters)
                     {
-                        View templateView = _doc.GetElement(targetItem.TemplateId) as View;
-                        if (templateView != null && processedViews.Add(templateView.Id))
+                        ElementId filterId = filter.FilterId;
+                        bool filterExists = existingFilters.Contains(filterId);
+
+                        if (filterExists && !options.OverwriteExistingFilters)
                         {
-                            viewsToApply.Add(templateView);
+                            result.SkippedCount++;
+                            continue;
                         }
-                    }
 
-                    foreach (View v in viewsToApply)
-                    {
-                        if (v == null) continue;
-                        ICollection<ElementId> existingFilters = v.GetFilters();
-
-                        foreach (BccFilterCopyItem BccFilterCopyItem in selectedFilters)
+                        try
                         {
-                            if (!BccFilterCopyItem.IsSelected) continue;
-
-                            ElementId fId = BccFilterCopyItem.FilterId;
-                            bool filterExists = existingFilters.Contains(fId);
-
-                            if (filterExists && !options.OverwriteExistingFilters)
+                            using (SubTransaction change = new SubTransaction(_doc))
                             {
-                                result.SkippedCount++;
-                                continue;
-                            }
+                                change.Start();
 
-                            try
-                            {
                                 if (!filterExists)
                                 {
-                                    v.AddFilter(fId);
+                                    view.AddFilter(filterId);
                                 }
-
                                 if (options.CopyVisibility)
                                 {
-                                    v.SetFilterVisibility(fId, BccFilterCopyItem.IsVisible);
+                                    view.SetFilterVisibility(filterId, filter.IsVisible);
                                 }
-
-                                if (options.CopyGraphicOverrides && BccFilterCopyItem.GraphicOverrides != null)
+                                if (options.CopyEnabledState)
                                 {
-                                    OverrideGraphicSettings ogs = BccFilterCopyItem.GraphicOverrides;
-                                    if (!options.CopyHalftone)
+                                    view.SetIsFilterEnabled(filterId, filter.IsEnabled);
+                                }
+                                if (options.CopyGraphicOverrides && filter.GraphicOverrides != null)
+                                {
+                                    using (OverrideGraphicSettings overrides = new OverrideGraphicSettings(filter.GraphicOverrides))
                                     {
-                                        OverrideGraphicSettings currentTargetOgs = v.GetFilterOverrides(fId);
-                                        bool currentHalftone = currentTargetOgs != null ? currentTargetOgs.Halftone : false;
-                                        ogs.SetHalftone(currentHalftone);
+                                        if (!options.CopyHalftone)
+                                        {
+                                            using (OverrideGraphicSettings currentOverrides = view.GetFilterOverrides(filterId))
+                                            {
+                                                overrides.SetHalftone(currentOverrides.Halftone);
+                                            }
+                                        }
+                                        view.SetFilterOverrides(filterId, overrides);
                                     }
-                                    v.SetFilterOverrides(fId, ogs);
                                 }
 
-                                result.CopiedFilterInstances++;
+                                if (change.Commit() != TransactionStatus.Committed)
+                                {
+                                    throw new InvalidOperationException("Revit отменил изменение фильтра.");
+                                }
                             }
-                            catch (Exception ex)
-                            {
-                                result.Warnings.Add($"Вид [{v.Name}]: Ошибка фильтра [{BccFilterCopyItem.FilterName}]: {ex.Message}");
-                            }
+
+                            result.CopiedFilterInstances++;
+                        }
+                        catch (Exception ex)
+                        {
+                            result.Warnings.Add($"Вид [{view.Name}]. Фильтр [{filter.FilterName}]: {ex.Message}");
                         }
                     }
 
                     result.ProcessedViewsCount++;
                 }
 
-                tx.Commit();
+                if (tx.Commit() != TransactionStatus.Committed)
+                {
+                    result.CopiedFilterInstances = 0;
+                    result.Message = "Revit не сохранил изменения фильтров.";
+                    return result;
+                }
             }
 
             result.Success = true;
-            result.Message = $"Успешно скопировано {result.CopiedFilterInstances} фильтров на {result.ProcessedViewsCount} видов/шаблонов.";
+            result.Message = $"Скопировано настроек фильтров: {result.CopiedFilterInstances}. Обработано видов и шаблонов: {result.ProcessedViewsCount}.";
             return result;
         }
 
-        private static bool IsValidViewType(ViewType vt)
+        private static string BuildOverridesSummary(OverrideGraphicSettings ogs, bool isVis, bool isEnabled, bool isHalftone)
         {
-            return vt == ViewType.FloorPlan ||
-                   vt == ViewType.CeilingPlan ||
-                   vt == ViewType.ThreeD ||
-                   vt == ViewType.Section ||
-                   vt == ViewType.Elevation ||
-                   vt == ViewType.EngineeringPlan ||
-                   vt == ViewType.AreaPlan ||
-                   vt == ViewType.DraftingView;
-        }
-
-        private static string BuildOverridesSummary(OverrideGraphicSettings ogs, bool isVis, bool isHalftone)
-        {
-            if (ogs == null) return "Без переопределений";
+            if (ogs == null) return isEnabled ? "Включён" : "Выключен";
 
             List<string> parts = new List<string>();
+            parts.Add(isEnabled ? "Включён" : "Выключен");
             parts.Add(isVis ? "Видимый" : "Скрыт");
             if (isHalftone) parts.Add("Полутон");
 
@@ -267,7 +246,7 @@ namespace BimboClub
             }
             catch { }
 
-            return parts.Count > 0 ? string.Join(", ", parts) : "По умолчанию";
+            return string.Join(", ", parts);
         }
     }
 

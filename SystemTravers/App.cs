@@ -88,14 +88,9 @@ namespace BimboClub
 				ToolTip = "Автоматически прокладывает обходы («утки») для воздуховодов и труб в местах пересечения со строительными конструкциями."
 			};
 
-			PushButtonData pushButtonDataFilters = new PushButtonData("cmdFilters", "Фильтры внутри проекта", text4, "BimboClub.FiltersCommand")
+			PushButtonData pushButtonDataFilterCopyBcc = new PushButtonData("cmdFilterCopyBcc", "Копировать фильтры", text4, "BimboClub.FilterCopyCommand")
 			{
-				ToolTip = "Копирует выбранные фильтры видов (видимость, активность и переопределение графики) с вида-донора на выбранные виды-получатели."
-			};
-
-			PushButtonData pushButtonDataFilterCopyBcc = new PushButtonData("cmdFilterCopyBcc", "Фильтры между проектами", text4, "BimboClub.FilterCopyCommand")
-			{
-				ToolTip = "Пакетное копирование фильтров видов и переопределений графики между видами и шаблонами видов."
+				ToolTip = "Копирует фильтры между видами и шаблонами текущего проекта, включая графику, видимость и состояние «Включён»."
 			};
 
 			PushButtonData pushButtonDataRename = new PushButtonData("cmdRenameFamily", "Переименовать семейство", text4, "BimboClub.RenameFamilyCommand")
@@ -198,192 +193,49 @@ namespace BimboClub
 				ToolTip = "Автоматическая расстановка пространств MEP по помещениям из связанного файла АР с переносом имен, номеров и высотных отметок."
 			};
 
-			// Загрузка иконок
-			BitmapSource bitmapSource3D = LoadImage(System.IO.Path.Combine(text, "icon_3d.png"));
-			BitmapSource bitmapSource3D16 = LoadImage(System.IO.Path.Combine(text, "icon_3d_16.png"));
-			if (bitmapSource3D != null) pushButtonData3D.LargeImage = bitmapSource3D;
-			if (bitmapSource3D16 != null) pushButtonData3D.Image = bitmapSource3D16;
-
-			BitmapSource bitmapSourceTags = LoadImage(System.IO.Path.Combine(text, "icon_tags.png"));
-			BitmapSource bitmapSourceTags16 = LoadImage(System.IO.Path.Combine(text, "icon_tags_16.png"));
-			if (bitmapSourceTags != null) pushButtonDataTags.LargeImage = bitmapSourceTags;
-			if (bitmapSourceTags16 != null) pushButtonDataTags.Image = bitmapSourceTags16;
-
-			BitmapSource bitmapSourceWall = LoadImage(System.IO.Path.Combine(text, "icon_wall.png"));
-			BitmapSource bitmapSourceWall16 = LoadImage(System.IO.Path.Combine(text, "icon_wall_16.png"));
-			if (bitmapSourceWall != null)
-			{
-				pushButtonDataWallOp.LargeImage = bitmapSourceWall;
-				pushButtonDataMergeWallOp.LargeImage = bitmapSourceWall;
-				pushButtonDataOpeningsBcc.LargeImage = bitmapSourceWall;
-			}
-			if (bitmapSourceWall16 != null)
-			{
-				pushButtonDataWallOp.Image = bitmapSourceWall16;
-				pushButtonDataMergeWallOp.Image = bitmapSourceWall16;
-				pushButtonDataOpeningsBcc.Image = bitmapSourceWall16;
-			}
-
-			BitmapSource bitmapSourceFloor = LoadImage(System.IO.Path.Combine(text, "icon_floor.png"));
-			BitmapSource bitmapSourceFloor16 = LoadImage(System.IO.Path.Combine(text, "icon_floor_16.png"));
-			if (bitmapSourceFloor != null)
-			{
-				pushButtonDataFloorOp.LargeImage = bitmapSourceFloor;
-				pushButtonDataMergeFloorOp.LargeImage = bitmapSourceFloor;
-			}
-			if (bitmapSourceFloor16 != null)
-			{
-				pushButtonDataFloorOp.Image = bitmapSourceFloor16;
-				pushButtonDataMergeFloorOp.Image = bitmapSourceFloor16;
-			}
-
-			BitmapSource bitmapSourceCopy = LoadImage(System.IO.Path.Combine(text, "icon_copy.png"));
-			BitmapSource bitmapSourceCopy16 = LoadImage(System.IO.Path.Combine(text, "icon_copy_16.png"));
-			if (bitmapSourceCopy != null) pushButtonDataParamCopy.LargeImage = bitmapSourceCopy;
-			if (bitmapSourceCopy16 != null) pushButtonDataParamCopy.Image = bitmapSourceCopy16;
-
-			BitmapSource bitmapSourcePrint = LoadImage(System.IO.Path.Combine(text, "icon_print.png"));
-			BitmapSource bitmapSourcePrint16 = LoadImage(System.IO.Path.Combine(text, "icon_print_16.png"));
-			if (bitmapSourcePrint != null)
-			{
-				pushButtonDataPrint.LargeImage = bitmapSourcePrint;
-				pushButtonDataSchedulePackBcc.LargeImage = bitmapSourcePrint;
-			}
-			if (bitmapSourcePrint16 != null)
-			{
-				pushButtonDataPrint.Image = bitmapSourcePrint16;
-				pushButtonDataSchedulePackBcc.Image = bitmapSourcePrint16;
-			}
-
-			BitmapSource bitmapSourceRouter = LoadImage(System.IO.Path.Combine(text, "icon_router.png"));
-			BitmapSource bitmapSourceRouter16 = LoadImage(System.IO.Path.Combine(text, "icon_router_16.png"));
-			if (bitmapSourceRouter != null) pushButtonDataRouter.LargeImage = bitmapSourceRouter;
-			if (bitmapSourceRouter16 != null) pushButtonDataRouter.Image = bitmapSourceRouter16;
-
-			BitmapSource bitmapSourceFilters = LoadImage(System.IO.Path.Combine(text, "icon_filters.png"));
-			BitmapSource bitmapSourceFilters16 = LoadImage(System.IO.Path.Combine(text, "icon_filters_16.png"));
-			if (bitmapSourceFilters != null)
-			{
-				pushButtonDataFilters.LargeImage = bitmapSourceFilters;
-				pushButtonDataFilterCopyBcc.LargeImage = bitmapSourceFilters;
-			}
-			if (bitmapSourceFilters16 != null)
-			{
-				pushButtonDataFilters.Image = bitmapSourceFilters16;
-				pushButtonDataFilterCopyBcc.Image = bitmapSourceFilters16;
-			}
-
-			BitmapSource bitmapSourceRename = LoadImage(System.IO.Path.Combine(text, "icon_rename.png"));
-			BitmapSource bitmapSourceRename16 = LoadImage(System.IO.Path.Combine(text, "icon_rename_16.png"));
-			if (bitmapSourceRename != null)
-			{
-				pushButtonDataRename.LargeImage = bitmapSourceRename;
-				pushButtonDataDeleteFamilyParams.LargeImage = bitmapSourceRename;
-			}
-			if (bitmapSourceRename16 != null)
-			{
-				pushButtonDataRename.Image = bitmapSourceRename16;
-				pushButtonDataDeleteFamilyParams.Image = bitmapSourceRename16;
-			}
-
-			BitmapSource bitmapSourceNetwork = LoadImage(System.IO.Path.Combine(text, "icon_network.png"));
-			BitmapSource bitmapSourceNetwork16 = LoadImage(System.IO.Path.Combine(text, "icon_network_16.png"));
-			if (bitmapSourceNetwork != null)
-			{
-				pushButtonDataPlacement.LargeImage = bitmapSourceNetwork;
-				pushButtonDataHangersBcc.LargeImage = bitmapSourceNetwork;
-				pushButtonDataLevelingBcc.LargeImage = bitmapSourceNetwork;
-				pushButtonDataPlaceXyzBcc.LargeImage = bitmapSourceNetwork;
-			}
-			if (bitmapSourceNetwork16 != null)
-			{
-				pushButtonDataPlacement.Image = bitmapSourceNetwork16;
-				pushButtonDataHangersBcc.Image = bitmapSourceNetwork16;
-				pushButtonDataLevelingBcc.Image = bitmapSourceNetwork16;
-				pushButtonDataPlaceXyzBcc.Image = bitmapSourceNetwork16;
-			}
-
-			BitmapSource bitmapSourceJson = LoadImage(System.IO.Path.Combine(text, "icon_json.png"));
-			BitmapSource bitmapSourceJson16 = LoadImage(System.IO.Path.Combine(text, "icon_json_16.png"));
-			if (bitmapSourceJson != null) pushButtonDataJson.LargeImage = bitmapSourceJson;
-			if (bitmapSourceJson16 != null) pushButtonDataJson.Image = bitmapSourceJson16;
-
-			BitmapSource bitmapSourceExcel = LoadImage(System.IO.Path.Combine(text, "icon_excel.png"));
-			BitmapSource bitmapSourceExcel16 = LoadImage(System.IO.Path.Combine(text, "icon_excel_16.png"));
-			if (bitmapSourceExcel != null)
-			{
-				pushButtonDataExcelExp.LargeImage = bitmapSourceExcel;
-				pushButtonDataExcelImp.LargeImage = bitmapSourceExcel;
-			}
-			if (bitmapSourceExcel16 != null)
-			{
-				pushButtonDataExcelExp.Image = bitmapSourceExcel16;
-				pushButtonDataExcelImp.Image = bitmapSourceExcel16;
-			}
-
-			BitmapSource bitmapSourceRiser = LoadImage(System.IO.Path.Combine(text, "icon_riser.png"));
-			BitmapSource bitmapSourceRiser16 = LoadImage(System.IO.Path.Combine(text, "icon_riser_16.png"));
-			if (bitmapSourceRiser != null) pushButtonDataRiser.LargeImage = bitmapSourceRiser;
-			if (bitmapSourceRiser16 != null) pushButtonDataRiser.Image = bitmapSourceRiser16;
-
-			BitmapSource bitmapSourceConnect = LoadImage(System.IO.Path.Combine(text, "icon_connect.png"));
-			BitmapSource bitmapSourceConnect16 = LoadImage(System.IO.Path.Combine(text, "icon_connect_16.png"));
-			if (bitmapSourceConnect != null)
-			{
-				pushButtonDataConnect.LargeImage = bitmapSourceConnect;
-				pushButtonDataConnectConnectors.LargeImage = bitmapSourceConnect;
-			}
-			if (bitmapSourceConnect16 != null)
-			{
-				pushButtonDataConnect.Image = bitmapSourceConnect16;
-				pushButtonDataConnectConnectors.Image = bitmapSourceConnect16;
-			}
-
-			if (bitmapSource3D != null) pushButtonDataFamilyDxf.LargeImage = bitmapSource3D;
-			if (bitmapSource3D16 != null) pushButtonDataFamilyDxf.Image = bitmapSource3D16;
-
-			BitmapSource bitmapSourceCrop = LoadImage(System.IO.Path.Combine(text, "icon_crop.png"));
-			BitmapSource bitmapSourceCrop16 = LoadImage(System.IO.Path.Combine(text, "icon_crop_16.png"));
-			if (bitmapSourceCrop != null) pushButtonDataCrop.LargeImage = bitmapSourceCrop;
-			if (bitmapSourceCrop16 != null) pushButtonDataCrop.Image = bitmapSourceCrop16;
-
-			BitmapSource bitmapSourceParam = LoadImage(System.IO.Path.Combine(text, "icon_param.png"));
-			BitmapSource bitmapSourceParam16 = LoadImage(System.IO.Path.Combine(text, "icon_param_16.png"));
-			if (bitmapSourceParam != null)
-			{
-				pushButtonDataHeatLossBcc.LargeImage = bitmapSourceParam;
-				pushButtonDataParamRulesBcc.LargeImage = bitmapSourceParam;
-				pushButtonDataBatchParamsBcc.LargeImage = bitmapSourceParam;
-				pushButtonDataRevitServerBcc.LargeImage = bitmapSourceParam;
-			}
-			if (bitmapSourceParam16 != null)
-			{
-				pushButtonDataHeatLossBcc.Image = bitmapSourceParam16;
-				pushButtonDataParamRulesBcc.Image = bitmapSourceParam16;
-				pushButtonDataBatchParamsBcc.Image = bitmapSourceParam16;
-				pushButtonDataRevitServerBcc.Image = bitmapSourceParam16;
-			}
-
-			BitmapSource bitmapSourceSpecs = LoadImage(System.IO.Path.Combine(text, "icon_specs.png"));
-			BitmapSource bitmapSourceSpecs16 = LoadImage(System.IO.Path.Combine(text, "icon_specs_16.png"));
-			if (bitmapSourceSpecs != null) pushButtonDataExtraSchedule.LargeImage = bitmapSourceSpecs;
-			if (bitmapSourceSpecs16 != null) pushButtonDataExtraSchedule.Image = bitmapSourceSpecs16;
-
-			if (bitmapSourceFloor != null) pushButtonDataSpacesFromRooms.LargeImage = bitmapSourceFloor;
-			if (bitmapSourceFloor16 != null) pushButtonDataSpacesFromRooms.Image = bitmapSourceFloor16;
+			SetRibbonIcon(pushButtonData3D, "3d");
+			SetRibbonIcon(pushButtonDataTags, "tags");
+			SetRibbonIcon(pushButtonDataWallOp, "wall");
+			SetRibbonIcon(pushButtonDataFloorOp, "floor");
+			SetRibbonIcon(pushButtonDataMergeWallOp, "merge_wall");
+			SetRibbonIcon(pushButtonDataMergeFloorOp, "merge_floor");
+			SetRibbonIcon(pushButtonDataOpeningsBcc, "opening_assignment");
+			SetRibbonIcon(pushButtonDataParamCopy, "system_labels");
+			SetRibbonIcon(pushButtonDataPrint, "print");
+			SetRibbonIcon(pushButtonDataSchedulePackBcc, "schedule_pack");
+			SetRibbonIcon(pushButtonDataRouter, "router");
+			SetRibbonIcon(pushButtonDataFilterCopyBcc, "filters");
+			SetRibbonIcon(pushButtonDataRename, "rename");
+			SetRibbonIcon(pushButtonDataDeleteFamilyParams, "family_params");
+			SetRibbonIcon(pushButtonDataPlacement, "placement");
+			SetRibbonIcon(pushButtonDataHangersBcc, "hangers");
+			SetRibbonIcon(pushButtonDataLevelingBcc, "leveling");
+			SetRibbonIcon(pushButtonDataPlaceXyzBcc, "xyz");
+			SetRibbonIcon(pushButtonDataHeatLossBcc, "heat_loss");
+			SetRibbonIcon(pushButtonDataParamRulesBcc, "rules");
+			SetRibbonIcon(pushButtonDataBatchParamsBcc, "batch_params");
+			SetRibbonIcon(pushButtonDataRevitServerBcc, "server");
+			SetRibbonIcon(pushButtonDataJson, "json");
+			SetRibbonIcon(pushButtonDataExcelExp, "excel_export");
+			SetRibbonIcon(pushButtonDataExcelImp, "excel_import");
+			SetRibbonIcon(pushButtonDataRiser, "riser");
+			SetRibbonIcon(pushButtonDataConnect, "pipe_connect");
+			SetRibbonIcon(pushButtonDataCrop, "crop");
+			SetRibbonIcon(pushButtonDataExtraSchedule, "specs");
+			SetRibbonIcon(pushButtonDataConnectConnectors, "connect");
+			SetRibbonIcon(pushButtonDataFamilyDxf, "family_dxf");
+			SetRibbonIcon(pushButtonDataSpacesFromRooms, "spaces");
 
 			// --- Pulldown: Схемы и Виды ---
 			try
 			{
 				PulldownButtonData pdData = new PulldownButtonData("pbViewsAndSchemes", "Схемы и Виды");
+				SetRibbonIcon(pdData, "views");
 				PulldownButton pd = ribbonPanel.AddItem(pdData) as PulldownButton;
 				if (pd != null)
 				{
-					pd.LargeImage = bitmapSource3D;
-					pd.Image = bitmapSource3D16;
 					pd.AddPushButton(pushButtonData3D);
 					pd.AddPushButton(pushButtonDataCrop);
-					pd.AddPushButton(pushButtonDataFilters);
 					pd.AddPushButton(pushButtonDataFilterCopyBcc);
 					pd.AddPushButton(pushButtonDataTags);
 				}
@@ -394,11 +246,10 @@ namespace BimboClub
 			try
 			{
 				PulldownButtonData pdData = new PulldownButtonData("pbOpenings", "Отверстия");
+				SetRibbonIcon(pdData, "openings");
 				PulldownButton pd = ribbonPanel.AddItem(pdData) as PulldownButton;
 				if (pd != null)
 				{
-					pd.LargeImage = bitmapSourceWall;
-					pd.Image = bitmapSourceWall16;
 					pd.AddPushButton(pushButtonDataOpeningsBcc);
 					pd.AddPushButton(pushButtonDataWallOp);
 					pd.AddPushButton(pushButtonDataFloorOp);
@@ -412,11 +263,10 @@ namespace BimboClub
 			try
 			{
 				PulldownButtonData pdData = new PulldownButtonData("pbMepNetworks", "Сети MEP");
+				SetRibbonIcon(pdData, "network");
 				PulldownButton pd = ribbonPanel.AddItem(pdData) as PulldownButton;
 				if (pd != null)
 				{
-					pd.LargeImage = bitmapSourceRouter;
-					pd.Image = bitmapSourceRouter16;
 					pd.AddPushButton(pushButtonDataSpacesFromRooms);
 					pd.AddPushButton(pushButtonDataRouter);
 					pd.AddPushButton(pushButtonDataHangersBcc);
@@ -435,10 +285,9 @@ namespace BimboClub
 			{
 				PushButtonData pushButtonDataPipeClamps = new PushButtonData("cmdPipeClamps", "Расстановка\nхомутов", text4, "BimboClub.PipeClamps.PipeClampsCommand")
 				{
-					ToolTip = "Автоматическая расстановка хомутов по вертикальным трубопроводам с выбором типа, шага и переносом параметров стояка.",
-					LargeImage = bitmapSourceRouter,
-					Image = bitmapSourceRouter16
+					ToolTip = "Автоматическая расстановка хомутов по вертикальным трубопроводам с выбором типа, шага и переносом параметров стояка."
 				};
+				SetRibbonIcon(pushButtonDataPipeClamps, "pipe_clamps");
 				ribbonPanel.AddItem(pushButtonDataPipeClamps);
 			}
 			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Расстановка хомутов", ex); }
@@ -447,11 +296,10 @@ namespace BimboClub
 			try
 			{
 				PulldownButtonData pdData = new PulldownButtonData("pbParams", "Параметры");
+				SetRibbonIcon(pdData, "param");
 				PulldownButton pd = ribbonPanel.AddItem(pdData) as PulldownButton;
 				if (pd != null)
 				{
-					pd.LargeImage = bitmapSourceCopy;
-					pd.Image = bitmapSourceCopy16;
 					pd.AddPushButton(pushButtonDataHeatLossBcc);
 					pd.AddPushButton(pushButtonDataParamRulesBcc);
 					pd.AddPushButton(pushButtonDataBatchParamsBcc);
@@ -466,11 +314,10 @@ namespace BimboClub
 			try
 			{
 				PulldownButtonData pdData = new PulldownButtonData("pbDataOutput", "Экспорт / Сервер");
+				SetRibbonIcon(pdData, "excel");
 				PulldownButton pd = ribbonPanel.AddItem(pdData) as PulldownButton;
 				if (pd != null)
 				{
-					pd.LargeImage = bitmapSourceExcel;
-					pd.Image = bitmapSourceExcel16;
 					pd.AddPushButton(pushButtonDataExtraSchedule);
 					pd.AddPushButton(pushButtonDataPrint);
 					pd.AddPushButton(pushButtonDataSchedulePackBcc);
@@ -495,13 +342,11 @@ namespace BimboClub
 			try
 			{
 				string currentVer = InfoCommand.GetCurrentVersion();
-				BitmapSource bitmapSourceLogo = LoadImage(System.IO.Path.Combine(text, "icon32.png"));
 				PushButtonData pushButtonDataInfo = new PushButtonData("cmdInfo", $"Инфо\nv{currentVer}", text4, "BimboClub.InfoCommand")
 				{
-					ToolTip = $"BimboClub Tools v{currentVer}\nКликните для просмотра сведений о плагине и запуска Менеджера обновлений.",
-					LargeImage = bitmapSourceLogo ?? bitmapSourceCopy,
-					Image = bitmapSourceCopy16
+					ToolTip = $"BimboClub Tools v{currentVer}\nКликните для просмотра сведений о плагине и запуска Менеджера обновлений."
 				};
+				SetRibbonIcon(pushButtonDataInfo, "info");
 				ribbonPanel.AddItem(pushButtonDataInfo);
 			}
 			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Инфо", ex); }
@@ -511,143 +356,135 @@ namespace BimboClub
 			{
 				RibbonPanel analogsPanel = _ribbon.CreatePanel(tabName, "Работа с моделью");
 
-				BitmapSource bitmapSourceSizer = LoadImage(System.IO.Path.Combine(text, "icon_sizer.png"));
-				BitmapSource bitmapSourceSizer16 = LoadImage(System.IO.Path.Combine(text, "icon_sizer_16.png"));
-
 				// 1. Pulldown: MEP выравнивание
 				PulldownButtonData pdMepAlignData = new PulldownButtonData("pbMepAlign", "MEP\nвыравнивание");
+				SetRibbonIcon(pdMepAlignData, "align_menu");
 				PulldownButton pdMepAlign = analogsPanel.AddItem(pdMepAlignData) as PulldownButton;
 				if (pdMepAlign != null)
 				{
-					pdMepAlign.LargeImage = bitmapSourceConnect;
-					pdMepAlign.Image = bitmapSourceConnect16;
 
 					// Команда 1: Выровнять по оси
 					PushButtonData btnAlign = new PushButtonData("cmdMepAlign", "Выровнять по оси", text4, "BimboClub.Analogs.MepAlign.MepAlignCommand")
 					{
-						ToolTip = "Соосное выравнивание труб, воздуховодов, лотков и фитингов (относительно ближайшего коннектора).",
-						LargeImage = bitmapSourceConnect,
-						Image = bitmapSourceConnect16
+						ToolTip = "Соосное выравнивание труб, воздуховодов, лотков и фитингов (относительно ближайшего коннектора)."
 					};
+					SetRibbonIcon(btnAlign, "align_axis");
 					pdMepAlign.AddPushButton(btnAlign);
 
 					// Команда 2: Выровнять по высоте
 					PushButtonData btnAlignElev = new PushButtonData("cmdMepAlignElevation", "Выровнять по высоте", text4, "BimboClub.Analogs.MepAlign.MepAlignElevationCommand")
 					{
-						ToolTip = "Перемещение выравниваемого элемента по оси Z до пересечения траектории с опорным элементом.",
-						LargeImage = bitmapSourceRiser,
-						Image = bitmapSourceRiser16
+						ToolTip = "Перемещение выравниваемого элемента по оси Z до пересечения траектории с опорным элементом."
 					};
+					SetRibbonIcon(btnAlignElev, "align_elevation");
 					pdMepAlign.AddPushButton(btnAlignElev);
 
 					// Команда 3: Задать расстояние
 					PushButtonData btnSetDist = new PushButtonData("cmdMepSetDistance", "Задать расстояние", text4, "BimboClub.Analogs.MepAlign.MepSetDistanceCommand")
 					{
-						ToolTip = "Установка точного расстояния между MEP кривыми по горизонтали или вертикали (по осям или по граням с учетом изоляции).",
-						LargeImage = bitmapSourceSizer ?? bitmapSourceNetwork,
-						Image = bitmapSourceSizer16 ?? bitmapSourceNetwork16
+						ToolTip = "Установка точного расстояния между MEP кривыми по горизонтали или вертикали (по осям или по граням с учетом изоляции)."
 					};
+					SetRibbonIcon(btnSetDist, "set_distance");
 					pdMepAlign.AddPushButton(btnSetDist);
 
 					// Команда 4: Выровнять стояк вертикально
 					PushButtonData btnAlignVert = new PushButtonData("cmdMepAlignVertical", "Выровнять стояк", text4, "BimboClub.Analogs.MepAlign.MepAlignVerticalCommand")
 					{
-						ToolTip = "Выравнивание стояка строго по вертикали (верхняя точка проецируется точно над нижней).",
-						LargeImage = bitmapSourceRiser,
-						Image = bitmapSourceRiser16
+						ToolTip = "Выравнивание стояка строго по вертикали (верхняя точка проецируется точно над нижней)."
 					};
+					SetRibbonIcon(btnAlignVert, "align_vertical");
 					pdMepAlign.AddPushButton(btnAlignVert);
 
 					// Команда 5: Мультипостроение
 					PushButtonData btnMultiRoute = new PushButtonData("cmdMepMultiRoute", "Мультипостроение", text4, "BimboClub.Analogs.MepAlign.MepMultiRouteCommand")
 					{
-						ToolTip = "Параллельная прокладка нескольких трасс с фиксацией углов и авто-отводами.",
-						LargeImage = bitmapSourceRouter,
-						Image = bitmapSourceRouter16
+						ToolTip = "Параллельная прокладка нескольких трасс с фиксацией углов и авто-отводами."
 					};
+					SetRibbonIcon(btnMultiRoute, "multi_route");
 					pdMepAlign.AddPushButton(btnMultiRoute);
 				}
 
 				// 2. Крупная кнопка: Базовый уровень
 				PushButtonData btnBaseLevel = new PushButtonData("cmdBaseLevel", "Базовый\nуровень", text4, "BimboClub.Analogs.BaseLevel.BaseLevelCommand")
 				{
-					ToolTip = "Пакетная перепривязка элементов к базовым и верхним уровням без физического смещения геометрии в пространстве.",
-					LargeImage = bitmapSourceFloor ?? bitmapSourceNetwork,
-					Image = bitmapSourceFloor16 ?? bitmapSourceNetwork16
+					ToolTip = "Пакетная перепривязка элементов к базовым и верхним уровням без физического смещения геометрии в пространстве."
 				};
+				SetRibbonIcon(btnBaseLevel, "base_level");
 				analogsPanel.AddItem(btnBaseLevel);
 
 				// 3. Крупная кнопка: Заменить шрифт
 				PushButtonData btnFontReplacer = new PushButtonData("cmdFontReplacer", "Заменить\nшрифт", text4, "BimboClub.Analogs.FontReplacer.FontReplacerCommand")
 				{
-					ToolTip = "Пакетная замена шрифта и свойств текста в размерных стилях, текстовых стилях, спецификациях и семействах марок.",
-					LargeImage = bitmapSourceRename ?? bitmapSourceTags,
-					Image = bitmapSourceRename16 ?? bitmapSourceTags16
+					ToolTip = "Пакетная замена шрифта и свойств текста в размерных стилях, текстовых стилях, спецификациях и семействах марок."
 				};
+				SetRibbonIcon(btnFontReplacer, "font");
 				analogsPanel.AddItem(btnFontReplacer);
 
 				// 4. Pulldown: Быстрая подрезка
 				PulldownButtonData pdFastCutData = new PulldownButtonData("pbFastViewCut", "Быстрая\nподрезка");
+				SetRibbonIcon(pdFastCutData, "cut_menu");
 				PulldownButton pdFastCut = analogsPanel.AddItem(pdFastCutData) as PulldownButton;
 				if (pdFastCut != null)
 				{
-					pdFastCut.LargeImage = bitmapSourceCrop ?? bitmapSource3D;
-					pdFastCut.Image = bitmapSourceCrop16 ?? bitmapSource3D16;
 
 					PushButtonData btnCrop2D = new PushButtonData("cmdFastCrop2D", "Подрезка 2D вида", text4, "BimboClub.Analogs.FastViewCut.FastCrop2DCommand")
 					{
-						ToolTip = "Быстрая подрезка активного вида (плана, фасада, разреза, узла) по двум угловым точкам.",
-						LargeImage = bitmapSourceCrop ?? bitmapSource3D,
-						Image = bitmapSourceCrop16 ?? bitmapSource3D16
+						ToolTip = "Быстрая подрезка активного вида (плана, фасада, разреза, узла) по двум угловым точкам."
 					};
+					SetRibbonIcon(btnCrop2D, "crop_2d");
 					pdFastCut.AddPushButton(btnCrop2D);
 
 					PushButtonData btnCrop3D = new PushButtonData("cmdFastCrop3D", "3D сечение по плану", text4, "BimboClub.Analogs.FastViewCut.FastCrop3DCommand")
 					{
-						ToolTip = "Создание или обновление 3D-вида с границей сечения (секущим кубом) по двум точкам на плане этажа.",
-						LargeImage = bitmapSource3D,
-						Image = bitmapSource3D16
+						ToolTip = "Создание или обновление 3D-вида с границей сечения (секущим кубом) по двум точкам на плане этажа."
 					};
+					SetRibbonIcon(btnCrop3D, "crop_3d");
 					pdFastCut.AddPushButton(btnCrop3D);
 				}
 
 				// 5. Крупная кнопка: Копировать листы
 				PushButtonData btnCopySheets = new PushButtonData("cmdCopySheets", "Копировать\nлисты", text4, "BimboClub.Analogs.CopySheets.CopySheetsCommand")
 				{
-					ToolTip = "Копирование листов, чертёжных видов, легенд, спецификаций и рамок между открытыми документами проекта.",
-					LargeImage = bitmapSourcePrint ?? bitmapSourceCopy,
-					Image = bitmapSourcePrint16 ?? bitmapSourceCopy16
+					ToolTip = "Копирование листов, чертёжных видов, легенд, спецификаций и рамок между открытыми документами проекта."
 				};
+				SetRibbonIcon(btnCopySheets, "copy_sheets");
 				analogsPanel.AddItem(btnCopySheets);
 
 				// 6. Крупная кнопка: Копировать элементы
 				PushButtonData btnCopyElements = new PushButtonData("cmdCopyElements", "Копировать\nэлементы", text4, "BimboClub.Analogs.CopyElements.CopyElementsCommand")
 				{
-					ToolTip = "Копирование стандартов проекта, типоразмеров, фильтров, спецификаций и элементов модели в открытые документы.",
-					LargeImage = bitmapSourceCopy ?? bitmapSourceRename,
-					Image = bitmapSourceCopy16 ?? bitmapSourceRename16
+					ToolTip = "Копирование стандартов проекта, типоразмеров, фильтров, спецификаций и элементов модели в открытые документы."
 				};
+				SetRibbonIcon(btnCopyElements, "copy");
 				analogsPanel.AddItem(btnCopyElements);
 
 				// 7. Крупная кнопка: Размеры на плане
 				PushButtonData btnPlanDimensions = new PushButtonData("cmdPlanDimensions", "Размеры\nна плане", text4, "BimboClub.Analogs.InteriorPlanDimensions.PlanDimensionsCommand")
 				{
-					ToolTip = "Автоматическая расстановка цепочек размеров стен, проёмов, толщин и привязок колонн к осям на плане этажа.",
-					LargeImage = bitmapSourceCrop ?? bitmapSourceTags,
-					Image = bitmapSourceCrop16 ?? bitmapSourceTags16
+					ToolTip = "Автоматическая расстановка цепочек размеров стен, проёмов, толщин и привязок колонн к осям на плане этажа."
 				};
+				SetRibbonIcon(btnPlanDimensions, "sizer");
 				analogsPanel.AddItem(btnPlanDimensions);
 			}
 			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка создания панели Аналоги", ex); }
 
-			// --- Wpf-маркер вкладки Revit (ModPlus style) ---
-			if (!_ribbonFailed) _ribbon.Start();
+			if (!_ribbonFailed)
+			{
+				_ribbon.Start();
+				RibbonTabMarker.Schedule(tabName);
+			}
 			else
 			{
 				_ribbon.Stop();
 				AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
 			}
 			return _ribbonFailed ? Result.Failed : Result.Succeeded;
+		}
+
+		private void SetRibbonIcon(ButtonData button, string icon)
+		{
+			button.LargeImage = LoadImage(System.IO.Path.Combine(AssemblyDir, $"icon_{icon}.png"));
+			button.Image = LoadImage(System.IO.Path.Combine(AssemblyDir, $"icon_{icon}_16.png"));
 		}
 
 		private BitmapSource LoadImage(string path)

@@ -7,6 +7,7 @@
     <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#19191E" />
     <SolidColorBrush x:Key="AccentBrush" Color="#9D4D66" />
     <SolidColorBrush x:Key="AccentHoverBrush" Color="#AE5D76" />
+    <SolidColorBrush x:Key="BrandPinkBrush" Color="#C17E96" />
     <SolidColorBrush x:Key="TextPrimaryBrush" Color="#FFFFFF" />
     <SolidColorBrush x:Key="TextSecondaryBrush" Color="#AAA6B5" />
     <SolidColorBrush x:Key="BorderBrush" Color="#41414D" />
@@ -25,11 +26,6 @@
     <LinearGradientBrush x:Key="SuccessGradientBrush" StartPoint="0,0" EndPoint="1,1">
         <GradientStop Color="#8BC6AA" Offset="0" />
         <GradientStop Color="#8BC6AA" Offset="1" />
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="WarningGradientBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#EDBF83" Offset="0" />
-        <GradientStop Color="#EDBF83" Offset="1" />
     </LinearGradientBrush>
 
     <!-- Custom Window Styling -->

@@ -9,6 +9,13 @@ The update manifest pins URLs to the commit containing the verified ZIPs on
 the ZIP commit first, then update the manifest; never replace an existing version's
 files with different bytes.
 
+Tools 3.0.2 SHA-256:
+
+| Package | SHA-256 |
+| --- | --- |
+| bimboclub_net48.zip | `a17cc3449d801c17b4701eaaeb3e12240aa6b425f2960cd2c185430657131450` |
+| bimboclub_net8.zip | `88415b173b624ed5c26c49bd30c2b17e0161067dc0a7e30695a3342525b29a10` |
+
 Tools 2.4.32 SHA-256:
 
 | Package | SHA-256 |

@@ -10,6 +10,15 @@ namespace BimboClub
 {
     public static class UiThemeHelper
     {
+        internal static readonly Brush BrandPink = CreateBrush(193, 126, 150);
+
+        private static Brush CreateBrush(byte red, byte green, byte blue)
+        {
+            var brush = new SolidColorBrush(Color.FromRgb(red, green, blue));
+            brush.Freeze();
+            return brush;
+        }
+
         public static void ApplyDarkTheme(Window window)
         {
             if (window == null) return;

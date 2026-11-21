@@ -305,7 +305,8 @@ namespace BimboClub
                 CopyToAppliedTemplates = CopyToAppliedTemplatesCheckBox.IsChecked ?? true,
                 IncludeViewsWithTemplate = IncludeViewsWithTemplateCheckBox.IsChecked ?? true,
                 CopyGraphicOverrides = CopyGraphicOverridesCheckBox.IsChecked ?? true,
-                CopyVisibility = CopyVisibilityCheckBox.IsChecked ?? true
+                CopyVisibility = CopyVisibilityCheckBox.IsChecked ?? true,
+                CopyEnabledState = CopyEnabledStateCheckBox.IsChecked ?? true
             };
 
             try
