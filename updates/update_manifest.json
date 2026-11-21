@@ -1,14 +1,14 @@
 {
-  "latestVersion": "2.4.32",
-  "releaseDate": "2026-11-17",
+  "latestVersion": "3.0.2",
+  "releaseDate": "2026-11-21",
   "changelog": [
-    "Отверстия: добавлены отдельные настройки округления размеров вверх и отметки низа от уровня вниз",
-    "Шаг по умолчанию 10 мм; 0 отключает округление. Применяется при расстановке, ручном и пакетном объединении",
-    "При опускании низа высота увеличивается для сохранения проёма; размеры и вертикальные границы проверяются до удаления исходных отверстий",
-    "75 проверок на каждой платформе, сборки пакетов и компиляция с API Revit 2023 прошли. Без запуска Revit и моделей"
+    "Единая команда «Копировать фильтры» переносит настройки между видами и шаблонами, включая состояние «Включён».",
+    "Новые пиктограммы для 46 команд и 7 меню, розовый маркер вкладки BimboClub.",
+    "Менеджер обновлений и окно «О плагине» оформлены в фирменной графитово-розовой палитре.",
+    "При первом переходе с 2.x перезапустите Revit после установки. Для обновлений в открытом Revit используйте Manager 3.0.2."
   ],
   "packages": {
-    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/aa1f8c0593f691370a1fcdd184227319902cf0ab/updates/packages/2.4.32/bimboclub_net48.zip",
-    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/aa1f8c0593f691370a1fcdd184227319902cf0ab/updates/packages/2.4.32/bimboclub_net8.zip"
+    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/6b476acfe89c854a7319b75d36811bd214b634dd/updates/packages/3.0.2/bimboclub_net48.zip",
+    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/6b476acfe89c854a7319b75d36811bd214b634dd/updates/packages/3.0.2/bimboclub_net8.zip"
   }
 }
