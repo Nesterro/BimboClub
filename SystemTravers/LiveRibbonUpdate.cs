@@ -14,12 +14,15 @@ namespace BimboClub
         private const string CandidateKey = "BimboClub.Tools.LiveCandidate";
         private readonly UIControlledApplication _application;
         private readonly List<RibbonPanel> _panels = new List<RibbonPanel>();
-        private readonly AssemblyName _identity;
         private readonly string _payload;
         private readonly string _manifest;
         private readonly string _packageRoot;
         private readonly string _panelSuffix = Guid.NewGuid().ToString("N");
         private readonly bool _late;
+        private AssemblyName _activeIdentity;
+        private string _activePayload;
+        private Action<bool> _setActiveVisible;
+        private bool _subscribed;
         private DateTime _nextCheck;
         private string _attempted;
         private FileStream _lease;
@@ -27,8 +30,10 @@ namespace BimboClub
         internal LiveRibbonUpdate(UIControlledApplication application, string payload, AssemblyName identity)
         {
             _application = application;
-            _identity = identity;
             _payload = Path.GetFullPath(payload);
+            _activeIdentity = identity;
+            _activePayload = _payload;
+            _setActiveVisible = SetVisible;
             string directory = Path.GetDirectoryName(_payload);
             string parent = Path.GetDirectoryName(directory);
             bool managed = PluginInstallation.IsGeneration(Path.GetFileName(directory))
@@ -55,14 +60,24 @@ namespace BimboClub
         internal void Start()
         {
             if (_late)
+            {
+                // LoadAddIn runs inside the startup generation's Idling callback.
+                // Revit forbids changing the event subscription while it is executing.
                 AppDomain.CurrentDomain.SetData(CandidateKey, (Action<bool>)SetVisible);
+                return;
+            }
             _application.Idling += OnIdling;
-            if (!_late && _packageRoot != null) CleanRetiredPackages();
+            _subscribed = true;
+            if (_packageRoot != null) CleanRetiredPackages();
         }
 
         internal void Stop()
         {
-            _application.Idling -= OnIdling;
+            if (_subscribed)
+            {
+                _application.Idling -= OnIdling;
+                _subscribed = false;
+            }
             _lease?.Dispose();
             _lease = null;
         }
@@ -79,7 +94,7 @@ namespace BimboClub
             _nextCheck = now.AddSeconds(5);
             string candidate = PluginInstallation.ReadPayload(_manifest);
             if (!PluginInstallation.IsManagedPayload(_manifest, candidate) ||
-                string.Equals(candidate, _payload, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(candidate, _activePayload, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(candidate, _attempted, StringComparison.OrdinalIgnoreCase)) return;
 
             _attempted = candidate;
@@ -87,7 +102,8 @@ namespace BimboClub
             Action<bool> switchCandidate = null;
             try
             {
-                if (!PluginInstallation.IsLiveCandidate(_identity, AssemblyName.GetAssemblyName(candidate)) ||
+                var candidateIdentity = AssemblyName.GetAssemblyName(candidate);
+                if (!PluginInstallation.IsLiveCandidate(_activeIdentity, candidateIdentity) ||
                     (File.GetAttributes(Path.GetDirectoryName(candidate)) & FileAttributes.ReparsePoint) != 0)
                     return;
                 // Keeping the temporary manifest beside the payload prevents startup discovery.
@@ -98,15 +114,17 @@ namespace BimboClub
                 switchCandidate = AppDomain.CurrentDomain.GetData(CandidateKey) as Action<bool>;
                 if (switchCandidate == null) throw new InvalidOperationException("Не подтверждена готовность новой панели BimboClub.");
                 switchCandidate(true);
-                SetVisible(false);
-                _application.Idling -= OnIdling;
+                _setActiveVisible(false);
+                _setActiveVisible = switchCandidate;
+                _activeIdentity = candidateIdentity;
+                _activePayload = candidate;
             }
             catch (Exception ex)
             {
                 try
                 {
                     switchCandidate?.Invoke(false);
-                    SetVisible(true);
+                    _setActiveVisible(true);
                 }
                 catch (Exception restoreError) { Logger.LogError("Восстановление видимости ленты", restoreError); }
                 Logger.LogError("Обновление в открытом Revit. Версия установлена для следующего запуска", ex);

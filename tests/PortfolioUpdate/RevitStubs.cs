@@ -14,11 +14,30 @@ namespace Autodesk.Revit.UI
 
     public sealed class UIControlledApplication
     {
-        public event EventHandler<IdlingEventArgs> Idling;
+        private EventHandler<IdlingEventArgs> _idling;
+        private bool _raisingIdling;
+        public event EventHandler<IdlingEventArgs> Idling
+        {
+            add
+            {
+                if (_raisingIdling) throw new InvalidOperationException("Cannot subscribe during Idling.");
+                _idling += value;
+            }
+            remove
+            {
+                if (_raisingIdling) throw new InvalidOperationException("Cannot unsubscribe during Idling.");
+                _idling -= value;
+            }
+        }
         public Action<string> OnLoad { get; set; }
         public RibbonPanel CreateRibbonPanel(string tab, string name) => new RibbonPanel();
         public void LoadAddIn(string path) => OnLoad(path);
-        public void RaiseIdling() => Idling?.Invoke(this, new IdlingEventArgs());
+        public void RaiseIdling()
+        {
+            _raisingIdling = true;
+            try { _idling?.Invoke(this, new IdlingEventArgs()); }
+            finally { _raisingIdling = false; }
+        }
     }
 }
 

@@ -72,7 +72,8 @@ try
     var application = new UIControlledApplication();
     var old = new LiveRibbonUpdate(application, first, current);
     var oldPanel = old.CreatePanel("BimboClub", "Old panel");
-    bool newVisible = false;
+    RibbonPanel newPanel = null;
+    LiveRibbonUpdate loadedCandidate = null;
     string temporaryManifest = null;
     application.OnLoad = path =>
     {
@@ -80,12 +81,16 @@ try
         var registration = XDocument.Load(path).Root.Element("AddIn");
         Check((string)registration.Element("Assembly") == second && oldPanel.Visible, "Old panel stays visible during loading");
         Check(Guid.Parse((string)registration.Element("AddInId")) != PluginInstallation.StartupId, "Live registration has a different AddInId");
-        AppDomain.CurrentDomain.SetData("BimboClub.Tools.LiveCandidate", (Action<bool>)(visible => newVisible = visible));
+        loadedCandidate = new LiveRibbonUpdate(application, second, candidate);
+        newPanel = loadedCandidate.CreatePanel("BimboClub", "New panel");
+        Check(!newPanel.Visible, "Candidate is initially hidden");
+        loadedCandidate.Start();
     };
     old.Start();
     application.RaiseIdling();
-    Check(newVisible && !oldPanel.Visible, "Confirmed candidate replaces the old panel");
+    Check(newPanel != null && newPanel.Visible && !oldPanel.Visible, "Confirmed candidate replaces the old panel");
     Check(!File.Exists(temporaryManifest), "Temporary registration is removed");
+    loadedCandidate.Stop();
     old.Stop();
 
     var failingApplication = new UIControlledApplication();
