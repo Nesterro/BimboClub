@@ -1,14 +1,13 @@
 {
-  "latestVersion": "3.0.2",
+  "latestVersion": "3.0.3",
   "releaseDate": "2026-11-21",
   "changelog": [
-    "Единая команда «Копировать фильтры» переносит настройки между видами и шаблонами, включая состояние «Включён».",
-    "Новые пиктограммы для 46 команд и 7 меню, розовый маркер вкладки BimboClub.",
-    "Менеджер обновлений и окно «О плагине» оформлены в фирменной графитово-розовой палитре.",
-    "При первом переходе с 2.x перезапустите Revit после установки. Для обновлений в открытом Revit используйте Manager 3.0.2."
+    "Исправлено создание и объединение заданий на отверстия с включённым округлением.",
+    "В окнах команд уточнены подписи округления размеров вверх и отметки низа вниз.",
+    "После установки через BimboClub Manager перезапустите Revit."
   ],
   "packages": {
-    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/6b476acfe89c854a7319b75d36811bd214b634dd/updates/packages/3.0.2/bimboclub_net48.zip",
-    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/6b476acfe89c854a7319b75d36811bd214b634dd/updates/packages/3.0.2/bimboclub_net8.zip"
+    "net48": "https://raw.githubusercontent.com/Nesterro/BimboClub/01baa99b0c7ac4ce2bfc7c6a835aa03b5287135a/updates/packages/3.0.3/bimboclub_net48.zip",
+    "net8": "https://raw.githubusercontent.com/Nesterro/BimboClub/01baa99b0c7ac4ce2bfc7c6a835aa03b5287135a/updates/packages/3.0.3/bimboclub_net8.zip"
   }
 }
