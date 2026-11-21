@@ -2,19 +2,19 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Color Palette -->
-    <SolidColorBrush x:Key="BgDarkBrush" Color="#141418" />
-    <SolidColorBrush x:Key="PanelDarkBrush" Color="#1C1C22" />
-    <SolidColorBrush x:Key="ControlDarkBrush" Color="#282832" />
-    <SolidColorBrush x:Key="BorderDarkBrush" Color="#3A3A46" />
-    <SolidColorBrush x:Key="BorderFocusBrush" Color="#FF2E5B" />
+    <SolidColorBrush x:Key="BgDarkBrush" Color="#19191E" />
+    <SolidColorBrush x:Key="PanelDarkBrush" Color="#24242B" />
+    <SolidColorBrush x:Key="ControlDarkBrush" Color="#2D2D36" />
+    <SolidColorBrush x:Key="BorderDarkBrush" Color="#41414D" />
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="#C17E96" />
     
     <SolidColorBrush x:Key="TextWhiteBrush" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="TextMutedBrush" Color="#A5A5B5" />
-    <SolidColorBrush x:Key="TextGrayBrush" Color="#707080" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#AAA6B5" />
+    <SolidColorBrush x:Key="TextGrayBrush" Color="#AAA6B5" />
 
-    <SolidColorBrush x:Key="AccentScarletBrush" Color="#B30E2D" />
-    <SolidColorBrush x:Key="AccentScarletHoverBrush" Color="#E0113A" />
-    <SolidColorBrush x:Key="AccentScarletActiveBrush" Color="#FF2E5B" />
+    <SolidColorBrush x:Key="AccentScarletBrush" Color="#9D4D66" />
+    <SolidColorBrush x:Key="AccentScarletHoverBrush" Color="#AE5D76" />
+    <SolidColorBrush x:Key="AccentScarletActiveBrush" Color="#C17E96" />
 
     <SolidColorBrush x:Key="SuccessGreenBrush" Color="#10B981" />
     <SolidColorBrush x:Key="WarningYellowBrush" Color="#F59E0B" />

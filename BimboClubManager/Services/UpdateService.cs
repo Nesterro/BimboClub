@@ -294,70 +294,14 @@ namespace BimboClubManager.Services
             try
             {
                 var processes = Process.GetProcessesByName("Revit");
-                return processes.Length > 0;
+                bool running = processes.Length > 0;
+                foreach (var process in processes) process.Dispose();
+                return running;
             }
             catch
             {
                 return false;
             }
-        }
-
-        public Process[] GetRevitProcesses()
-        {
-            try
-            {
-                return Process.GetProcessesByName("Revit");
-            }
-            catch
-            {
-                return Array.Empty<Process>();
-            }
-        }
-
-        public async Task<bool> CloseRevitGracefullyAsync(int timeoutSeconds = 10)
-        {
-            var processes = GetRevitProcesses();
-            if (processes.Length == 0) return true;
-
-            foreach (var proc in processes)
-            {
-                try
-                {
-                    proc.CloseMainWindow();
-                }
-                catch { }
-            }
-
-            var sw = Stopwatch.StartNew();
-            while (sw.Elapsed.TotalSeconds < timeoutSeconds)
-            {
-                if (!IsRevitRunning()) return true;
-                await Task.Delay(500);
-            }
-
-            return !IsRevitRunning();
-        }
-
-        public void ForceKillRevit()
-        {
-            var processes = GetRevitProcesses();
-            foreach (var process in processes)
-            {
-                try
-                {
-                    process.Kill();
-                    process.WaitForExit(3000);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Failed to terminate Revit process: {ex.Message}");
-                }
-            }
-        }
-
-        public void TerminateRevit()
-        {
-            ForceKillRevit();
         }
 
         public async Task InstallUpdateAsync(
@@ -424,46 +368,9 @@ namespace BimboClubManager.Services
 
                 progress.Report(70);
 
-                // 4. Copy to Target Directory
-                string targetDir = Path.GetDirectoryName(versionInfo.AddinPath) ?? 
-                    throw new Exception("Невозможно определить путь установки.");
-
-                if (!Directory.Exists(targetDir))
-                {
-                    Directory.CreateDirectory(targetDir);
-                }
-
-                // Copy files with retry to handle transient file locks
-                var files = Directory.GetFiles(tempExtractPath, "*.*", SearchOption.AllDirectories);
-                int fileCount = files.Length;
-                for (int i = 0; i < fileCount; i++)
-                {
-                    string file = files[i];
-                    string relativePath = Path.GetRelativePath(tempExtractPath, file);
-                    string destFile = Path.Combine(targetDir, relativePath);
-
-                    string? destFolder = Path.GetDirectoryName(destFile);
-                    if (destFolder != null && !Directory.Exists(destFolder))
-                    {
-                        Directory.CreateDirectory(destFolder);
-                    }
-
-                    CopyFileWithRetry(file, destFile);
-
-                    double copyProgress = 70.0 + (20.0 * (i + 1) / fileCount);
-                    progress.Report(copyProgress);
-                }
-
-                // 5. Write version.txt
-                try
-                {
-                    File.WriteAllText(Path.Combine(targetDir, "version.txt"), manifest.LatestVersion);
-                }
-                catch { }
-
-                // 6. Verify / Write Addin Manifest
-                progress.Report(95);
-                WriteAddinManifest(versionInfo.AddinPath);
+                cancellationToken.ThrowIfCancellationRequested();
+                versionInfo.DllPath = SideBySideInstaller.Install(tempExtractPath, versionInfo.AddinPath,
+                    manifest.LatestVersion, versionInfo.TargetFramework, cancellationToken);
 
                 progress.Report(100);
             }
@@ -478,22 +385,6 @@ namespace BimboClubManager.Services
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Failed to clean up temp files: {ex.Message}");
-                }
-            }
-        }
-
-        private static void CopyFileWithRetry(string source, string dest, int maxRetries = 3)
-        {
-            for (int attempt = 1; attempt <= maxRetries; attempt++)
-            {
-                try
-                {
-                    File.Copy(source, dest, true);
-                    return;
-                }
-                catch (IOException) when (attempt < maxRetries)
-                {
-                    Thread.Sleep(500);
                 }
             }
         }
@@ -622,13 +513,15 @@ namespace BimboClubManager.Services
 
         public void UninstallPlugin(RevitVersionInfo versionInfo)
         {
+            if (IsRevitRunning())
+                throw new InvalidOperationException("Закройте Revit обычным способом перед удалением дополнения.");
             string targetDir = Path.GetDirectoryName(versionInfo.AddinPath) ?? 
                 throw new Exception("Невозможно определить путь установки.");
 
             if (!Directory.Exists(targetDir)) return;
 
             // Delete specific BimboClub files
-            DeleteFileIfExists(versionInfo.AddinPath);
+            File.Delete(versionInfo.AddinPath);
             DeleteFileIfExists(versionInfo.DllPath);
             DeleteFileIfExists(Path.Combine(targetDir, "DuctSystemParamCopy.dll"));
             DeleteFileIfExists(Path.Combine(targetDir, "icon32.png"));
@@ -701,27 +594,5 @@ namespace BimboClubManager.Services
             }
         }
 
-        private void WriteAddinManifest(string path)
-        {
-            string xmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
-<RevitAddIns>
-  <AddIn Type=""Application"">
-    <Name>BimboClub Tools</Name>
-    <Assembly>BimboClub.dll</Assembly>
-    <AddInId>B13B0C1B-C10B-4DDE-A3C9-968B750A8610</AddInId>
-    <FullClassName>BimboClub.App</FullClassName>
-    <VendorId>BMBC</VendorId>
-    <VendorDescription>BimboClub</VendorDescription>
-  </AddIn>
-</RevitAddIns>";
-
-            string? dir = Path.GetDirectoryName(path);
-            if (dir != null && !Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-            File.WriteAllText(path, xmlContent, System.Text.Encoding.UTF8);
-        }
     }
 }

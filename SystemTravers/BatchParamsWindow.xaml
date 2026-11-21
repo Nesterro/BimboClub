@@ -5,7 +5,7 @@
         Height="900" Width="1320"
         MinHeight="750" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E2E"
+        Background="#19191E"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#FFFFFF"
@@ -18,25 +18,25 @@
             <Setter Property="Control.Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <Rectangle Margin="-2" Stroke="#FFD700" StrokeThickness="2" StrokeDashArray="2 2" RadiusX="4" RadiusY="4"/>
+                        <Rectangle Margin="-2" Stroke="#C17E96" StrokeThickness="2" StrokeDashArray="2 2" RadiusX="4" RadiusY="4"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
 
         <!-- Theme Brushes -->
-        <SolidColorBrush x:Key="BgDarkBrush" Color="#181824"/>
-        <SolidColorBrush x:Key="PanelDarkBrush" Color="#222232"/>
-        <SolidColorBrush x:Key="PanelSubtleBrush" Color="#2A2A3E"/>
-        <SolidColorBrush x:Key="BorderDarkBrush" Color="#383852"/>
+        <SolidColorBrush x:Key="BgDarkBrush" Color="#19191E"/>
+        <SolidColorBrush x:Key="PanelDarkBrush" Color="#24242B"/>
+        <SolidColorBrush x:Key="PanelSubtleBrush" Color="#2D2D36"/>
+        <SolidColorBrush x:Key="BorderDarkBrush" Color="#2D2D36"/>
         <SolidColorBrush x:Key="TextWhiteBrush" Color="#FFFFFF"/>
         <SolidColorBrush x:Key="TextMutedBrush" Color="#A5A5C0"/>
-        <SolidColorBrush x:Key="AccentScarletBrush" Color="#C91414"/>
+        <SolidColorBrush x:Key="AccentScarletBrush" Color="#9D4D66"/>
         <SolidColorBrush x:Key="AccentScarletHoverBrush" Color="#E53935"/>
         <SolidColorBrush x:Key="AccentGreenBrush" Color="#2E7D32"/>
         <SolidColorBrush x:Key="AccentGreenHoverBrush" Color="#388E3C"/>
-        <SolidColorBrush x:Key="AccentGoldBrush" Color="#FFD700"/>
-        <SolidColorBrush x:Key="RowDarkBrush" Color="#1E1E2E"/>
+        <SolidColorBrush x:Key="AccentGoldBrush" Color="#C17E96"/>
+        <SolidColorBrush x:Key="RowDarkBrush" Color="#19191E"/>
         <SolidColorBrush x:Key="RowAltDarkBrush" Color="#252538"/>
         <SolidColorBrush x:Key="RowSelectedBrush" Color="#3D3558"/>
 
@@ -160,7 +160,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#B30E2D"/>
+                    <Setter Property="Background" Value="#9D4D66"/>
                     <Setter Property="BorderBrush" Value="{StaticResource AccentScarletBrush}"/>
                     <Setter Property="Foreground" Value="#FFFFFF"/>
                 </Trigger>
@@ -259,7 +259,7 @@
                                 <Setter Property="Foreground" Value="#FFFFFF"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#B30E2D"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#9D4D66"/>
                                 <Setter Property="Foreground" Value="#FFFFFF"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>
@@ -305,7 +305,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header Bar -->
-        <Border Grid.Row="0" BorderBrush="#383852" BorderThickness="0,0,0,1" Padding="0,0,0,10" Margin="0,0,0,12">
+        <Border Grid.Row="0" BorderBrush="#2D2D36" BorderThickness="0,0,0,1" Padding="0,0,0,10" Margin="0,0,0,12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -313,7 +313,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="BimboClub" Foreground="#FFD700" FontWeight="Bold" FontSize="22"/>
+                    <TextBlock Text="BimboClub" Foreground="#C17E96" FontWeight="Bold" FontSize="22"/>
                     <TextBlock Text=" | МЕНЕДЖЕР ПАРАМЕТРОВ" Foreground="#FFFFFF" FontWeight="Bold" FontSize="20" Margin="8,0,0,0"/>
                 </StackPanel>
 
@@ -325,7 +325,7 @@
         </Border>
 
         <!-- Shared Parameter File Bar -->
-        <Border Grid.Row="1" Background="#252536" BorderBrush="#383852" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,12">
+        <Border Grid.Row="1" Background="#24242B" BorderBrush="#2D2D36" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,12">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -369,7 +369,7 @@
                     </Grid.RowDefinitions>
 
                     <!-- STEP 1: FOP PARAMETERS PICKER WITH SEPARATE GROUPS LISTBOX -->
-                    <Border Grid.Row="0" BorderBrush="#383852" BorderThickness="1" CornerRadius="6" Background="#252536" Padding="10" Margin="0,0,0,6">
+                    <Border Grid.Row="0" BorderBrush="#2D2D36" BorderThickness="1" CornerRadius="6" Background="#24242B" Padding="10" Margin="0,0,0,6">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -602,7 +602,7 @@
                 </Grid.RowDefinitions>
 
                 <!-- Batch Settings Box -->
-                <Border Grid.Row="0" Background="#252536" BorderBrush="#383852" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,10">
+                <Border Grid.Row="0" Background="#24242B" BorderBrush="#2D2D36" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,10">
                     <StackPanel>
                         <TextBlock Text="ПАКЕТНОЕ НАЗНАЧЕНИЕ СВОЙСТВ" FontSize="11" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,0,0,8"/>
 
@@ -650,7 +650,7 @@
                 </Border>
 
                 <!-- Project Categories Box (Shown in .rvt mode) -->
-                <Border Grid.Row="1" x:Name="CategoriesBorder" Background="#252536" BorderBrush="#383852" BorderThickness="1" CornerRadius="6" Padding="12">
+                <Border Grid.Row="1" x:Name="CategoriesBorder" Background="#24242B" BorderBrush="#2D2D36" BorderThickness="1" CornerRadius="6" Padding="12">
                     <Grid>
                         <Grid.RowDefinitions>
                             <!-- Title & Presets -->
@@ -681,7 +681,7 @@
                         <TextBox Grid.Row="1" x:Name="CategorySearchTextBox" TextChanged="CategorySearchTextBox_TextChanged" Margin="0,0,0,6" ToolTip="Поиск категории..." AutomationProperties.Name="Поиск категорий проекта"/>
 
                         <!-- Categories ListBox -->
-                        <Border Grid.Row="2" BorderBrush="#383852" BorderThickness="1" CornerRadius="5" Background="#1E1E2E">
+                        <Border Grid.Row="2" BorderBrush="#2D2D36" BorderThickness="1" CornerRadius="5" Background="#19191E">
                             <ListBox x:Name="CategoriesListBox" SelectionMode="Extended" BorderThickness="0" AutomationProperties.Name="Список категорий проекта">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -718,7 +718,7 @@
         <!-- Progress Bar -->
         <StackPanel Grid.Row="3" Margin="0,0,0,8">
             <TextBlock x:Name="ProgressStatusTextBlock" Text="Готов к работе. Выберите группу ФОП слева, затем параметры и нажмите 'Преддобавить в список (Step 2)'..." Foreground="#FFFFFF" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,4"/>
-            <ProgressBar x:Name="BatchProgressBar" Height="10" Minimum="0" Maximum="100" Value="0" Foreground="#FFD700"/>
+            <ProgressBar x:Name="BatchProgressBar" Height="10" Minimum="0" Maximum="100" Value="0" Foreground="#C17E96"/>
         </StackPanel>
 
         <!-- Footer -->
@@ -732,7 +732,7 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="Закрыть" Style="{StaticResource SecondaryButtonStyle}" Width="110" Margin="0" Click="Cancel_Click" AutomationProperties.Name="Закрыть окно"/>
-            <Button Grid.Column="2" x:Name="DeleteButton" Content="УДАЛИТЬ ОТМЕЧЕННЫЕ ИЗ МОДЕЛИ" Style="{StaticResource SecondaryButtonStyle}" Foreground="#FFD700" BorderBrush="#C91414" FontWeight="Bold" Height="40" Padding="14,0" Click="ExecuteDelete_Click" AutomationProperties.Name="Пакетное удаление отмеченных параметров из модели"/>
+            <Button Grid.Column="2" x:Name="DeleteButton" Content="УДАЛИТЬ ОТМЕЧЕННЫЕ ИЗ МОДЕЛИ" Style="{StaticResource SecondaryButtonStyle}" Foreground="#C17E96" BorderBrush="#9D4D66" FontWeight="Bold" Height="40" Padding="14,0" Click="ExecuteDelete_Click" AutomationProperties.Name="Пакетное удаление отмеченных параметров из модели"/>
             <Button Grid.Column="4" x:Name="ExecuteButton" Content="ЗАПИСАТЬ ПОДГОТОВЛЕННЫЕ ПАРАМЕТРЫ В МОДЕЛЬ" Style="{StaticResource PrimaryButtonStyle}" Height="40" Padding="16,0" Click="Execute_Click" AutomationProperties.Name="Выполнить пакетную запись подготовленных параметров в модель"/>
         </Grid>
     </Grid>

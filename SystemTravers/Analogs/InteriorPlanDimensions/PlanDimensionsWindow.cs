@@ -56,13 +56,13 @@ namespace BimboClub.Analogs.InteriorPlanDimensions
             MinHeight = 520;
             MinWidth = 550;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(MediaColor.FromRgb(24, 24, 28));
+            Background = new SolidColorBrush(MediaColor.FromRgb(25, 25, 30));
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
 
             var bgCard = new SolidColorBrush(MediaColor.FromRgb(32, 32, 38));
-            var borderCard = new SolidColorBrush(MediaColor.FromRgb(48, 48, 56));
-            var accentRed = new SolidColorBrush(MediaColor.FromRgb(179, 14, 45));
+            var borderCard = new SolidColorBrush(MediaColor.FromRgb(65, 65, 77));
+            var accentRed = new SolidColorBrush(MediaColor.FromRgb(157, 77, 102));
             var textMuted = new SolidColorBrush(MediaColor.FromRgb(180, 180, 200));
 
             WpfGrid mainGrid = new WpfGrid();
@@ -75,7 +75,7 @@ namespace BimboClub.Analogs.InteriorPlanDimensions
             // 1. Шапка
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(MediaColor.FromRgb(18, 18, 20), MediaColor.FromRgb(179, 14, 45), 0),
+                Background = new LinearGradientBrush(MediaColor.FromRgb(18, 18, 20), MediaColor.FromRgb(157, 77, 102), 0),
                 Padding = new Thickness(16, 12, 16, 12)
             };
             StackPanel headerStack = new StackPanel();
@@ -127,7 +127,7 @@ namespace BimboClub.Analogs.InteriorPlanDimensions
             {
                 ItemsSource = _dimTypes,
                 DisplayMemberPath = "Name",
-                Background = new SolidColorBrush(MediaColor.FromRgb(24, 24, 28)),
+                Background = new SolidColorBrush(MediaColor.FromRgb(25, 25, 30)),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
                 Padding = new Thickness(6, 3, 6, 3)
@@ -205,7 +205,7 @@ namespace BimboClub.Analogs.InteriorPlanDimensions
             _tbOffsetMm = new TextBox
             {
                 Text = "800",
-                Background = new SolidColorBrush(MediaColor.FromRgb(24, 24, 28)),
+                Background = new SolidColorBrush(MediaColor.FromRgb(25, 25, 30)),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
                 Padding = new Thickness(4),
@@ -221,7 +221,7 @@ namespace BimboClub.Analogs.InteriorPlanDimensions
             _tbMinWallWidthMm = new TextBox
             {
                 Text = "50",
-                Background = new SolidColorBrush(MediaColor.FromRgb(24, 24, 28)),
+                Background = new SolidColorBrush(MediaColor.FromRgb(25, 25, 30)),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
                 Padding = new Thickness(4),
@@ -244,7 +244,7 @@ namespace BimboClub.Analogs.InteriorPlanDimensions
             _tbExcludeTypes = new TextBox
             {
                 Text = "отделка, штукатурка, утеплитель",
-                Background = new SolidColorBrush(MediaColor.FromRgb(24, 24, 28)),
+                Background = new SolidColorBrush(MediaColor.FromRgb(25, 25, 30)),
                 Foreground = Brushes.White,
                 BorderBrush = borderCard,
                 Padding = new Thickness(4)

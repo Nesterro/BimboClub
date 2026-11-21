@@ -51,17 +51,17 @@ namespace BimboClub
             MinHeight = 550;
             MinWidth = 800;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(25, 25, 30)); // #18181C
             FontFamily = new System.Windows.Media.FontFamily("Segoe UI");
             FontSize = 13;
             UiThemeHelper.ApplyDarkTheme(this);
 
             SolidColorBrush panelBg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38));
-            SolidColorBrush controlBg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 48));
-            SolidColorBrush borderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 46, 91));
+            SolidColorBrush controlBg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 54));
+            SolidColorBrush borderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(65, 65, 77));
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(193, 126, 150));
             SolidColorBrush textMuted = new SolidColorBrush(System.Windows.Media.Color.FromRgb(160, 160, 170));
-            SolidColorBrush scarletBtn = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
+            SolidColorBrush scarletBtn = new SolidColorBrush(System.Windows.Media.Color.FromRgb(157, 77, 102));
             SolidColorBrush scarletHover = new SolidColorBrush(System.Windows.Media.Color.FromRgb(220, 20, 60));
 
             // Стили
@@ -88,7 +88,7 @@ namespace BimboClub
             // 1. Шапка
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(157, 77, 102), 0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
             System.Windows.Controls.Grid.SetRow(headerBorder, 0);

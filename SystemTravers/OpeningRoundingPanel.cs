@@ -24,7 +24,7 @@ namespace BimboClub
             Grid.SetColumnSpan(hint, 2);
             foreach (var box in new[] { _size, _bottom })
             {
-                box.Background = new SolidColorBrush(Color.FromRgb(30, 30, 36));
+                box.Background = new SolidColorBrush(Color.FromRgb(36, 36, 43));
                 box.Foreground = Brushes.White;
                 box.CaretBrush = Brushes.White;
                 box.Padding = new Thickness(5, 3, 5, 3);

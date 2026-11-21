@@ -279,7 +279,7 @@ namespace BimboClub
 			Button btnOk = new Button
 			{
 				Content = "Обрезать",
-				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45)),
+				Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(157, 77, 102)),
 				Foreground = Brushes.White,
 				BorderThickness = new Thickness(0.0),
 				Height = 28.0,
@@ -294,7 +294,7 @@ namespace BimboClub
 			};
 			btnOk.MouseLeave += delegate(object s, MouseEventArgs e)
 			{
-				btnOk.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
+				btnOk.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(157, 77, 102));
 			};
 			System.Windows.Controls.Grid.SetColumn(btnOk, 0);
 			grid2.Children.Add(btnOk);

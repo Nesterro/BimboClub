@@ -486,12 +486,12 @@ namespace BimboClub
 			base.SizeToContent = SizeToContent.Height;
 			base.ResizeMode = ResizeMode.NoResize;
 			base.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-			base.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28));
+			base.Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(25, 25, 30));
 			base.FontFamily = new FontFamily("Segoe UI");
 			base.FontSize = 13.0;
 			SolidColorBrush background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38));
-			SolidColorBrush solidColorBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-			SolidColorBrush accentBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
+			SolidColorBrush solidColorBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(65, 65, 77));
+			SolidColorBrush accentBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(157, 77, 102));
 			SolidColorBrush cancelNormal = new SolidColorBrush(System.Windows.Media.Color.FromRgb(58, 58, 66));
 			SolidColorBrush cancelHover = new SolidColorBrush(System.Windows.Media.Color.FromRgb(78, 78, 88));
 			Style roundedButtonStyle = this.GetRoundedButtonStyle(6.0);
@@ -517,7 +517,7 @@ namespace BimboClub
 			base.Content = stackPanel;
 			Border border = new Border
 			{
-				Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(179, 14, 45), 0.0),
+				Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(157, 77, 102), 0.0),
 				Padding = new Thickness(20.0, 14.0, 20.0, 14.0)
 			};
 			stackPanel.Children.Add(border);

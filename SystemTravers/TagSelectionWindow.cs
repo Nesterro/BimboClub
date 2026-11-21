@@ -176,7 +176,7 @@ namespace BimboClub
             this.Width = 850;
             this.Height = 550;
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            this.Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            this.Background = new SolidColorBrush(Color.FromRgb(25, 25, 30)); // #18181C
             this.FontFamily = new FontFamily("Segoe UI");
             this.FontSize = 13;
             this.MinHeight = 450;
@@ -184,8 +184,8 @@ namespace BimboClub
 
             // Цветовая палитра
             SolidColorBrush panelBg = new SolidColorBrush(Color.FromRgb(32, 32, 38)); // #202026
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(255, 46, 91)); // #FF2E5B (Scarlet)
+            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(65, 65, 77)); // #303038
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(193, 126, 150)); // #FF2E5B (Scarlet)
             SolidColorBrush cancelNormal = new SolidColorBrush(Color.FromRgb(58, 58, 66));
             SolidColorBrush cancelHover = new SolidColorBrush(Color.FromRgb(78, 78, 88));
 
@@ -206,7 +206,7 @@ namespace BimboClub
             {
                 Background = new LinearGradientBrush(
                     Color.FromRgb(18, 18, 20),
-                    Color.FromRgb(179, 14, 45), // #B30E2D (Бренд алый)
+                    Color.FromRgb(157, 77, 102), // #B30E2D (Бренд алый)
                     0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
@@ -517,7 +517,7 @@ namespace BimboClub
             };
             _btnOk.Click += BtnOk_Click;
             
-            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(193, 126, 150), Color.FromRgb(157, 77, 102), 90.0);
             LinearGradientBrush hoverGrad = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
             ApplyButtonStyles(_btnOk, normalGrad, hoverGrad, roundedButtonStyle);
             bottomGrid.Children.Add(_btnOk);

@@ -48,7 +48,7 @@ namespace BimboClub
             Width = 350;
             Height = 155;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(Color.FromRgb(24, 24, 28));
+            Background = new SolidColorBrush(Color.FromRgb(25, 25, 30));
             ResizeMode = ResizeMode.NoResize;
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
@@ -64,9 +64,9 @@ namespace BimboClub
             _txtInput = new TextBox
             {
                 Text = defaultVal,
-                Background = new SolidColorBrush(Color.FromRgb(40, 40, 48)),
+                Background = new SolidColorBrush(Color.FromRgb(45, 45, 54)),
                 Foreground = Brushes.White,
-                BorderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(65, 65, 77)),
                 Padding = new Thickness(5),
                 VerticalContentAlignment = VerticalAlignment.Center
             };
@@ -93,7 +93,7 @@ namespace BimboClub
             style.Setters.Add(new Setter(Button.TemplateProperty, template));
 
             btnOk.Style = style;
-            btnOk.Background = new SolidColorBrush(Color.FromRgb(179, 14, 45));
+            btnOk.Background = new SolidColorBrush(Color.FromRgb(157, 77, 102));
             btnOk.Click += (s, e) => { if (!string.IsNullOrEmpty(InputText)) { DialogResult = true; Close(); } };
 
             btnCancel.Style = style;
@@ -204,18 +204,18 @@ namespace BimboClub
             Width = 500;
             Height = 780;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(Color.FromRgb(25, 25, 30)); // #18181C
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
             ResizeMode = ResizeMode.NoResize;
 
             // Colors & brushes
-            SolidColorBrush controlBg = new SolidColorBrush(Color.FromRgb(40, 40, 48)); // #282830
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
-            SolidColorBrush activeBorder = new SolidColorBrush(Color.FromRgb(255, 46, 91)); // #FF2E5B
-            LinearGradientBrush headerGrad = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(179, 14, 45), 0.0);
-            LinearGradientBrush redBtnGrad = new LinearGradientBrush(Color.FromRgb(179, 14, 45), Color.FromRgb(135, 10, 34), 90.0);
-            LinearGradientBrush redBtnHover = new LinearGradientBrush(Color.FromRgb(210, 20, 58), Color.FromRgb(179, 14, 45), 90.0);
+            SolidColorBrush controlBg = new SolidColorBrush(Color.FromRgb(45, 45, 54)); // #282830
+            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(65, 65, 77)); // #303038
+            SolidColorBrush activeBorder = new SolidColorBrush(Color.FromRgb(193, 126, 150)); // #FF2E5B
+            LinearGradientBrush headerGrad = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(157, 77, 102), 0.0);
+            LinearGradientBrush redBtnGrad = new LinearGradientBrush(Color.FromRgb(157, 77, 102), Color.FromRgb(135, 10, 34), 90.0);
+            LinearGradientBrush redBtnHover = new LinearGradientBrush(Color.FromRgb(210, 20, 58), Color.FromRgb(157, 77, 102), 90.0);
 
             // Styles
             Style textBoxStyle = new Style(typeof(TextBox));

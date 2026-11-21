@@ -5,7 +5,7 @@
         Height="800" Width="1350"
         MinHeight="650" MinWidth="1050"
         WindowStartupLocation="CenterScreen"
-        Background="#181824"
+        Background="#19191E"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#E2E2EB"
@@ -13,12 +13,12 @@
 
     <Window.Resources>
         <!-- Brushes -->
-        <SolidColorBrush x:Key="BgDarkBrush" Color="#181824"/>
-        <SolidColorBrush x:Key="PanelDarkBrush" Color="#222232"/>
-        <SolidColorBrush x:Key="PanelSubtleBrush" Color="#2A2A3E"/>
-        <SolidColorBrush x:Key="BorderDarkBrush" Color="#38384E"/>
+        <SolidColorBrush x:Key="BgDarkBrush" Color="#19191E"/>
+        <SolidColorBrush x:Key="PanelDarkBrush" Color="#24242B"/>
+        <SolidColorBrush x:Key="PanelSubtleBrush" Color="#2D2D36"/>
+        <SolidColorBrush x:Key="BorderDarkBrush" Color="#2D2D36"/>
         <SolidColorBrush x:Key="TextWhiteBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="TextMutedBrush" Color="#9A9AB2"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#AAA6B5"/>
         <SolidColorBrush x:Key="AccentScarletBrush" Color="#D32F2F"/>
         <SolidColorBrush x:Key="AccentScarletHoverBrush" Color="#B71C1C"/>
         <SolidColorBrush x:Key="AccentGreenBrush" Color="#2E7D32"/>
@@ -71,7 +71,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#35354F"/>
+                    <Setter Property="Background" Value="#2D2D36"/>
                     <Setter Property="BorderBrush" Value="#4F4F72"/>
                 </Trigger>
             </Style.Triggers>
@@ -141,7 +141,7 @@
 
         <!-- ComboBoxItem Style -->
         <Style x:Key="DarkComboBoxItemStyle" TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="#222232"/>
+            <Setter Property="Background" Value="#24242B"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="Padding" Value="10,6"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -156,10 +156,10 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsHighlighted" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="#383855"/>
-                                <Setter Property="Foreground" Value="#FFD700"/>
+                                <Setter Property="Foreground" Value="#C17E96"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#B30E2D"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#9D4D66"/>
                                 <Setter Property="Foreground" Value="#FFFFFF"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>
@@ -186,13 +186,13 @@
             </Grid>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter TargetName="Border" Property="Background" Value="#35354F"/>
+                    <Setter TargetName="Border" Property="Background" Value="#2D2D36"/>
                     <Setter TargetName="Border" Property="BorderBrush" Value="#525270"/>
                     <Setter TargetName="Arrow" Property="Fill" Value="#FFFFFF"/>
                 </Trigger>
                 <Trigger Property="IsChecked" Value="True">
                     <Setter TargetName="Border" Property="Background" Value="#2C2C40"/>
-                    <Setter TargetName="Border" Property="BorderBrush" Value="#B30E2D"/>
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#9D4D66"/>
                     <Setter TargetName="Arrow" Property="Fill" Value="#FFFFFF"/>
                 </Trigger>
             </ControlTemplate.Triggers>
@@ -240,7 +240,7 @@
                                    Focusable="False" 
                                    PopupAnimation="Slide">
                                 <Border x:Name="DropDownBorder" 
-                                        Background="#1E1E2C" 
+                                        Background="#19191E"
                                         BorderBrush="{StaticResource BorderDarkBrush}" 
                                         BorderThickness="1" 
                                         CornerRadius="5" 
@@ -272,7 +272,7 @@
             <Setter Property="Foreground" Value="{StaticResource TextWhiteBrush}"/>
             <Setter Property="BorderBrush" Value="{StaticResource BorderDarkBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="RowBackground" Value="#1E1E2C"/>
+            <Setter Property="RowBackground" Value="#19191E"/>
             <Setter Property="AlternatingRowBackground" Value="#252538"/>
             <Setter Property="GridLinesVisibility" Value="Horizontal"/>
             <Setter Property="HorizontalGridLinesBrush" Value="#2E2E42"/>
@@ -353,7 +353,7 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="HeaderBorder" Property="Background" Value="#383852"/>
+                                <Setter TargetName="HeaderBorder" Property="Background" Value="#2D2D36"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="HeaderBorder" Property="Background" Value="#4A1825"/>
@@ -394,7 +394,7 @@
 
         <!-- DataGridRow Style with dark selection and hover -->
         <Style TargetType="DataGridRow">
-            <Setter Property="Background" Value="#1E1E2C"/>
+            <Setter Property="Background" Value="#19191E"/>
             <Setter Property="Foreground" Value="{StaticResource TextWhiteBrush}"/>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
@@ -503,7 +503,7 @@
                                 <Setter TargetName="Expander" Property="Visibility" Value="Hidden"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#B30E2D"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#9D4D66"/>
                                 <Setter Property="Foreground" Value="#FFFFFF"/>
                             </Trigger>
                             <MultiTrigger>
@@ -519,7 +519,7 @@
                                     <Condition Property="IsMouseOver" Value="True"/>
                                     <Condition Property="IsSelected" Value="False"/>
                                 </MultiTrigger.Conditions>
-                                <Setter TargetName="Bd" Property="Background" Value="#2A2A3E"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#2D2D36"/>
                                 <Setter Property="Foreground" Value="#FFFFFF"/>
                             </MultiTrigger>
                         </ControlTemplate.Triggers>

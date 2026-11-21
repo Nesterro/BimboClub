@@ -5,7 +5,7 @@
         Height="780" Width="550"
         MinHeight="600" MinWidth="480"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E2E"
+        Background="#19191E"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#FFFFFF"
@@ -13,7 +13,7 @@
 
     <Window.Resources>
         <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#FFD700"/>
+            <Setter Property="Background" Value="#C17E96"/>
             <Setter Property="Foreground" Value="#121020"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Height" Value="36"/>
@@ -36,12 +36,12 @@
         </Style>
 
         <Style x:Key="SecondaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#252536"/>
+            <Setter Property="Background" Value="#24242B"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="32"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#4F4F6E"/>
+            <Setter Property="BorderBrush" Value="#41414D"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -55,16 +55,16 @@
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#35354A"/>
-                    <Setter Property="BorderBrush" Value="#FFD700"/>
+                    <Setter Property="BorderBrush" Value="#C17E96"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
             <Setter Property="Height" Value="32"/>
-            <Setter Property="Background" Value="#181824"/>
+            <Setter Property="Background" Value="#19191E"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4F4F6E"/>
+            <Setter Property="BorderBrush" Value="#41414D"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -76,7 +76,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#FFD700"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#C17E96"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -86,9 +86,9 @@
 
         <Style TargetType="ComboBox">
             <Setter Property="Height" Value="32"/>
-            <Setter Property="Background" Value="#181824"/>
+            <Setter Property="Background" Value="#19191E"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4F4F6E"/>
+            <Setter Property="BorderBrush" Value="#41414D"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
@@ -111,9 +111,9 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" BorderBrush="#3F3F56" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,12">
+        <Border Grid.Row="0" BorderBrush="#41414D" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="BimboClub" Foreground="#FFD700" FontWeight="Bold" FontSize="18"/>
+                <TextBlock Text="BimboClub" Foreground="#C17E96" FontWeight="Bold" FontSize="18"/>
                 <TextBlock Text=" | РАСЧЁТ ТЕПЛОПОТЕРЬ" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="18" Margin="5,0,0,0"/>
             </StackPanel>
         </Border>
@@ -123,19 +123,19 @@
             <StackPanel>
 
                 <!-- Info banner -->
-                <Border Background="#2B2415" BorderBrush="#FFD700" BorderThickness="1"
+                <Border Background="#2B2415" BorderBrush="#C17E96" BorderThickness="1"
                         CornerRadius="5" Padding="10,8" Margin="0,0,0,14">
                     <TextBlock x:Name="InfoTextBlock"
                                Text="Найдено помещений: —"
-                               Foreground="#FFD700" FontWeight="Bold" FontSize="12.5" TextWrapping="Wrap"/>
+                               Foreground="#C17E96" FontWeight="Bold" FontSize="12.5" TextWrapping="Wrap"/>
                 </Border>
 
                 <!-- Scope Area -->
-                <Border Background="#252536" BorderBrush="#3F3F56" BorderThickness="1"
+                <Border Background="#24242B" BorderBrush="#41414D" BorderThickness="1"
                         CornerRadius="6" Padding="14" Margin="0,0,0,12">
                     <StackPanel>
                         <TextBlock Text="Область расстановки:"
-                                   FontWeight="Bold" Foreground="#FFD700" Margin="0,0,0,8"/>
+                                   FontWeight="Bold" Foreground="#C17E96" Margin="0,0,0,8"/>
                         <RadioButton x:Name="AllSpacesRadioButton" Content="🌐 Во всём проекте"
                                      IsChecked="True" GroupName="ScopeGroup" Margin="0,0,0,6" Checked="Scope_Checked"/>
                         <RadioButton x:Name="ActiveViewRadioButton" Content="👁️ Только на текущем виде"
@@ -144,21 +144,21 @@
                 </Border>
 
                 <!-- Cube Family -->
-                <Border Background="#252536" BorderBrush="#3F3F56" BorderThickness="1"
+                <Border Background="#24242B" BorderBrush="#41414D" BorderThickness="1"
                         CornerRadius="6" Padding="14" Margin="0,0,0,12">
                     <StackPanel>
                         <TextBlock Text="Семейство кубика (Обобщённая модель):"
-                                   FontWeight="Bold" Foreground="#FFD700" Margin="0,0,0,6"/>
+                                   FontWeight="Bold" Foreground="#C17E96" Margin="0,0,0,6"/>
                         <ComboBox x:Name="FamilyComboBox"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Temperatures -->
-                <Border Background="#252536" BorderBrush="#3F3F56" BorderThickness="1"
+                <Border Background="#24242B" BorderBrush="#41414D" BorderThickness="1"
                         CornerRadius="6" Padding="14" Margin="0,0,0,12">
                     <StackPanel>
                         <TextBlock Text="Температурные условия (°C):"
-                                   FontWeight="Bold" Foreground="#FFD700" Margin="0,0,0,10"/>
+                                   FontWeight="Bold" Foreground="#C17E96" Margin="0,0,0,10"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -184,11 +184,11 @@
                 </Border>
 
                 <!-- Construction Types -->
-                <Border Background="#252536" BorderBrush="#3F3F56" BorderThickness="1"
+                <Border Background="#24242B" BorderBrush="#41414D" BorderThickness="1"
                         CornerRadius="6" Padding="14" Margin="0,0,0,12">
                     <StackPanel>
                         <TextBlock Text="Обрабатываемые конструкции:"
-                                   FontWeight="Bold" Foreground="#FFD700" Margin="0,0,0,10"/>
+                                   FontWeight="Bold" Foreground="#C17E96" Margin="0,0,0,10"/>
 
                         <UniformGrid Columns="2" Rows="3">
                             <CheckBox x:Name="ExteriorWallsCheckBox" Content="🧱  Наружные стены"
@@ -206,18 +206,18 @@
                 </Border>
 
                 <!-- Exterior / Interior Detection Settings -->
-                <Border Background="#252536" BorderBrush="#3F3F56" BorderThickness="1"
+                <Border Background="#24242B" BorderBrush="#41414D" BorderThickness="1"
                         CornerRadius="6" Padding="14" Margin="0,0,0,12">
                     <StackPanel>
                         <TextBlock Text="Определение наружных / внутренних конструкций:"
-                                   FontWeight="Bold" Foreground="#FFD700" Margin="0,0,0,10"/>
+                                   FontWeight="Bold" Foreground="#C17E96" Margin="0,0,0,10"/>
 
                         <RadioButton x:Name="ExteriorDetectByParamRadioButton" 
                                      Content="🏷️ По параметру элементов (MN_Наружный / АР / КР)"
                                      IsChecked="True" GroupName="ExteriorDetectGroup" Margin="0,0,0,8"
                                      Checked="ExteriorDetect_Checked" Unchecked="ExteriorDetect_Checked"/>
 
-                        <Border x:Name="ExteriorParamSettingsPanel" Background="#181824" BorderBrush="#3F3F56" BorderThickness="1"
+                        <Border x:Name="ExteriorParamSettingsPanel" Background="#19191E" BorderBrush="#41414D" BorderThickness="1"
                                 CornerRadius="5" Padding="10" Margin="0,0,0,8">
                             <StackPanel>
                                 <Grid Margin="0,0,0,8">

@@ -17,7 +17,7 @@ namespace BimboClub
             Width = 450;
             Height = 240;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(Color.FromRgb(25, 25, 30)); // #18181C
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
             ResizeMode = ResizeMode.NoResize;
@@ -25,7 +25,7 @@ namespace BimboClub
 
             // Styles
             Style roundedButtonStyle = GetRoundedButtonStyle(4);
-            LinearGradientBrush redBtnGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
+            LinearGradientBrush redBtnGrad = new LinearGradientBrush(Color.FromRgb(193, 126, 150), Color.FromRgb(157, 77, 102), 90.0);
             LinearGradientBrush redBtnHover = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
 
             Grid grid = new Grid();
@@ -37,7 +37,7 @@ namespace BimboClub
             // Header
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(157, 77, 102), 0.0),
                 Padding = new Thickness(15, 0, 15, 0)
             };
             Grid.SetRow(headerBorder, 0);

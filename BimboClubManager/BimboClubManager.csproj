@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="../Shared/PluginInstallation.cs" Link="Installation/PluginInstallation.cs" />
     <Resource Include="icon_manager.png" />
     <None Include="icon_manager.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

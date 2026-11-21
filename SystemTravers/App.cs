@@ -1,7 +1,6 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,58 +15,22 @@ namespace BimboClub
 	public class App : IExternalApplication
 	{
 		public static string AssemblyDir { get; private set; }
+		private LiveRibbonUpdate _ribbon;
+		private bool _ribbonFailed;
 
 		public Result OnStartup(UIControlledApplication application)
 		{
-			AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(this.OnAssemblyResolve);
-			Logger.Log("Запуск инициализации панели BimboClub Tools.", "INFO");
+			Assembly assembly = typeof(App).Assembly;
+			string text4 = assembly.Location;
+			string text = System.IO.Path.GetDirectoryName(text4);
+			AssemblyDir = text;
+			AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
+			_ribbon = new LiveRibbonUpdate(application, text4, assembly.GetName());
 
-			string tabName = "⚫ BimboClub";
-			try
-			{
-				application.CreateRibbonTab(tabName);
-			}
-			catch (Exception) { }
-
-			RibbonPanel ribbonPanel = application.CreateRibbonPanel(tabName, "BimboClub Tools");
-
-			string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			string folderPath2 = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-			string versionNumber = application.ControlledApplication.VersionNumber;
-			string text = null;
-
-			string text2 = System.IO.Path.Combine(folderPath, "Autodesk", "Revit", "Addins", versionNumber);
-			if (File.Exists(System.IO.Path.Combine(text2, "BimboClub.dll")))
-			{
-				text = text2;
-			}
-			else
-			{
-				string text3 = System.IO.Path.Combine(folderPath2, "Autodesk", "Revit", "Addins", versionNumber);
-				if (File.Exists(System.IO.Path.Combine(text3, "BimboClub.dll")))
-				{
-					text = text3;
-				}
-			}
-
-			if (string.IsNullOrEmpty(text))
-			{
-				string path;
-				try
-				{
-					path = new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath;
-				}
-				catch
-				{
-					path = Assembly.GetExecutingAssembly().Location;
-				}
-				text = System.IO.Path.GetDirectoryName(path);
-			}
-			App.AssemblyDir = text;
-			string text4 = System.IO.Path.Combine(text, "BimboClub.dll");
-
-			Logger.Log("Вычисленный путь сборки BimboClub: " + text4, "INFO");
-			Logger.Log("Вычисленная папка сборки BimboClub: " + text, "INFO");
+			const string tabName = "BimboClub";
+			try { application.CreateRibbonTab(tabName); }
+			catch (Autodesk.Revit.Exceptions.ArgumentException) { }
+			RibbonPanel ribbonPanel = _ribbon.CreatePanel(tabName, "BimboClub Tools");
 
 			// --- Инициализация кнопок ---
 			PushButtonData pushButtonData3D = new PushButtonData("cmdCreate3DScheme", "3D схемы", text4, "BimboClub.Command")
@@ -125,12 +88,12 @@ namespace BimboClub
 				ToolTip = "Автоматически прокладывает обходы («утки») для воздуховодов и труб в местах пересечения со строительными конструкциями."
 			};
 
-			PushButtonData pushButtonDataFilters = new PushButtonData("cmdFilters", "Копирование фильтров", text4, "BimboClub.FiltersCommand")
+			PushButtonData pushButtonDataFilters = new PushButtonData("cmdFilters", "Фильтры внутри проекта", text4, "BimboClub.FiltersCommand")
 			{
 				ToolTip = "Копирует выбранные фильтры видов (видимость, активность и переопределение графики) с вида-донора на выбранные виды-получатели."
 			};
 
-			PushButtonData pushButtonDataFilterCopyBcc = new PushButtonData("cmdFilterCopyBcc", "Перенос фильтров", text4, "BimboClub.FilterCopyCommand")
+			PushButtonData pushButtonDataFilterCopyBcc = new PushButtonData("cmdFilterCopyBcc", "Фильтры между проектами", text4, "BimboClub.FilterCopyCommand")
 			{
 				ToolTip = "Пакетное копирование фильтров видов и переопределений графики между видами и шаблонами видов."
 			};
@@ -425,7 +388,7 @@ namespace BimboClub
 					pd.AddPushButton(pushButtonDataTags);
 				}
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Схемы и Виды", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Схемы и Виды", ex); }
 
 			// --- Pulldown: Отверстия ---
 			try
@@ -443,7 +406,7 @@ namespace BimboClub
 					pd.AddPushButton(pushButtonDataMergeFloorOp);
 				}
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Отверстия", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Отверстия", ex); }
 
 			// --- Pulldown: Сети MEP ---
 			try
@@ -465,7 +428,7 @@ namespace BimboClub
 					pd.AddPushButton(pushButtonDataPlaceXyzBcc);
 				}
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Сети MEP", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Сети MEP", ex); }
 
 			// 1. Отдельная крупная кнопка "Расстановка хомутов"
 			try
@@ -478,20 +441,7 @@ namespace BimboClub
 				};
 				ribbonPanel.AddItem(pushButtonDataPipeClamps);
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Расстановка хомутов", ex); }
-
-			// 2. Отдельная крупная кнопка "Редактор правил" (LTools Ruler)
-			try
-			{
-				PushButtonData pushButtonDataParamRulesMain = new PushButtonData("cmdParamRulesMain", "Редактор\nправил", text4, "BimboClub.ParamRulesCommand")
-				{
-					ToolTip = "Оригинальный полнофункциональный Редактор правил заполнения параметров элементов (LTools Ruler).",
-					LargeImage = bitmapSourceParam,
-					Image = bitmapSourceParam16
-				};
-				ribbonPanel.AddItem(pushButtonDataParamRulesMain);
-			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Редактор правил", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Расстановка хомутов", ex); }
 
 			// --- Pulldown: Параметры & Теплопотери ---
 			try
@@ -510,7 +460,7 @@ namespace BimboClub
 					pd.AddPushButton(pushButtonDataParamCopy);
 				}
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Параметры", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Параметры", ex); }
 
 			// --- Pulldown: Импорт/Экспорт & Сервер ---
 			try
@@ -530,29 +480,17 @@ namespace BimboClub
 					pd.AddPushButton(pushButtonDataRevitServerBcc);
 				}
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Импорт/Экспорт", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Импорт/Экспорт", ex); }
 
 			// 3. Отдельная крупная кнопка "Допы в спеку"
-			try
-			{
-				ribbonPanel.AddItem(pushButtonDataExtraSchedule);
-			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Допы в спеку", ex); }
-
 			// 4. Отдельная крупная кнопка "Семейство по DXF"
 			try
 			{
 				ribbonPanel.AddItem(pushButtonDataFamilyDxf);
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Семейство по DXF", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Семейство по DXF", ex); }
 
 			// 5. Отдельная крупная кнопка "Пространства по АР"
-			try
-			{
-				ribbonPanel.AddItem(pushButtonDataSpacesFromRooms);
-			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Пространства по АР", ex); }
-
 			// 2. Отдельная крупная кнопка "Инфо vX.X.X" с прямо отображаемой версией
 			try
 			{
@@ -566,12 +504,12 @@ namespace BimboClub
 				};
 				ribbonPanel.AddItem(pushButtonDataInfo);
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка добавления Инфо", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка добавления Инфо", ex); }
 
 			// --- Панель: "Аналоги" ---
 			try
 			{
-				RibbonPanel analogsPanel = application.CreateRibbonPanel(tabName, "Аналоги");
+				RibbonPanel analogsPanel = _ribbon.CreatePanel(tabName, "Работа с моделью");
 
 				BitmapSource bitmapSourceSizer = LoadImage(System.IO.Path.Combine(text, "icon_sizer.png"));
 				BitmapSource bitmapSourceSizer16 = LoadImage(System.IO.Path.Combine(text, "icon_sizer_16.png"));
@@ -700,152 +638,16 @@ namespace BimboClub
 				};
 				analogsPanel.AddItem(btnPlanDimensions);
 			}
-			catch (Exception ex) { Logger.LogError("Ошибка создания панели Аналоги", ex); }
+			catch (Exception ex) { _ribbonFailed = true; Logger.LogError("Ошибка создания панели Аналоги", ex); }
 
 			// --- Wpf-маркер вкладки Revit (ModPlus style) ---
-			TrySetTabLogo(application, tabName);
-
-			return Result.Succeeded;
-		}
-
-		private void TrySetTabLogo(UIControlledApplication application, string tabName)
-		{
-			EventHandler<Autodesk.Revit.UI.Events.IdlingEventArgs> handler = null;
-			handler = (s, e) =>
+			if (!_ribbonFailed) _ribbon.Start();
+			else
 			{
-				try
-				{
-					application.Idling -= handler;
-				}
-				catch { }
-				ApplyTabLogoWpf(tabName);
-			};
-
-			try
-			{
-				application.Idling += handler;
+				_ribbon.Stop();
+				AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
 			}
-			catch { }
-
-			ApplyTabLogoWpf(tabName);
-		}
-
-		private void ApplyTabLogoWpf(string tabName)
-		{
-			try
-			{
-				Assembly adWinAsm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "AdWindows");
-				if (adWinAsm == null) return;
-
-				Type compMgrType = adWinAsm.GetType("Autodesk.Windows.ComponentManager");
-				if (compMgrType == null) return;
-
-				PropertyInfo ribbonProp = compMgrType.GetProperty("Ribbon", BindingFlags.Public | BindingFlags.Static);
-				if (ribbonProp == null) return;
-
-				object ribbonControl = ribbonProp.GetValue(null);
-				if (ribbonControl == null) return;
-
-				if (ribbonControl is System.Windows.Threading.DispatcherObject dispatcherObj)
-				{
-					dispatcherObj.Dispatcher.BeginInvoke(new Action(() =>
-					{
-						try
-						{
-							PropertyInfo tabsProp = ribbonControl.GetType().GetProperty("Tabs");
-							if (tabsProp == null) return;
-
-							var tabs = tabsProp.GetValue(ribbonControl) as IEnumerable;
-							if (tabs == null) return;
-
-							object targetTab = null;
-							foreach (var tab in tabs)
-							{
-								PropertyInfo titleProp = tab.GetType().GetProperty("Title");
-								PropertyInfo idProp = tab.GetType().GetProperty("Id");
-								string title = titleProp?.GetValue(tab)?.ToString();
-								string id = idProp?.GetValue(tab)?.ToString();
-
-								if (title == tabName || id == tabName || (title != null && title.Contains("BimboClub")))
-								{
-									targetTab = tab;
-									break;
-								}
-							}
-
-							if (targetTab == null) return;
-
-							var tabButtons = FindVisualChildren(ribbonControl as DependencyObject, "RibbonTabButton");
-							foreach (var btn in tabButtons)
-							{
-								PropertyInfo dataContextProp = btn.GetType().GetProperty("DataContext");
-								PropertyInfo contentProp = btn.GetType().GetProperty("Content");
-
-								object dc = dataContextProp?.GetValue(btn);
-								object contentVal = contentProp?.GetValue(btn);
-
-								if (dc == targetTab || (contentVal != null && contentVal.ToString().Contains("BimboClub")))
-								{
-									var stackPanel = new StackPanel
-									{
-										Orientation = Orientation.Horizontal,
-										VerticalAlignment = VerticalAlignment.Center,
-										Margin = new Thickness(0)
-									};
-
-									var redDot = new System.Windows.Shapes.Ellipse
-									{
-										Width = 8,
-										Height = 8,
-										Fill = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FFD700")), // Gold marker
-										Margin = new Thickness(0, 0, 6, 0),
-										VerticalAlignment = VerticalAlignment.Center,
-										SnapsToDevicePixels = true
-									};
-
-									var textBlock = new TextBlock
-									{
-										Text = tabName,
-										VerticalAlignment = VerticalAlignment.Center,
-										FontWeight = FontWeights.Bold,
-										FontSize = 11.5,
-										Margin = new Thickness(0)
-									};
-
-									stackPanel.Children.Add(redDot);
-									stackPanel.Children.Add(textBlock);
-
-									contentProp?.SetValue(btn, stackPanel);
-									break;
-								}
-							}
-						}
-						catch { }
-					}), System.Windows.Threading.DispatcherPriority.Background);
-				}
-			}
-			catch { }
-		}
-
-		private static List<DependencyObject> FindVisualChildren(DependencyObject depObj, string typeName)
-		{
-			var results = new List<DependencyObject>();
-			if (depObj == null) return results;
-
-			int count = VisualTreeHelper.GetChildrenCount(depObj);
-			for (int i = 0; i < count; i++)
-			{
-				DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-				if (child != null)
-				{
-					if (child.GetType().Name == typeName)
-					{
-						results.Add(child);
-					}
-					results.AddRange(FindVisualChildren(child, typeName));
-				}
-			}
-			return results;
+			return _ribbonFailed ? Result.Failed : Result.Succeeded;
 		}
 
 		private BitmapSource LoadImage(string path)
@@ -865,7 +667,8 @@ namespace BimboClub
 
 		public Result OnShutdown(UIControlledApplication application)
 		{
-			AppDomain.CurrentDomain.AssemblyResolve -= new ResolveEventHandler(this.OnAssemblyResolve);
+			_ribbon?.Stop();
+			AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
 			return Result.Succeeded;
 		}
 
@@ -886,7 +689,7 @@ namespace BimboClub
 						}
 					}
 				}
-				if (!string.IsNullOrEmpty(App.AssemblyDir))
+				if (args.RequestingAssembly == typeof(App).Assembly && !string.IsNullOrEmpty(App.AssemblyDir))
 				{
 					string text = System.IO.Path.Combine(App.AssemblyDir, assemblyName.Name + ".dll");
 					if (File.Exists(text))

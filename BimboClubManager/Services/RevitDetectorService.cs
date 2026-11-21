@@ -1,4 +1,5 @@
 using System;
+using BimboClub.Installation;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -53,10 +54,10 @@ namespace BimboClubManager.Services
                 // 1) Current user AppData
                 // 2) All users ProgramData
                 string appDataAddin = Path.Combine(appData, "Autodesk", "Revit", "Addins", year, "BimboClub.addin");
-                string appDataDll = Path.Combine(appData, "Autodesk", "Revit", "Addins", year, "BimboClub.dll");
+                string? appDataDll = PluginInstallation.ReadPayload(appDataAddin);
 
                 string progDataAddin = Path.Combine(programData, "Autodesk", "Revit", "Addins", year, "BimboClub.addin");
-                string progDataDll = Path.Combine(programData, "Autodesk", "Revit", "Addins", year, "BimboClub.dll");
+                string? progDataDll = PluginInstallation.ReadPayload(progDataAddin);
 
                 bool appDataExists = File.Exists(appDataAddin) && File.Exists(appDataDll);
                 bool progDataExists = File.Exists(progDataAddin) && File.Exists(progDataDll);
@@ -64,12 +65,12 @@ namespace BimboClubManager.Services
                 if (appDataExists)
                 {
                     info.AddinPath = appDataAddin;
-                    info.DllPath = appDataDll;
+                    info.DllPath = appDataDll ?? Path.Combine(Path.GetDirectoryName(appDataAddin)!, PluginInstallation.PayloadName);
                 }
-                else if (progDataExists)
+                else if (!File.Exists(appDataAddin) && progDataExists)
                 {
                     info.AddinPath = progDataAddin;
-                    info.DllPath = progDataDll;
+                    info.DllPath = progDataDll!;
                 }
                 else
                 {
@@ -81,7 +82,7 @@ namespace BimboClubManager.Services
                 // Detect Plugin installation
                 if (info.IsRevitInstalled)
                 {
-                    if (appDataExists || progDataExists)
+                    if (File.Exists(info.AddinPath) && File.Exists(info.DllPath))
                     {
                         info.IsPluginInstalled = true;
                         info.InstalledVersion = GetDllVersion(info.DllPath);

@@ -4,7 +4,7 @@
         Title="вљ« BimboClub | Коэффициенты теплопередачи"
         Height="500" Width="550"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E2E"
+        Background="#19191E"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#FFFFFF"
@@ -16,7 +16,7 @@
             <Setter Property="Control.Template">
                 <Setter.Value>
                     <ControlTemplate>
-                        <Rectangle Margin="-2" Stroke="#005FB8" StrokeThickness="2"
+                        <Rectangle Margin="-2" Stroke="#9D4D66" StrokeThickness="2"
                                    StrokeDashArray="2 2" RadiusX="4" RadiusY="4"/>
                     </ControlTemplate>
                 </Setter.Value>
@@ -25,7 +25,7 @@
 
         <!-- Primary Button -->
         <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#C91414"/>
+            <Setter Property="Background" Value="#9D4D66"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Height" Value="36"/>
@@ -44,11 +44,11 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#A50E0E"/>
+                    <Setter Property="Background" Value="#AE5D76"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Background" Value="#E0E0E0"/>
-                    <Setter Property="Foreground" Value="#888888"/>
+                    <Setter Property="Foreground" Value="#AAA6B5"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -60,7 +60,7 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="32"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#B0B0B0"/>
+            <Setter Property="BorderBrush" Value="#AAA6B5"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="FocusVisualStyle" Value="{StaticResource WcagFocusVisual}"/>
             <Setter Property="Template">
@@ -79,7 +79,7 @@
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#E5E5E5"/>
-                    <Setter Property="BorderBrush" Value="#005FB8"/>
+                    <Setter Property="BorderBrush" Value="#9D4D66"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -101,7 +101,7 @@
         <Border Grid.Row="0" BorderBrush="#EAEAEA" BorderThickness="0,0,0,1"
                 Padding="0,0,0,10" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="BimboClub" Foreground="#FFD700"
+                <TextBlock Text="BimboClub" Foreground="#C17E96"
                            FontWeight="Bold" FontSize="18"/>
                 <TextBlock Text=" | КОЭФФИЦИЕНТЫ ТЕПЛОПЕРЕДАЧИ (k)" Foreground="#FFFFFF"
                            FontWeight="SemiBold" FontSize="18" Margin="5,0,0,0"/>
@@ -126,7 +126,7 @@
                   HorizontalGridLinesBrush="#E0E0E0"
                   RowHeight="32"
                   HeadersVisibility="Column"
-                  Background="#1E1E2E"
+                  Background="#19191E"
                   BorderBrush="#D9D9D9"
                   BorderThickness="1">
             <DataGrid.Resources>
@@ -165,7 +165,7 @@
                             <Setter Property="HorizontalAlignment" Value="Center"/>
                             <Setter Property="VerticalAlignment" Value="Center"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="Foreground" Value="#005FB8"/>
+                            <Setter Property="Foreground" Value="#9D4D66"/>
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                     <DataGridTextColumn.EditingElementStyle>

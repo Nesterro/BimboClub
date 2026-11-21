@@ -154,7 +154,7 @@ namespace BimboClub
             Width = 560;
             Height = 720;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            Background = new SolidColorBrush(Color.FromRgb(25, 25, 30)); // #18181C
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
             MinHeight = 600;
@@ -162,9 +162,9 @@ namespace BimboClub
 
             // Цветовая палитра
             SolidColorBrush panelBg = new SolidColorBrush(Color.FromRgb(32, 32, 38)); // #202026
-            SolidColorBrush controlBg = new SolidColorBrush(Color.FromRgb(40, 40, 48)); // #282830
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
-            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(255, 46, 91)); // #FF2E5B (Scarlet)
+            SolidColorBrush controlBg = new SolidColorBrush(Color.FromRgb(45, 45, 54)); // #282830
+            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(65, 65, 77)); // #303038
+            SolidColorBrush activeBorderBrush = new SolidColorBrush(Color.FromRgb(193, 126, 150)); // #FF2E5B (Scarlet)
             SolidColorBrush textMuted = new SolidColorBrush(Color.FromRgb(160, 160, 170));
 
             // Стили
@@ -202,7 +202,7 @@ namespace BimboClub
             // 0. Шапка
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(Color.FromRgb(18, 18, 20), Color.FromRgb(157, 77, 102), 0.0),
                 Padding = new Thickness(15, 10, 15, 10)
             };
             Grid.SetRow(headerBorder, 0);
@@ -338,7 +338,7 @@ namespace BimboClub
             };
             _btnCopy.Click += BtnCopy_Click;
 
-            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(255, 46, 91), Color.FromRgb(179, 14, 45), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(Color.FromRgb(193, 126, 150), Color.FromRgb(157, 77, 102), 90.0);
             LinearGradientBrush hoverGrad = new LinearGradientBrush(Color.FromRgb(255, 80, 118), Color.FromRgb(210, 20, 60), 90.0);
             ApplyButtonStyles(_btnCopy, normalGrad, hoverGrad, roundedButtonStyle);
             Grid.SetColumn(_btnCopy, 1);
@@ -445,7 +445,7 @@ namespace BimboClub
                 Grid.SetColumn(txtName, 1);
                 row.Children.Add(txtName);
 
-                Border typeBorder = new Border { Background = new SolidColorBrush(Color.FromRgb(48, 48, 56)), CornerRadius = new CornerRadius(3), Padding = new Thickness(5, 1, 5, 1), HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
+                Border typeBorder = new Border { Background = new SolidColorBrush(Color.FromRgb(65, 65, 77)), CornerRadius = new CornerRadius(3), Padding = new Thickness(5, 1, 5, 1), HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center };
                 TextBlock txtType = new TextBlock { Text = item.ViewType, Foreground = Brushes.Gray, FontSize = 10, FontWeight = FontWeights.SemiBold };
                 typeBorder.Child = txtType;
                 Grid.SetColumn(typeBorder, 2);

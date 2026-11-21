@@ -5,7 +5,7 @@
         Height="840" Width="620"
         MinHeight="650" MinWidth="540"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E2E"
+        Background="#19191E"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#FFFFFF"
@@ -17,7 +17,7 @@
 
         <!-- Primary Button Style (Gold background, dark bold text) -->
         <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#FFD700"/>
+            <Setter Property="Background" Value="#C17E96"/>
             <Setter Property="Foreground" Value="#121020"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Height" Value="36"/>
@@ -37,20 +37,20 @@
                     <Setter Property="Background" Value="#FFE44D"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="#3F3F56"/>
-                    <Setter Property="Foreground" Value="#888888"/>
+                    <Setter Property="Background" Value="#41414D"/>
+                    <Setter Property="Foreground" Value="#AAA6B5"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
         <!-- Secondary Button Style -->
         <Style x:Key="SecondaryButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#252536"/>
+            <Setter Property="Background" Value="#24242B"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Height" Value="32"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#4F4F6E"/>
+            <Setter Property="BorderBrush" Value="#41414D"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -64,7 +64,7 @@
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#35354A"/>
-                    <Setter Property="BorderBrush" Value="#FFD700"/>
+                    <Setter Property="BorderBrush" Value="#C17E96"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -72,9 +72,9 @@
         <!-- Custom TextBox Style -->
         <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
             <Setter Property="Height" Value="32"/>
-            <Setter Property="Background" Value="#181824"/>
+            <Setter Property="Background" Value="#19191E"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4F4F6E"/>
+            <Setter Property="BorderBrush" Value="#41414D"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -86,7 +86,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#FFD700"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#C17E96"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -96,9 +96,9 @@
 
         <!-- Custom ListBox Style -->
         <Style x:Key="ModernListBoxStyle" TargetType="ListBox">
-            <Setter Property="BorderBrush" Value="#3F3F56"/>
+            <Setter Property="BorderBrush" Value="#41414D"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="#181824"/>
+            <Setter Property="Background" Value="#19191E"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -115,7 +115,7 @@
 
         <!-- Modern Dark ComboBoxItem Style -->
         <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="#1E1E2C"/>
+            <Setter Property="Background" Value="#19191E"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="Padding" Value="10,7"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -134,8 +134,8 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsHighlighted" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#383852"/>
-                                <Setter Property="Foreground" Value="#FFD700"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#2D2D36"/>
+                                <Setter Property="Foreground" Value="#C17E96"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="#4F46E5"/>
@@ -155,10 +155,10 @@
             </Grid>
             <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter TargetName="Border" Property="BorderBrush" Value="#FFD700"/>
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#C17E96"/>
                 </Trigger>
                 <Trigger Property="IsChecked" Value="True">
-                    <Setter TargetName="Border" Property="BorderBrush" Value="#FFD700"/>
+                    <Setter TargetName="Border" Property="BorderBrush" Value="#C17E96"/>
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
@@ -166,9 +166,9 @@
         <!-- Modern Dark ComboBox Style -->
         <Style TargetType="ComboBox">
             <Setter Property="Height" Value="32"/>
-            <Setter Property="Background" Value="#181824"/>
+            <Setter Property="Background" Value="#19191E"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
-            <Setter Property="BorderBrush" Value="#4F4F6E"/>
+            <Setter Property="BorderBrush" Value="#41414D"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,4"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -204,8 +204,8 @@
                                    Focusable="False" 
                                    PopupAnimation="Slide">
                                 <Border Name="DropDownBorder" 
-                                        Background="#1E1E2C" 
-                                        BorderBrush="#4F4F6E" 
+                                        Background="#19191E"
+                                        BorderBrush="#41414D"
                                         BorderThickness="1" 
                                         CornerRadius="5" 
                                         MinWidth="{Binding ActualWidth, ElementName=ToggleButton}" 
@@ -246,9 +246,9 @@
         </Grid.RowDefinitions>
 
         <!-- Title Header -->
-        <Border Grid.Row="0" BorderBrush="#3F3F56" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,12">
+        <Border Grid.Row="0" BorderBrush="#41414D" BorderThickness="0,0,0,1" Padding="0,0,0,8" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="BimboClub" Foreground="#FFD700" FontWeight="Bold" FontSize="18"/>
+                <TextBlock Text="BimboClub" Foreground="#C17E96" FontWeight="Bold" FontSize="18"/>
                 <TextBlock Text=" | ЭКСПОРТ В PDF" Foreground="#FFFFFF" FontWeight="SemiBold" FontSize="18" Margin="5,0,0,0"/>
                 <TextBlock x:Name="SelectedCountText" Text=" (выбрано: 0 из 0)" Foreground="#00E5FF" FontSize="13" VerticalAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
@@ -337,9 +337,9 @@
         </StackPanel>
 
         <!-- Advanced Options Grid -->
-        <Border Grid.Row="5" Background="#252536" BorderBrush="#3F3F56" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
+        <Border Grid.Row="5" Background="#24242B" BorderBrush="#41414D" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,0,0,12">
             <StackPanel>
-                <TextBlock Text="НАСТРОЙКИ ПЕЧАТИ И ЭКСПОРТА" FontWeight="Bold" FontSize="11" Foreground="#FFD700" Margin="0,0,0,8"/>
+                <TextBlock Text="НАСТРОЙКИ ПЕЧАТИ И ЭКСПОРТА" FontWeight="Bold" FontSize="11" Foreground="#C17E96" Margin="0,0,0,8"/>
                 
                 <!-- Output Folder Selection -->
                 <TextBlock Text="Папка сохранения:" FontWeight="SemiBold" Foreground="#D0D0E0" Margin="0,0,0,4"/>

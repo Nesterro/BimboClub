@@ -5,7 +5,7 @@
         Height="490" Width="560"
         MinHeight="450" MinWidth="480"
         WindowStartupLocation="CenterScreen"
-        Background="#181824"
+        Background="#19191E"
         FontFamily="Segoe UI"
         FontSize="13"
         Foreground="#E2E2EB"
@@ -13,12 +13,12 @@
 
     <Window.Resources>
         <!-- Brushes -->
-        <SolidColorBrush x:Key="BgDarkBrush" Color="#181824"/>
-        <SolidColorBrush x:Key="PanelDarkBrush" Color="#222232"/>
-        <SolidColorBrush x:Key="PanelSubtleBrush" Color="#2A2A3E"/>
-        <SolidColorBrush x:Key="BorderDarkBrush" Color="#38384E"/>
+        <SolidColorBrush x:Key="BgDarkBrush" Color="#19191E"/>
+        <SolidColorBrush x:Key="PanelDarkBrush" Color="#24242B"/>
+        <SolidColorBrush x:Key="PanelSubtleBrush" Color="#2D2D36"/>
+        <SolidColorBrush x:Key="BorderDarkBrush" Color="#2D2D36"/>
         <SolidColorBrush x:Key="TextWhiteBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="TextMutedBrush" Color="#9A9AB2"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#AAA6B5"/>
         <SolidColorBrush x:Key="AccentScarletBrush" Color="#D32F2F"/>
         <SolidColorBrush x:Key="AccentGreenBrush" Color="#2E7D32"/>
         <SolidColorBrush x:Key="AccentGreenHoverBrush" Color="#1B5E20"/>
@@ -69,7 +69,7 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#35354F"/>
+                    <Setter Property="Background" Value="#2D2D36"/>
                     <Setter Property="BorderBrush" Value="#4F4F72"/>
                 </Trigger>
             </Style.Triggers>
@@ -103,7 +103,7 @@
 
         <!-- Dark ComboBoxItem Style -->
         <Style TargetType="ComboBoxItem">
-            <Setter Property="Background" Value="#222232"/>
+            <Setter Property="Background" Value="#24242B"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="Padding" Value="10,6"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -116,10 +116,10 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsHighlighted" Value="True">
                                 <Setter TargetName="Bd" Property="Background" Value="#383855"/>
-                                <Setter Property="Foreground" Value="#FFD700"/>
+                                <Setter Property="Foreground" Value="#C17E96"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#B30E2D"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#9D4D66"/>
                                 <Setter Property="Foreground" Value="#FFFFFF"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>

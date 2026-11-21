@@ -24,14 +24,9 @@ namespace BimboClubManager.ViewModels
         private double _globalProgress;
         private string _progressText = string.Empty;
         private string _updateSource = string.Empty;
-        private bool _autoCloseRevit = false; // Never silently kill Revit by default
         private string _currentTab = "plugins"; // plugins, settings, about
         private string _changelog = "Загрузка списка изменений...";
         private string _latestVersion = "—";
-        private bool _showRevitWarning;
-        private string _revitWarningStatus = string.Empty;
-        private RevitVersionInfo? _pendingInstallVersion;
-        private bool _pendingInstallAll;
         private UpdateService.UpdateManifest? _lastManifest;
 
         public ObservableCollection<RevitVersionInfo> RevitVersions { get; } = new();
@@ -64,12 +59,6 @@ namespace BimboClubManager.ViewModels
         {
             get => UpdateSource;
             set { UpdateSource = value; OnPropertyChanged(); }
-        }
-
-        public bool AutoCloseRevit
-        {
-            get => _autoCloseRevit;
-            set { _autoCloseRevit = value; OnPropertyChanged(); }
         }
 
         public bool AutoCheckUpdates { get; set; } = true;
@@ -137,18 +126,6 @@ namespace BimboClubManager.ViewModels
         public string LatestReleaseName => string.IsNullOrEmpty(LatestVersion) || LatestVersion == "—" ? "Список изменений" : $"Версия {LatestVersion}";
         public string LatestReleaseBody => Changelog;
 
-        public bool ShowRevitWarning
-        {
-            get => _showRevitWarning;
-            set { _showRevitWarning = value; OnPropertyChanged(); }
-        }
-
-        public string RevitWarningStatus
-        {
-            get => _revitWarningStatus;
-            set { _revitWarningStatus = value; OnPropertyChanged(); }
-        }
-
         public bool HasUpdatesAvailable => RevitVersions.Any(v => v.IsRevitInstalled && v.IsUpdateAvailable);
         public int AvailableUpdatesCount => RevitVersions.Count(v => v.IsRevitInstalled && v.IsUpdateAvailable);
         public string UpdateAllButtonText => AvailableUpdatesCount > 0 ? $"Обновить все ({AvailableUpdatesCount})" : "Обновить все";
@@ -162,10 +139,6 @@ namespace BimboClubManager.ViewModels
         public ICommand UpdateAllCommand { get; }
         public ICommand UninstallCommand { get; }
         public ICommand SaveSettingsCommand { get; }
-        public ICommand CloseWarningCommand { get; }
-        public ICommand CheckRevitClosedCommand { get; }
-        public ICommand GracefulCloseRevitCommand { get; }
-        public ICommand ForceKillRevitCommand { get; }
 
         public MainViewModel()
         {
@@ -181,10 +154,6 @@ namespace BimboClubManager.ViewModels
             UninstallCommand = new RelayCommand<RevitVersionInfo>(ver => Uninstall(ver));
             SaveSettingsCommand = new RelayCommand(SaveSettings);
             
-            CloseWarningCommand = new RelayCommand(CancelWarning);
-            CheckRevitClosedCommand = new RelayCommand(async () => await CheckRevitClosedAndProceedAsync());
-            GracefulCloseRevitCommand = new RelayCommand(async () => await GracefulCloseRevitAndProceedAsync());
-            ForceKillRevitCommand = new RelayCommand(async () => await ForceKillRevitAndProceedAsync());
 
             LoadSettings();
             
@@ -329,128 +298,17 @@ namespace BimboClubManager.ViewModels
 
         private async Task StartInstallAsync(RevitVersionInfo? version)
         {
-            if (version == null) return;
-
-            // Check if Revit is currently running
-            if (_updateService.IsRevitRunning())
-            {
-                _pendingInstallVersion = version;
-                _pendingInstallAll = false;
-                RevitWarningStatus = string.Empty;
-                ShowRevitWarning = true;
-                return;
-            }
-
-            await ProceedInstallAsync(version);
+            if (version != null && !IsLoading) await ProceedInstallAsync(version);
         }
 
         private async Task StartUpdateAllAsync()
         {
-            var outdated = RevitVersions.Where(v => v.IsRevitInstalled && v.IsUpdateAvailable).ToList();
-            if (!outdated.Any())
-            {
-                MessageBox.Show("Все установленные версии плагина актуальны!", "Обновление", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            // Check if Revit is running
-            if (_updateService.IsRevitRunning())
-            {
-                _pendingInstallAll = true;
-                _pendingInstallVersion = null;
-                RevitWarningStatus = string.Empty;
-                ShowRevitWarning = true;
-                return;
-            }
-
-            await ProceedInstallAllAsync();
+            if (!IsLoading) await ProceedInstallAllAsync();
         }
 
-        private async Task CheckRevitClosedAndProceedAsync()
-        {
-            if (_updateService.IsRevitRunning())
-            {
-                RevitWarningStatus = "Autodesk Revit все еще запущен! Закройте его или нажмите «Закрыть Revit корректно».";
-                return;
-            }
-
-            ShowRevitWarning = false;
-            RevitWarningStatus = string.Empty;
-
-            if (_pendingInstallAll)
-            {
-                _pendingInstallAll = false;
-                await ProceedInstallAllAsync();
-            }
-            else if (_pendingInstallVersion != null)
-            {
-                var ver = _pendingInstallVersion;
-                _pendingInstallVersion = null;
-                await ProceedInstallAsync(ver);
-            }
-        }
-
-        private async Task GracefulCloseRevitAndProceedAsync()
-        {
-            RevitWarningStatus = "Отправлен запрос на закрытие окон Revit. Сохраните или синхронизируйте файл в диалоге Revit...";
-            bool closed = await _updateService.CloseRevitGracefullyAsync(8);
-            if (closed)
-            {
-                ShowRevitWarning = false;
-                RevitWarningStatus = string.Empty;
-
-                if (_pendingInstallAll)
-                {
-                    _pendingInstallAll = false;
-                    await ProceedInstallAllAsync();
-                }
-                else if (_pendingInstallVersion != null)
-                {
-                    var ver = _pendingInstallVersion;
-                    _pendingInstallVersion = null;
-                    await ProceedInstallAsync(ver);
-                }
-            }
-            else
-            {
-                RevitWarningStatus = "Revit ожидает ответа пользователя (сохранение/синхронизация). Завершите диалог в Revit.";
-            }
-        }
-
-        private async Task ForceKillRevitAndProceedAsync()
-        {
-            var confirm = MessageBox.Show(
-                "ВНИМАНИЕ! Принудительное завершение Revit приведет к потере всех несохраненных данных и сбою синхронизации с хранилищем!\n\nВы точно хотите принудительно завершить процесс Revit?",
-                "Подтверждение принудительного закрытия",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
-
-            if (confirm != MessageBoxResult.Yes) return;
-
-            _updateService.ForceKillRevit();
-            ShowRevitWarning = false;
-            RevitWarningStatus = string.Empty;
-
-            if (_pendingInstallAll)
-            {
-                _pendingInstallAll = false;
-                await ProceedInstallAllAsync();
-            }
-            else if (_pendingInstallVersion != null)
-            {
-                var ver = _pendingInstallVersion;
-                _pendingInstallVersion = null;
-                await ProceedInstallAsync(ver);
-            }
-        }
-
-        private void CancelWarning()
-        {
-            ShowRevitWarning = false;
-            RevitWarningStatus = string.Empty;
-            _pendingInstallVersion = null;
-            _pendingInstallAll = false;
-        }
+        private string SessionStatus() => _updateService.IsRevitRunning()
+            ? " В открытом Revit новые кнопки появятся после успешного переключения в паузе между командами. При первом переходе или если панель не поменялась, новая версия включится при следующем запуске."
+            : " Новая версия включится при запуске Revit.";
 
         private async Task ProceedInstallAsync(RevitVersionInfo version)
         {
@@ -478,7 +336,7 @@ namespace BimboClubManager.ViewModels
                 using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(5));
                 await _updateService.InstallUpdateAsync(version, manifest, UpdateSource, progress, cts.Token);
 
-                MessageBox.Show($"Плагин BimboClub (v{manifest.LatestVersion}) успешно установлен для Revit {version.Year}!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Плагин BimboClub (v{manifest.LatestVersion}) установлен для Revit {version.Year}.{SessionStatus()}", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 if (OperatingSystem.IsWindows())
                 {
@@ -531,7 +389,7 @@ namespace BimboClubManager.ViewModels
                     await _updateService.InstallUpdateAsync(ver, manifest, UpdateSource, progress, cts.Token);
                 }
 
-                MessageBox.Show($"Все плагины BimboClub успешно обновлены до версии {manifest.LatestVersion}!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Все плагины BimboClub установлены в версии {manifest.LatestVersion}.{SessionStatus()}", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 if (OperatingSystem.IsWindows())
                 {
@@ -578,7 +436,6 @@ namespace BimboClubManager.ViewModels
         private class UserSettings
         {
             public string UpdateSource { get; set; } = string.Empty;
-            public bool AutoCloseRevit { get; set; } = false;
         }
 
         private void LoadSettings()
@@ -597,7 +454,6 @@ namespace BimboClubManager.ViewModels
                     if (settings != null)
                     {
                         UpdateSource = string.IsNullOrEmpty(settings.UpdateSource) ? defaultRawPath : settings.UpdateSource;
-                        AutoCloseRevit = settings.AutoCloseRevit;
                         return;
                     }
                 }
@@ -608,7 +464,6 @@ namespace BimboClubManager.ViewModels
             }
 
             UpdateSource = defaultRawPath;
-            AutoCloseRevit = false;
         }
 
         private void SaveSettings()
@@ -625,7 +480,6 @@ namespace BimboClubManager.ViewModels
                 var settings = new UserSettings
                 {
                     UpdateSource = UpdateSource,
-                    AutoCloseRevit = AutoCloseRevit
                 };
 
                 string json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });

@@ -9,9 +9,13 @@
     <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <LangVersion>10.0</LangVersion>
+    <AssemblyName Condition="'$(BimboClubLive)' == 'true'">BimboClub.Tools.V$(Version.Replace('.', '_'))</AssemblyName>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="../Shared/PluginInstallation.cs" Link="Installation/PluginInstallation.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <!-- Ссылки для Revit 2024 (и старее) -->
     <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2024.0.0" ExcludeAssets="runtime" />
@@ -42,4 +46,8 @@
   <ItemGroup>
     <EmbeddedResource Include="LTools\Resources\*.png" />
   </ItemGroup>
+  <Target Name="CopyLivePayloadForPackaging" AfterTargets="Build"
+          Condition="'$(BimboClubLive)' == 'true' and '$(TargetFramework)' != ''">
+    <Copy SourceFiles="$(TargetPath)" DestinationFiles="$(TargetDir)BimboClub.dll" />
+  </Target>
 </Project>

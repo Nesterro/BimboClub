@@ -133,13 +133,13 @@ namespace BimboClub.Analogs.BaseLevel
             MinHeight = 450;
             MinWidth = 600;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28));
+            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(25, 25, 30));
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13;
 
             var bgCard = new SolidColorBrush(System.Windows.Media.Color.FromRgb(32, 32, 38));
-            var borderCard = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-            var accentRed = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
+            var borderCard = new SolidColorBrush(System.Windows.Media.Color.FromRgb(65, 65, 77));
+            var accentRed = new SolidColorBrush(System.Windows.Media.Color.FromRgb(157, 77, 102));
             var textMuted = new SolidColorBrush(System.Windows.Media.Color.FromRgb(180, 180, 200));
 
             WpfGrid mainGrid = new WpfGrid();
@@ -154,7 +154,7 @@ namespace BimboClub.Analogs.BaseLevel
             {
                 Background = new LinearGradientBrush(
                     System.Windows.Media.Color.FromRgb(18, 18, 20),
-                    System.Windows.Media.Color.FromRgb(179, 14, 45), 0),
+                    System.Windows.Media.Color.FromRgb(157, 77, 102), 0),
                 Padding = new Thickness(16, 12, 16, 12)
             };
             StackPanel headerStack = new StackPanel();
@@ -610,7 +610,7 @@ namespace BimboClub.Analogs.BaseLevel
                 Content = "OK",
                 Width = 80,
                 Height = 28,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45)),
+                Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(157, 77, 102)),
                 Foreground = Brushes.White,
                 FontWeight = FontWeights.Bold
             };

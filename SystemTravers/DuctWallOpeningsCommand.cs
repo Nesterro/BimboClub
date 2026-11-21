@@ -1539,7 +1539,7 @@ namespace DuctWallOpenings
             ResizeMode = ResizeMode.NoResize;
 
             // Настройка темы оформления BimboClub (Темная тема)
-            this.Background = new SolidColorBrush(Color.FromRgb(24, 24, 28)); // #18181C
+            this.Background = new SolidColorBrush(Color.FromRgb(25, 25, 30)); // #18181C
             this.FontFamily = new FontFamily("Segoe UI");
             this.FontSize = 13;
             this.Foreground = Brushes.White;
@@ -1558,7 +1558,7 @@ namespace DuctWallOpenings
 
             // Кисти
             SolidColorBrush bgBrush = new SolidColorBrush(Color.FromRgb(45, 45, 53)); // #2D2D35
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(48, 48, 56)); // #303038
+            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(65, 65, 77)); // #303038
 
             Style comboBoxItemStyle = new Style(typeof(ComboBoxItem));
             comboBoxItemStyle.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, bgBrush));
@@ -1577,7 +1577,7 @@ namespace DuctWallOpenings
             {
                 Background = new LinearGradientBrush(
                     Color.FromRgb(18, 18, 20),
-                    Color.FromRgb(179, 14, 45), // #B30E2D
+                    Color.FromRgb(157, 77, 102), // #B30E2D
                     0.0),
                 Padding = new Thickness(15, 10, 15, 10),
                 Height = 50
@@ -1749,7 +1749,7 @@ namespace DuctWallOpenings
                 Margin = new Thickness(0, 0, 10, 0),
                 IsDefault = true,
                 Style = roundedButtonStyle,
-                Background = new SolidColorBrush(Color.FromRgb(179, 14, 45)), // Brand crimson
+                Background = new SolidColorBrush(Color.FromRgb(157, 77, 102)), // Brand crimson
                 Foreground = Brushes.White,
                 FontWeight = FontWeights.Bold
             };
@@ -1953,13 +1953,13 @@ namespace DuctWallOpenings
             Height = 600.0;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             ResizeMode = ResizeMode.NoResize;
-            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(24, 24, 28));
+            Background = new SolidColorBrush(System.Windows.Media.Color.FromRgb(25, 25, 30));
             FontFamily = new FontFamily("Segoe UI");
             FontSize = 13.0;
 
-            SolidColorBrush panelBg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(40, 40, 48));
-            SolidColorBrush borderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(48, 48, 56));
-            SolidColorBrush accentBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(179, 14, 45));
+            SolidColorBrush panelBg = new SolidColorBrush(System.Windows.Media.Color.FromRgb(45, 45, 54));
+            SolidColorBrush borderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(65, 65, 77));
+            SolidColorBrush accentBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(157, 77, 102));
 
             try
             {
@@ -1980,7 +1980,7 @@ namespace DuctWallOpenings
 
             Border headerBorder = new Border
             {
-                Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(179, 14, 45), 0.0),
+                Background = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(18, 18, 20), System.Windows.Media.Color.FromRgb(157, 77, 102), 0.0),
                 Padding = new Thickness(15.0, 10.0, 15.0, 10.0)
             };
             grid.Children.Add(headerBorder);
@@ -2015,19 +2015,19 @@ namespace DuctWallOpenings
             contentBorder.Child = new ScrollViewer { Content = grid2, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
 
             Style style = new Style(typeof(TextBox));
-            style.Setters.Add(new Setter(TextBox.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36))));
+            style.Setters.Add(new Setter(TextBox.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(36, 36, 43))));
             style.Setters.Add(new Setter(TextBox.ForegroundProperty, Brushes.White));
             style.Setters.Add(new Setter(TextBox.BorderBrushProperty, borderBrush));
             style.Setters.Add(new Setter(TextBox.CaretBrushProperty, Brushes.White));
             style.Setters.Add(new Setter(TextBox.PaddingProperty, new Thickness(5, 2, 5, 2)));
 
             Style style2 = new Style(typeof(ComboBox));
-            style2.Setters.Add(new Setter(ComboBox.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36))));
+            style2.Setters.Add(new Setter(ComboBox.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(36, 36, 43))));
             style2.Setters.Add(new Setter(ComboBox.ForegroundProperty, Brushes.White));
             style2.Setters.Add(new Setter(ComboBox.BorderBrushProperty, borderBrush));
 
             Style style3 = new Style(typeof(ComboBoxItem));
-            style3.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(30, 30, 36))));
+            style3.Setters.Add(new Setter(ComboBoxItem.BackgroundProperty, new SolidColorBrush(System.Windows.Media.Color.FromRgb(36, 36, 43))));
             style3.Setters.Add(new Setter(ComboBoxItem.ForegroundProperty, Brushes.White));
             this.Resources[typeof(ComboBoxItem)] = style3;
 
@@ -2080,7 +2080,7 @@ namespace DuctWallOpenings
                 Margin = new Thickness(0.0, 0.0, 0.0, 10.0),
                 Style = roundedButtonStyle
             };
-            LinearGradientBrush normalGrad = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(255, 46, 91), System.Windows.Media.Color.FromRgb(179, 14, 45), 90.0);
+            LinearGradientBrush normalGrad = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(193, 126, 150), System.Windows.Media.Color.FromRgb(157, 77, 102), 90.0);
             LinearGradientBrush hoverGrad = new LinearGradientBrush(System.Windows.Media.Color.FromRgb(255, 80, 118), System.Windows.Media.Color.FromRgb(210, 20, 60), 90.0);
             this.ApplyButtonStyles(button, normalGrad, hoverGrad, roundedButtonStyle);
             button.Click += new RoutedEventHandler(this.SelectBtn_Click);
@@ -2273,7 +2273,7 @@ namespace DuctWallOpenings
         {
             Border border = new Border
             {
-                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(60, 60, 70)),
+                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromRgb(65, 65, 77)),
                 BorderThickness = new Thickness(0.0, 0.0, 0.0, 1.0),
                 Padding = new Thickness(0.0, 10.0, 0.0, 5.0),
                 Margin = new Thickness(0.0, 5.0, 0.0, 10.0)
@@ -2281,7 +2281,7 @@ namespace DuctWallOpenings
             TextBlock child = new TextBlock
             {
                 Text = text,
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 46, 91)),
+                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(193, 126, 150)),
                 FontWeight = FontWeights.Bold,
                 FontSize = 12.0
             };

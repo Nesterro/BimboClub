@@ -14,11 +14,11 @@ namespace BimboClub
         {
             if (window == null) return;
 
-            SolidColorBrush darkBg = new SolidColorBrush(Color.FromRgb(38, 38, 44));
-            SolidColorBrush popupBg = new SolidColorBrush(Color.FromRgb(30, 30, 36));
-            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(60, 60, 70));
-            SolidColorBrush accentRed = new SolidColorBrush(Color.FromRgb(179, 14, 45));
-            SolidColorBrush accentRedHover = new SolidColorBrush(Color.FromRgb(199, 16, 50));
+            SolidColorBrush darkBg = new SolidColorBrush(Color.FromRgb(36, 36, 43));
+            SolidColorBrush popupBg = new SolidColorBrush(Color.FromRgb(36, 36, 43));
+            SolidColorBrush borderBrush = new SolidColorBrush(Color.FromRgb(65, 65, 77));
+            SolidColorBrush accentRed = new SolidColorBrush(Color.FromRgb(157, 77, 102));
+            SolidColorBrush accentRedHover = new SolidColorBrush(Color.FromRgb(174, 93, 118));
 
             // Overriding SystemColors resources so built-in controls use dark background and white text
             window.Resources[SystemColors.WindowBrushKey] = popupBg;
@@ -73,9 +73,9 @@ namespace BimboClub
         public static Style CreateScarletTabItemStyle()
         {
             Style style = new Style(typeof(TabItem));
-            SolidColorBrush unselectedBg = new SolidColorBrush(Color.FromRgb(40, 40, 48));
-            SolidColorBrush selectedBg = new SolidColorBrush(Color.FromRgb(179, 14, 45));   // Scarlet Red #B30E2D
-            SolidColorBrush hoverBg = new SolidColorBrush(Color.FromRgb(199, 16, 50));      // Bright Scarlet Red #C71032
+            SolidColorBrush unselectedBg = new SolidColorBrush(Color.FromRgb(45, 45, 54));
+            SolidColorBrush selectedBg = new SolidColorBrush(Color.FromRgb(157, 77, 102));   // Scarlet Red #B30E2D
+            SolidColorBrush hoverBg = new SolidColorBrush(Color.FromRgb(174, 93, 118));      // Bright Scarlet Red #C71032
 
             style.Setters.Add(new Setter(TabItem.BackgroundProperty, unselectedBg));
             style.Setters.Add(new Setter(TabItem.ForegroundProperty, Brushes.White));
@@ -256,7 +256,7 @@ namespace BimboClub
             if (cb == null) return;
 
             SolidColorBrush popupBg = new SolidColorBrush(Color.FromRgb(30, 30, 40));
-            SolidColorBrush accentRed = new SolidColorBrush(Color.FromRgb(179, 14, 45));
+            SolidColorBrush accentRed = new SolidColorBrush(Color.FromRgb(157, 77, 102));
             SolidColorBrush border = borderBrush ?? new SolidColorBrush(Color.FromRgb(60, 60, 75));
             SolidColorBrush inputBg = bg ?? new SolidColorBrush(Color.FromRgb(38, 38, 48));
 
